@@ -39,7 +39,7 @@ export const FloatingContactPanel: React.FC = () => {
   return (
     <aside
       aria-label="Floating quick contact options"
-      className="fixed right-2 xs:right-3 sm:right-4 md:right-5 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-2.5 sm:gap-3.5 select-none pointer-events-none"
+      className="hidden md:flex fixed right-3 sm:right-4 md:right-5 top-1/2 -translate-y-1/2 z-40 flex-col items-center gap-2.5 sm:gap-3.5 select-none pointer-events-none"
     >
       {/* 1. CALL BUTTON */}
       <div
