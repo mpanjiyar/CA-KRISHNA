@@ -688,3 +688,7 @@ export const SECURITY_AUDIT_LOGS: SecurityAuditEntry[] = [
     details: 'Perfect forward secrecy enabled; legacy ciphers rejected.'
   }
 ];
+
+// Re-export OUR_OFFICES for convenience
+export { OUR_OFFICES, type OfficeLocation } from './indiaMapData';
+

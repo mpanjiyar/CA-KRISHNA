@@ -16,7 +16,6 @@ import { IndustriesSection } from './components/IndustriesSection';
 import { WhoWeHelp } from './components/WhoWeHelp';
 import { SpecializedSections } from './components/SpecializedSections';
 import { ProcessTimeline } from './components/ProcessTimeline';
-import { PanIndiaSection } from './components/PanIndiaSection';
 import { TestimonialsSection } from './components/TestimonialsSection';
 import { FaqSection } from './components/FaqSection';
 import { FinalHomeCta } from './components/FinalHomeCta';
@@ -124,8 +123,6 @@ export default function App() {
             />
 
             <ProcessTimeline />
-
-            <PanIndiaSection />
 
             <TestimonialsSection />
 
