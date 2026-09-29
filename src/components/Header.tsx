@@ -15,6 +15,7 @@ import { FIRM_DETAILS, CORE_SERVICES } from '../data/firmData';
 import { BrandHeaderLockup } from './CaLogo';
 import { WhatsAppOfficialIcon } from './FloatingContactPanel';
 import { PageRoute } from '../types';
+import { useSiteContent } from '../context/SiteContentContext';
 
 interface HeaderProps {
   currentRoute: PageRoute;
@@ -27,6 +28,8 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigate,
   onOpenConsultation
 }) => {
+  const { state } = useSiteContent();
+  const { firmDetails, services } = state;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [servicesMenuOpen, setServicesMenuOpen] = useState(false);
   const [mobileServicesExpanded, setMobileServicesExpanded] = useState(false);
@@ -118,31 +121,35 @@ export const Header: React.FC<HeaderProps> = ({
               <Phone size={12} className="text-[#F28C18] shrink-0" />
               <span className="hidden md:inline text-[10.5px] uppercase tracking-wider text-slate-300">Direct:</span>
               <a
-                href={`tel:${FIRM_DETAILS.phone1}`}
+                href={`tel:${firmDetails.phone1}`}
                 className="font-semibold text-[11px] sm:text-xs hover:text-[#F28C18] transition-colors focus-visible:underline min-h-[30px] flex items-center"
-                aria-label={`Call ${FIRM_DETAILS.phone1}`}
+                aria-label={`Call ${firmDetails.phone1}`}
               >
-                {FIRM_DETAILS.phone1}
+                {firmDetails.phone1}
               </a>
-              <span className="text-slate-400 hidden sm:inline">/</span>
-              <a
-                href={`tel:${FIRM_DETAILS.phone2}`}
-                className="font-semibold text-xs hover:text-[#F28C18] transition-colors focus-visible:underline hidden sm:flex items-center min-h-[30px]"
-                aria-label={`Call ${FIRM_DETAILS.phone2}`}
-              >
-                {FIRM_DETAILS.phone2}
-              </a>
+              {firmDetails.phone2 && (
+                <>
+                  <span className="text-slate-400 hidden sm:inline">/</span>
+                  <a
+                    href={`tel:${firmDetails.phone2}`}
+                    className="font-semibold text-xs hover:text-[#F28C18] transition-colors focus-visible:underline hidden sm:flex items-center min-h-[30px]"
+                    aria-label={`Call ${firmDetails.phone2}`}
+                  >
+                    {firmDetails.phone2}
+                  </a>
+                </>
+              )}
             </div>
 
             <span className="hidden lg:inline text-slate-500">|</span>
 
             <a
-              href={`mailto:${FIRM_DETAILS.email}`}
+              href={`mailto:${firmDetails.email}`}
               className="hidden lg:flex items-center gap-1.5 hover:text-white transition-colors text-slate-300 text-xs min-h-[30px]"
-              aria-label={`Email ${FIRM_DETAILS.email}`}
+              aria-label={`Email ${firmDetails.email}`}
             >
               <Mail size={13} className="text-[#F28C18]" />
-              <span className="truncate max-w-[200px]">{FIRM_DETAILS.email}</span>
+              <span className="truncate max-w-[200px]">{firmDetails.email}</span>
             </a>
           </div>
 
@@ -242,7 +249,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                   {/* 2-Column Responsive Service Grid */}
                   <div className="grid grid-cols-2 gap-2">
-                    {CORE_SERVICES.map((srv) => (
+                    {services.map((srv) => (
                       <div
                         key={srv.id}
                         role="menuitem"

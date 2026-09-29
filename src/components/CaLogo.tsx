@@ -1,16 +1,16 @@
 import React from 'react';
-import { useMedia } from '../context/MediaContext';
+import { useSiteContent } from '../context/SiteContentContext';
 
 /**
  * OfficialFirmLogo:
- * Dynamically displays the configured firm logo (from MediaContext / local uploads)
+ * Dynamically displays the configured firm logo (from SiteContentContext / local uploads)
  * or defaults to the official ICAI emblem.
  */
 export const OfficialFirmLogo: React.FC<{
   sizePx?: number;
   className?: string;
   alt?: string;
-  source?: 'header' | 'footer' | 'custom';
+  source?: 'header' | 'footer' | 'custom' | 'hero';
   customUrl?: string;
 }> = ({
   sizePx = 44,
@@ -19,11 +19,13 @@ export const OfficialFirmLogo: React.FC<{
   source = 'header',
   customUrl
 }) => {
-  const { settings } = useMedia();
+  const { state } = useSiteContent();
 
-  let logoUrl = settings.headerLogo || '/icai-emblem.svg';
+  let logoUrl = state.media.headerLogo || '/icai-emblem.svg';
   if (source === 'footer') {
-    logoUrl = settings.footerLogo || settings.headerLogo || '/icai-emblem.svg';
+    logoUrl = state.media.footerLogo || state.media.headerLogo || '/icai-emblem.svg';
+  } else if (source === 'hero') {
+    logoUrl = state.media.heroBadge || state.media.headerLogo || '/icai-emblem.svg';
   } else if (source === 'custom' && customUrl) {
     logoUrl = customUrl;
   }
@@ -53,7 +55,7 @@ export const CaIndiaLogo = OfficialFirmLogo;
 /**
  * BrandHeaderLockup:
  * Official Navigation Brand Lockup for PANJIYAR KRISHNA & CO.
- * Supports theme ('light' | 'dark'), source ('header' | 'footer'), and responsive sizes.
+ * Pulls firm name, designation, and logo dynamically from live admin state.
  */
 export const BrandHeaderLockup: React.FC<{
   theme?: 'dark' | 'light';
@@ -61,6 +63,7 @@ export const BrandHeaderLockup: React.FC<{
   onClick?: () => void;
   className?: string;
 }> = ({ theme = 'light', source = 'header', onClick, className = '' }) => {
+  const { state } = useSiteContent();
   const isDark = theme === 'dark';
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -77,7 +80,7 @@ export const BrandHeaderLockup: React.FC<{
       className={`inline-flex items-center gap-2.5 xs:gap-3 sm:gap-3.5 cursor-pointer group py-0.5 select-none focus-visible:outline-2 focus-visible:outline-[#0969C7] rounded-lg min-w-0 transition-opacity hover:opacity-95 ${className}`}
       role="button"
       tabIndex={0}
-      aria-label="PANJIYAR KRISHNA & CO. – Chartered Accountants Home"
+      aria-label={`${state.firmDetails.name} Home`}
     >
       {/* Official / Custom Logo Container with Responsive Breakpoint Sizing */}
       <div className="shrink-0 flex items-center justify-center">
@@ -108,7 +111,7 @@ export const BrandHeaderLockup: React.FC<{
             isDark ? 'text-white' : 'text-[#062A5A]'
           }`}
         >
-          PANJIYAR KRISHNA &amp; CO.
+          {state.firmDetails.name}
         </span>
         <div className="flex items-center gap-1.5 mt-0.5">
           <span
@@ -116,7 +119,7 @@ export const BrandHeaderLockup: React.FC<{
               isDark ? 'text-slate-300' : 'text-[#0969C7]'
             }`}
           >
-            Chartered Accountants
+            {state.firmDetails.designation || 'Chartered Accountants'}
           </span>
           <span className="w-1.5 h-1.5 rounded-full bg-[#F28C18] shrink-0" />
           <span
@@ -124,7 +127,7 @@ export const BrandHeaderLockup: React.FC<{
               isDark ? 'text-slate-400' : 'text-[#667085]'
             }`}
           >
-            Andheri (W), Mumbai
+            {state.firmDetails.address?.city ? `${state.firmDetails.address.locality || ''}, ${state.firmDetails.address.city}` : 'Andheri (W), Mumbai'}
           </span>
         </div>
       </div>

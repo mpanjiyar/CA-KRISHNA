@@ -1,8 +1,8 @@
 import React from 'react';
 import { Phone, Mail, MapPin } from 'lucide-react';
-import { FIRM_DETAILS } from '../data/firmData';
 import { BrandHeaderLockup } from './CaLogo';
 import { PageRoute } from '../types';
+import { useSiteContent } from '../context/SiteContentContext';
 
 interface FooterProps {
   onNavigate: (route: PageRoute, serviceId?: string) => void;
@@ -10,6 +10,9 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenConsultation }) => {
+  const { state } = useSiteContent();
+  const { firmDetails, services } = state;
+
   return (
     <footer className="w-full bg-[#031C3D] text-white border-t border-[#062A5A] pb-16 md:pb-0">
       <div className="max-w-7xl mx-auto px-3.5 xs:px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 lg:pt-16 pb-10">
@@ -22,7 +25,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenConsultation }
             </div>
 
             <p className="text-xs xs:text-sm text-slate-300 leading-relaxed mb-5 font-light max-w-sm">
-              PANJIYAR KRISHNA &amp; CO. is a dedicated Chartered Accountancy practice delivering excellence in tax advisory, statutory compliance, audit, and strategic financial planning across India.
+              {firmDetails.name} is a dedicated Chartered Accountancy practice delivering excellence in tax advisory, statutory compliance, audit, and strategic financial planning across India.
             </p>
 
             <div className="p-3 xs:p-3.5 rounded-xl bg-white/5 border border-white/10 max-w-sm">
@@ -30,156 +33,100 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenConsultation }
                 Firm Creed
               </div>
               <p className="font-manrope font-bold text-xs xs:text-sm text-white tracking-wide">
-                {FIRM_DETAILS.tagline}
+                {firmDetails.tagline}
               </p>
             </div>
           </div>
 
-          {/* Column 2: Services (lg:col-span-2) */}
-          <div className="lg:col-span-2 flex flex-col text-left">
+          {/* Column 2: Core Services (lg:col-span-3) */}
+          <div className="lg:col-span-3 flex flex-col text-left">
             <h4 className="font-manrope font-bold text-xs uppercase tracking-wider text-[#F28C18] mb-3 sm:mb-4">
-              Services
+              Practice Areas
             </h4>
             <ul className="space-y-1.5 xs:space-y-2 text-xs xs:text-sm text-slate-300">
+              {services.slice(0, 5).map((srv) => (
+                <li key={srv.id}>
+                  <button
+                    onClick={() => onNavigate('service-detail', srv.id)}
+                    className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
+                  >
+                    {srv.name}
+                  </button>
+                </li>
+              ))}
               <li>
                 <button
-                  onClick={() => onNavigate('service-detail', 'income-tax')}
-                  className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
-                >
-                  Income Tax
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('service-detail', 'gst-services')}
-                  className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
-                >
-                  GST
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('service-detail', 'tds-services')}
-                  className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
-                >
-                  TDS
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('service-detail', 'audit-assurance')}
-                  className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
-                >
-                  Audit
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('service-detail', 'accounting')}
-                  className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
-                >
-                  Accounting
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('service-detail', 'roc-compliance')}
-                  className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
-                >
-                  ROC &amp; Compliance
-                </button>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 3: Business & Advisory (lg:col-span-2) */}
-          <div className="lg:col-span-2 flex flex-col text-left">
-            <h4 className="font-manrope font-bold text-xs uppercase tracking-wider text-[#F28C18] mb-3 sm:mb-4">
-              Business
-            </h4>
-            <ul className="space-y-1.5 xs:space-y-2 text-xs xs:text-sm text-slate-300">
-              <li>
-                <button
-                  onClick={() => onNavigate('service-detail', 'registrations-licenses')}
-                  className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
-                >
-                  Registrations
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('service-detail', 'registrations-licenses')}
-                  className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
-                >
-                  Licenses
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('service-detail', 'loan-financing')}
-                  className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
-                >
-                  Loan &amp; Financing
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('service-detail', 'startup-advisory')}
-                  className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
-                >
-                  Startup Advisory
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('service-detail', 'accounting')}
-                  className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
-                >
-                  Financial Statements
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('location-andheri')}
+                  onClick={() => onNavigate('services')}
                   className="hover:text-white transition-colors py-1 text-left text-sky-400 font-medium min-h-[32px] inline-flex items-center"
                 >
-                  Andheri CA Office
+                  View All Services &rarr;
                 </button>
               </li>
             </ul>
           </div>
 
-          {/* Column 4: Contact & Office (lg:col-span-4) */}
-          <div className="sm:col-span-2 lg:col-span-4 flex flex-col text-left">
+          {/* Column 3: Regional & Strategic Links (lg:col-span-2) */}
+          <div className="lg:col-span-2 flex flex-col text-left">
             <h4 className="font-manrope font-bold text-xs uppercase tracking-wider text-[#F28C18] mb-3 sm:mb-4">
-              Contact &amp; Office
+              Regional Desks
+            </h4>
+            <ul className="space-y-1.5 xs:space-y-2 text-xs xs:text-sm text-slate-300">
+              {state.offices.slice(0, 4).map((off) => (
+                <li key={off.id}>
+                  <button
+                    onClick={() => onNavigate(off.isHeadquarter ? 'location-andheri' : 'contact')}
+                    className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
+                  >
+                    {off.city} {off.isHeadquarter ? '(HQ)' : 'Desk'}
+                  </button>
+                </li>
+              ))}
+              <li>
+                <button
+                  onClick={() => onNavigate('industries')}
+                  className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
+                >
+                  Industries We Serve
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 4: Contact & Office (lg:col-span-3) */}
+          <div className="sm:col-span-2 lg:col-span-3 flex flex-col text-left">
+            <h4 className="font-manrope font-bold text-xs uppercase tracking-wider text-[#F28C18] mb-3 sm:mb-4">
+              Contact &amp; Head Office
             </h4>
 
             <div className="space-y-3 text-xs xs:text-sm text-slate-300">
               <div className="flex items-center gap-2">
                 <Phone size={15} className="text-[#F28C18] shrink-0" />
                 <div className="flex items-center gap-2 flex-wrap">
-                  <a href={`tel:${FIRM_DETAILS.phone1}`} className="hover:underline text-white font-medium py-1">
-                    {FIRM_DETAILS.phone1}
+                  <a href={`tel:${firmDetails.phone1}`} className="hover:underline text-white font-medium py-1">
+                    {firmDetails.phone1}
                   </a>
-                  <span>/</span>
-                  <a href={`tel:${FIRM_DETAILS.phone2}`} className="hover:underline text-white font-medium py-1">
-                    {FIRM_DETAILS.phone2}
-                  </a>
+                  {firmDetails.phone2 && (
+                    <>
+                      <span>/</span>
+                      <a href={`tel:${firmDetails.phone2}`} className="hover:underline text-white font-medium py-1">
+                        {firmDetails.phone2}
+                      </a>
+                    </>
+                  )}
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
                 <Mail size={15} className="text-sky-400 shrink-0" />
-                <a href={`mailto:${FIRM_DETAILS.email}`} className="hover:underline text-white break-all py-1">
-                  {FIRM_DETAILS.email}
+                <a href={`mailto:${firmDetails.email}`} className="hover:underline text-white break-all py-1">
+                  {firmDetails.email}
                 </a>
               </div>
 
               <div className="flex items-start gap-2 pt-1">
                 <MapPin size={15} className="text-emerald-400 shrink-0 mt-0.5" />
                 <span className="leading-relaxed">
-                  102, Shourie Complex, Bombay Bazaar, Andheri (W), Mumbai – 400058, Maharashtra
+                  {firmDetails.address?.full || '102, Shourie Complex, Bombay Bazaar, Andheri (W), Mumbai – 400058'}
                 </span>
               </div>
             </div>
@@ -199,7 +146,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenConsultation }
         {/* Bottom Bar: Copyright & Compliance Disclaimer */}
         <div className="pt-6 sm:pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <p className="text-center md:text-left text-[11px] xs:text-xs">
-            &copy; 2026 {FIRM_DETAILS.name} All Rights Reserved.
+            &copy; {new Date().getFullYear()} {firmDetails.name} All Rights Reserved.
           </p>
 
           <div className="flex items-center gap-3 sm:gap-4 text-slate-400 flex-wrap justify-center text-[11px] xs:text-xs">

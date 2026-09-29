@@ -1,11 +1,12 @@
 import React from 'react';
 import { Phone, Mail, Award, CheckCircle2 } from 'lucide-react';
-import { FIRM_DETAILS } from '../data/firmData';
 import { CaEmblem } from './CaLogo';
-import { useMedia } from '../context/MediaContext';
+import { useSiteContent } from '../context/SiteContentContext';
 
 export const FounderSection: React.FC = () => {
-  const { settings } = useMedia();
+  const { state } = useSiteContent();
+  const { firmDetails, media } = state;
+
   return (
     <section className="w-full bg-[#F7F9FC] py-10 sm:py-16 lg:py-20 border-b border-[#D9E2EC]">
       <div className="max-w-5xl mx-auto px-3.5 xs:px-4 sm:px-6 lg:px-8">
@@ -25,10 +26,10 @@ export const FounderSection: React.FC = () => {
                 {/* Circular Profile Frame with ICAI Colors or Uploaded Photo */}
                 <div className="w-24 h-24 xs:w-28 xs:h-28 sm:w-34 sm:h-34 rounded-full bg-gradient-to-br from-[#062A5A] to-[#0969C7] p-1 shadow-sm flex items-center justify-center overflow-hidden">
                   <div className="w-full h-full rounded-full bg-white flex flex-col items-center justify-center p-2 text-center overflow-hidden">
-                    {settings.founderPhoto ? (
+                    {media.founderPhoto ? (
                       <img
-                        src={settings.founderPhoto}
-                        alt={FIRM_DETAILS.founder}
+                        src={media.founderPhoto}
+                        alt={firmDetails.founder}
                         className="w-full h-full object-cover rounded-full"
                       />
                     ) : (
@@ -50,13 +51,13 @@ export const FounderSection: React.FC = () => {
               </div>
 
               <span className="font-brand font-bold text-base sm:text-lg text-[#062A5A]">
-                {FIRM_DETAILS.founder}
+                {firmDetails.founder}
               </span>
               <span className="text-[11px] xs:text-xs uppercase tracking-wider font-semibold text-[#0969C7] mt-0.5">
-                {FIRM_DETAILS.founderTitle}
+                {firmDetails.founderTitle}
               </span>
               <span className="text-[11px] xs:text-xs text-[#667085] mt-0.5">
-                Andheri (W), Mumbai
+                {firmDetails.address?.locality || 'Andheri (W)'}, {firmDetails.address?.city || 'Mumbai'}
               </span>
             </div>
 
@@ -70,37 +71,39 @@ export const FounderSection: React.FC = () => {
               </div>
 
               <h2 className="font-manrope text-[20px] xs:text-[24px] sm:text-[28px] md:text-[32px] font-bold text-[#062A5A] tracking-tight leading-tight mb-1">
-                Meet CA Krishna Panjiyar
+                Meet {firmDetails.founder}
               </h2>
 
               <h3 className="text-xs xs:text-sm sm:text-base font-semibold text-[#0969C7] mb-2.5 sm:mb-3">
-                Founder &amp; Chartered Accountant
+                {firmDetails.founderTitle}
               </h3>
 
               <p className="text-xs xs:text-sm sm:text-base text-[#172033]/90 leading-[1.65] mb-5 font-normal">
-                CA Krishna Panjiyar leads <strong className="font-semibold text-[#062A5A]">PANJIYAR KRISHNA &amp; CO.</strong> with a focus on accuracy, professional integrity, responsive service and long-term client relationships. Specializing in corporate taxation, GST litigation, and strategic bank financing, he brings direct partner oversight to every client file.
+                {firmDetails.founder} leads <strong className="font-semibold text-[#062A5A]">{firmDetails.name}</strong> with a focus on accuracy, professional integrity, responsive service and long-term client relationships. Specializing in corporate taxation, GST litigation, and strategic bank financing, he brings direct partner oversight to every client file.
               </p>
 
               {/* Verified Contact Buttons */}
               <div className="flex flex-col xs:flex-row flex-wrap items-stretch sm:items-center gap-2 xs:gap-2.5">
                 <a
-                  href={`tel:${FIRM_DETAILS.phone1}`}
+                  href={`tel:${firmDetails.phone1}`}
                   className="inline-flex items-center justify-center gap-2 px-4 py-2.5 xs:px-5 xs:py-3 text-xs sm:text-sm font-semibold text-white bg-[#062A5A] hover:bg-[#031C3D] active:scale-[0.98] rounded-xl transition-all shadow-xs min-h-[44px]"
                 >
                   <Phone size={14} className="text-[#F28C18]" />
-                  <span>Call {FIRM_DETAILS.phone1}</span>
+                  <span>Call {firmDetails.phone1}</span>
                 </a>
 
-                <a
-                  href={`tel:${FIRM_DETAILS.phone2}`}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 xs:px-5 xs:py-3 text-xs sm:text-sm font-semibold text-[#062A5A] bg-[#EEF5FC] hover:bg-[#D9E2EC] active:scale-[0.98] border border-[#D9E2EC] rounded-xl transition-all min-h-[44px]"
-                >
-                  <Phone size={14} className="text-[#0969C7]" />
-                  <span>Call {FIRM_DETAILS.phone2}</span>
-                </a>
+                {firmDetails.phone2 && (
+                  <a
+                    href={`tel:${firmDetails.phone2}`}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 xs:px-5 xs:py-3 text-xs sm:text-sm font-semibold text-[#062A5A] bg-[#EEF5FC] hover:bg-[#D9E2EC] active:scale-[0.98] border border-[#D9E2EC] rounded-xl transition-all min-h-[44px]"
+                  >
+                    <Phone size={14} className="text-[#0969C7]" />
+                    <span>Call {firmDetails.phone2}</span>
+                  </a>
+                )}
 
                 <a
-                  href={`mailto:${FIRM_DETAILS.email}`}
+                  href={`mailto:${firmDetails.email}`}
                   className="inline-flex items-center justify-center gap-2 px-4 py-2.5 xs:px-5 xs:py-3 text-xs sm:text-sm font-semibold text-[#172033] hover:text-[#062A5A] hover:bg-slate-100 active:scale-[0.98] border border-[#D9E2EC] rounded-xl transition-all min-h-[44px]"
                 >
                   <Mail size={14} className="text-[#159447]" />
@@ -113,7 +116,6 @@ export const FounderSection: React.FC = () => {
           </div>
 
         </div>
-
       </div>
     </section>
   );
