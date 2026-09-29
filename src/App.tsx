@@ -16,7 +16,7 @@ import { IndustriesSection } from './components/IndustriesSection';
 import { WhoWeHelp } from './components/WhoWeHelp';
 import { SpecializedSections } from './components/SpecializedSections';
 import { ProcessTimeline } from './components/ProcessTimeline';
-import { InteractiveIndiaMap } from './components/InteractiveIndiaMap';
+import { PanIndiaSection } from './components/PanIndiaSection';
 import { TestimonialsSection } from './components/TestimonialsSection';
 import { FaqSection } from './components/FaqSection';
 import { FinalHomeCta } from './components/FinalHomeCta';
@@ -30,6 +30,7 @@ import { AboutFullPage } from './components/AboutFullPage';
 import { ClientPortal } from './components/ClientPortal';
 import { FloatingContactPanel } from './components/FloatingContactPanel';
 import { ScrollToTopButton } from './components/ScrollToTopButton';
+import { ScrollProgressBar } from './components/ScrollProgressBar';
 import { PageRoute } from './types';
 import { CORE_SERVICES, FIRM_DETAILS } from './data/firmData';
 
@@ -71,6 +72,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#172033] font-inter pb-16 md:pb-0">
+      {/* Scroll Progress Indicator Line (Every Page) */}
+      <ScrollProgressBar />
+
       {/* Main Header with Top Navy Info Bar & Desktop Mega Menu */}
       <Header
         currentRoute={currentRoute}
@@ -121,9 +125,7 @@ export default function App() {
 
             <ProcessTimeline />
 
-            <InteractiveIndiaMap
-              onOpenConsultation={(region) => handleOpenConsultation(region)}
-            />
+            <PanIndiaSection />
 
             <TestimonialsSection />
 
