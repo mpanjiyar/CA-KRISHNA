@@ -11,7 +11,7 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenConsultation }) => {
   return (
-    <footer className="w-full bg-[#031C3D] text-white border-t border-[#062A5A]">
+    <footer className="w-full bg-[#031C3D] text-white border-t border-[#062A5A] pb-16 md:pb-0">
       <div className="max-w-7xl mx-auto px-3.5 xs:px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 lg:pt-16 pb-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-8 pb-8 sm:pb-12 border-b border-white/10">
           
