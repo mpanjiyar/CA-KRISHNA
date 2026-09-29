@@ -30,18 +30,48 @@ import { ClientPortal } from './components/ClientPortal';
 import { FloatingContactPanel } from './components/FloatingContactPanel';
 import { ScrollToTopButton } from './components/ScrollToTopButton';
 import { ScrollProgressBar } from './components/ScrollProgressBar';
+import { AdminRoute } from './components/AdminRoute';
 import { PageRoute } from './types';
 import { CORE_SERVICES, FIRM_DETAILS } from './data/firmData';
 
 export default function App() {
-  const [currentRoute, setCurrentRoute] = useState<PageRoute>('home');
+  const [currentRoute, setCurrentRoute] = useState<PageRoute>(() => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname.toLowerCase();
+      if (path === '/admin' || path.startsWith('/admin/')) {
+        return 'admin';
+      }
+    }
+    return 'home';
+  });
   const [selectedServiceId, setSelectedServiceId] = useState<string>('income-tax');
   const [consultationModalOpen, setConsultationModalOpen] = useState(false);
   const [consultationDefaultService, setConsultationDefaultService] = useState('Income Tax Services');
 
-  // Scroll to top upon route change
+  // Handle URL synchronizing for /admin and popstate (browser back/forward)
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname.toLowerCase();
+      if (path === '/admin' || path.startsWith('/admin/')) {
+        setCurrentRoute('admin');
+      } else {
+        setCurrentRoute('home');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Scroll to top upon route change and update URL history if appropriate
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (typeof window !== 'undefined') {
+      const targetPath = currentRoute === 'admin' ? '/admin' : '/';
+      if (window.location.pathname !== targetPath && (currentRoute === 'admin' || window.location.pathname === '/admin')) {
+        window.history.pushState({}, '', targetPath);
+      }
+    }
   }, [currentRoute, selectedServiceId]);
 
   const handleNavigate = (route: PageRoute, serviceId?: string) => {
@@ -68,6 +98,15 @@ export default function App() {
       setCurrentRoute('services');
     }
   };
+
+  if (currentRoute === 'admin') {
+    return (
+      <div className="min-h-screen bg-[#F7F9FC] font-inter">
+        <ScrollProgressBar />
+        <AdminRoute onBackToWebsite={() => setCurrentRoute('home')} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#172033] font-inter pb-16 md:pb-0">

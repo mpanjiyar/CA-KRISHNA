@@ -1,39 +1,45 @@
 import React from 'react';
+import { useMedia } from '../context/MediaContext';
 
 /**
- * Official ICAI Firm Emblem Component
- * The authentic Institute of Chartered Accountants of India emblem uploaded by the user:
- * - 16 fluted petals with terracotta outline & red radiating striations
- * - Central deep navy blue circular medallion
- * - Golden mythical Garuda (eagle of vigilance) with outstretched spread wings
- * - Green pedestal base
- * - Flowing scroll ribbon with Sanskrit inscription "य एष सुप्तेषु जागर्ति"
- * - Outer circular title "THE INSTITUTE OF CHARTERED ACCOUNTANTS OF INDIA"
- * 
- * Uses vector SVG (/icai-emblem.svg) with fallback to high-fidelity vector definitions
- * ensuring crisp rendering at every resolution (retina, mobile, 4K).
+ * OfficialFirmLogo:
+ * Dynamically displays the configured firm logo (from MediaContext / local uploads)
+ * or defaults to the official ICAI emblem.
  */
 export const OfficialFirmLogo: React.FC<{
   sizePx?: number;
   className?: string;
   alt?: string;
+  source?: 'header' | 'footer' | 'custom';
+  customUrl?: string;
 }> = ({
   sizePx = 44,
   className = '',
-  alt = 'Official Emblem of The Institute of Chartered Accountants of India'
+  alt = 'Official Emblem of The Institute of Chartered Accountants of India',
+  source = 'header',
+  customUrl
 }) => {
+  const { settings } = useMedia();
+
+  let logoUrl = settings.headerLogo || '/icai-emblem.svg';
+  if (source === 'footer') {
+    logoUrl = settings.footerLogo || settings.headerLogo || '/icai-emblem.svg';
+  } else if (source === 'custom' && customUrl) {
+    logoUrl = customUrl;
+  }
+
   return (
     <div
-      className={`relative inline-flex items-center justify-center shrink-0 select-none ${className}`}
+      className={`relative inline-flex items-center justify-center shrink-0 select-none overflow-hidden ${className}`}
       style={{ width: sizePx, height: sizePx }}
       aria-label={alt}
     >
       <img
-        src="/icai-emblem.svg"
+        src={logoUrl}
         alt={alt}
         width={sizePx}
         height={sizePx}
-        className="w-full h-full object-contain drop-shadow-sm transition-transform duration-200"
+        className="w-full h-full object-contain drop-shadow-xs transition-all duration-200"
         loading="eager"
         decoding="async"
       />
@@ -46,18 +52,15 @@ export const CaIndiaLogo = OfficialFirmLogo;
 
 /**
  * BrandHeaderLockup:
- * The official Navigation Brand Lockup for PANJIYAR KRISHNA & CO.
- * Features:
- * - The authentic, high-res ICAI Emblem as uploaded by the user
- * - Responsively sized across mobile (36px), tablet (42px), and desktop (48px)
- * - Rock-solid alignment preventing line wraps, overflow, or vertical shift
- * - Clear contrast in both light (Header navbar) and dark (Footer) modes
+ * Official Navigation Brand Lockup for PANJIYAR KRISHNA & CO.
+ * Supports theme ('light' | 'dark'), source ('header' | 'footer'), and responsive sizes.
  */
 export const BrandHeaderLockup: React.FC<{
   theme?: 'dark' | 'light';
+  source?: 'header' | 'footer';
   onClick?: () => void;
   className?: string;
-}> = ({ theme = 'light', onClick, className = '' }) => {
+}> = ({ theme = 'light', source = 'header', onClick, className = '' }) => {
   const isDark = theme === 'dark';
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -76,14 +79,26 @@ export const BrandHeaderLockup: React.FC<{
       tabIndex={0}
       aria-label="PANJIYAR KRISHNA & CO. – Chartered Accountants Home"
     >
-      {/* Official ICAI Emblem Logo Container with Responsive Breakpoint Sizing */}
+      {/* Official / Custom Logo Container with Responsive Breakpoint Sizing */}
       <div className="shrink-0 flex items-center justify-center">
         {/* Mobile (320px - 479px): 36px */}
-        <OfficialFirmLogo sizePx={36} className="xs:hidden group-hover:scale-105 transition-transform" />
+        <OfficialFirmLogo 
+          source={source} 
+          sizePx={36} 
+          className="xs:hidden group-hover:scale-105 transition-transform" 
+        />
         {/* Medium Mobile / Small Tablet (480px - 639px): 42px */}
-        <OfficialFirmLogo sizePx={42} className="hidden xs:flex sm:hidden group-hover:scale-105 transition-transform" />
+        <OfficialFirmLogo 
+          source={source} 
+          sizePx={42} 
+          className="hidden xs:flex sm:hidden group-hover:scale-105 transition-transform" 
+        />
         {/* Tablet & Desktop (640px+): 48px */}
-        <OfficialFirmLogo sizePx={48} className="hidden sm:flex group-hover:scale-105 transition-transform" />
+        <OfficialFirmLogo 
+          source={source} 
+          sizePx={48} 
+          className="hidden sm:flex group-hover:scale-105 transition-transform" 
+        />
       </div>
 
       {/* Firm Typography Lockup */}

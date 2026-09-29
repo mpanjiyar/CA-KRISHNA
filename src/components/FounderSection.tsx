@@ -2,8 +2,10 @@ import React from 'react';
 import { Phone, Mail, Award, CheckCircle2 } from 'lucide-react';
 import { FIRM_DETAILS } from '../data/firmData';
 import { CaEmblem } from './CaLogo';
+import { useMedia } from '../context/MediaContext';
 
 export const FounderSection: React.FC = () => {
+  const { settings } = useMedia();
   return (
     <section className="w-full bg-[#F7F9FC] py-10 sm:py-16 lg:py-20 border-b border-[#D9E2EC]">
       <div className="max-w-5xl mx-auto px-3.5 xs:px-4 sm:px-6 lg:px-8">
@@ -17,18 +19,27 @@ export const FounderSection: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-8 items-center">
             
-            {/* Left Column: Founder Profile Monogram & Avatar Card */}
+            {/* Left Column: Visual CA Crest & Avatar Card */}
             <div className="md:col-span-4 flex flex-col items-center text-center">
               <div className="relative mb-2.5 sm:mb-4">
-                {/* Circular Profile Frame with Brand Colors */}
-                <div className="w-24 h-24 xs:w-28 xs:h-28 sm:w-34 sm:h-34 rounded-full bg-gradient-to-br from-[#062A5A] to-[#0969C7] p-1 shadow-sm flex items-center justify-center">
-                  <div className="w-full h-full rounded-full bg-white flex flex-col items-center justify-center p-2 text-center">
-                    <span className="font-brand font-bold text-xl xs:text-2xl sm:text-3xl text-[#062A5A] tracking-wider">
-                      KP
-                    </span>
-                    <span className="text-[9px] xs:text-[10px] font-bold text-[#0969C7] uppercase tracking-wider mt-0.5">
-                      FCA Member
-                    </span>
+                {/* Circular Profile Frame with ICAI Colors or Uploaded Photo */}
+                <div className="w-24 h-24 xs:w-28 xs:h-28 sm:w-34 sm:h-34 rounded-full bg-gradient-to-br from-[#062A5A] to-[#0969C7] p-1 shadow-sm flex items-center justify-center overflow-hidden">
+                  <div className="w-full h-full rounded-full bg-white flex flex-col items-center justify-center p-2 text-center overflow-hidden">
+                    {settings.founderPhoto ? (
+                      <img
+                        src={settings.founderPhoto}
+                        alt={FIRM_DETAILS.founder}
+                        className="w-full h-full object-cover rounded-full"
+                      />
+                    ) : (
+                      <>
+                        <CaEmblem sizePx={46} className="xs:hidden" />
+                        <CaEmblem sizePx={56} className="hidden xs:block" />
+                        <span className="text-[9px] xs:text-[10px] font-bold text-[#062A5A] uppercase tracking-wider mt-0.5">
+                          ICAI Member
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
 

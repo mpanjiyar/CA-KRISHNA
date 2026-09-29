@@ -6,7 +6,8 @@ export type PageRoute =
   | 'location-andheri' 
   | 'industries' 
   | 'portal' 
-  | 'contact';
+  | 'contact'
+  | 'admin';
 
 export interface ServiceItem {
   id: string;

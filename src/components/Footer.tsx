@@ -18,7 +18,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenConsultation }
           {/* Column 1: Brand & Logo (lg:col-span-4) */}
           <div className="sm:col-span-2 lg:col-span-4 flex flex-col text-left">
             <div className="mb-4">
-              <BrandHeaderLockup theme="dark" onClick={() => onNavigate('home')} />
+              <BrandHeaderLockup theme="dark" source="footer" onClick={() => onNavigate('home')} />
             </div>
 
             <p className="text-xs xs:text-sm text-slate-300 leading-relaxed mb-5 font-light max-w-sm">
@@ -208,6 +208,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenConsultation }
             <span className="hover:text-white cursor-pointer py-1">Terms of Engagement</span>
             <span>&middot;</span>
             <span className="hover:text-white cursor-pointer py-1">Statutory Disclaimer</span>
+            <span>&middot;</span>
+            <button 
+              onClick={() => onNavigate('admin')} 
+              className="hover:text-[#F28C18] text-slate-400 transition-colors py-1 flex items-center gap-1 font-medium"
+            >
+              <span>Admin Portal</span>
+            </button>
           </div>
         </div>
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { ShieldCheck, Target } from 'lucide-react';
 import { FIRM_DETAILS } from '../data/firmData';
 import { CaEmblem } from './CaLogo';
+import { useMedia } from '../context/MediaContext';
 
 interface AboutFullPageProps {
   onOpenConsultation: () => void;
@@ -14,6 +15,7 @@ export const AboutFullPage: React.FC<AboutFullPageProps> = ({
   onNavigateToIndustries,
   onNavigateToContact
 }) => {
+  const { settings } = useMedia();
   return (
     <div className="w-full bg-white text-left min-h-screen py-8 sm:py-12">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -60,8 +62,16 @@ export const AboutFullPage: React.FC<AboutFullPageProps> = ({
         <section className="mb-10 sm:mb-14 p-6 sm:p-8 rounded-2xl bg-[#F7F9FC] border border-[#D9E2EC]">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 items-center">
             <div className="md:col-span-4 flex flex-col items-center text-center">
-              <div className="p-3 rounded-full bg-white border border-[#D9E2EC] shadow-sm mb-3">
-                <CaEmblem sizePx={72} />
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white border border-[#D9E2EC] shadow-sm mb-3 flex items-center justify-center overflow-hidden p-1">
+                {settings.founderPhoto ? (
+                  <img
+                    src={settings.founderPhoto}
+                    alt={FIRM_DETAILS.founder}
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                ) : (
+                  <CaEmblem sizePx={72} />
+                )}
               </div>
               <h3 className="font-brand font-bold text-base sm:text-lg text-[#062A5A]">
                 {FIRM_DETAILS.founder}
