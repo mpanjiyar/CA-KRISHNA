@@ -1,0 +1,109 @@
+import React from 'react';
+import { Phone, Mail, Award, CheckCircle2 } from 'lucide-react';
+import { FIRM_DETAILS } from '../data/firmData';
+import { CaEmblem } from './CaLogo';
+
+export const FounderSection: React.FC = () => {
+  return (
+    <section className="w-full bg-[#F7F9FC] py-10 sm:py-16 lg:py-20 border-b border-[#D9E2EC]">
+      <div className="max-w-5xl mx-auto px-3.5 xs:px-4 sm:px-6 lg:px-8">
+        
+        {/* Card Container for Founder Profile */}
+        <div className="bg-white rounded-2xl shadow-xs border border-[#D9E2EC] p-4 xs:p-5 sm:p-8 md:p-10 relative overflow-hidden">
+          
+          {/* Subtle Navy Geometric Corner Accent */}
+          <div className="absolute top-0 right-0 w-36 h-36 bg-[#062A5A]/5 rounded-bl-full pointer-events-none" />
+          <div className="absolute top-0 left-0 w-20 xs:w-24 h-1.5 bg-[#F28C18]" />
+
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-8 items-center">
+            
+            {/* Left Column: Founder Profile Monogram & Avatar Card */}
+            <div className="md:col-span-4 flex flex-col items-center text-center">
+              <div className="relative mb-2.5 sm:mb-4">
+                {/* Circular Profile Frame with Brand Colors */}
+                <div className="w-24 h-24 xs:w-28 xs:h-28 sm:w-34 sm:h-34 rounded-full bg-gradient-to-br from-[#062A5A] to-[#0969C7] p-1 shadow-sm flex items-center justify-center">
+                  <div className="w-full h-full rounded-full bg-white flex flex-col items-center justify-center p-2 text-center">
+                    <span className="font-brand font-bold text-xl xs:text-2xl sm:text-3xl text-[#062A5A] tracking-wider">
+                      KP
+                    </span>
+                    <span className="text-[9px] xs:text-[10px] font-bold text-[#0969C7] uppercase tracking-wider mt-0.5">
+                      FCA Member
+                    </span>
+                  </div>
+                </div>
+
+                {/* Verified Green Dot */}
+                <div className="absolute bottom-1 right-1 w-5 h-5 xs:w-6 xs:h-6 rounded-full bg-[#159447] text-white flex items-center justify-center border-2 border-white shadow-xs">
+                  <CheckCircle2 size={13} />
+                </div>
+              </div>
+
+              <span className="font-brand font-bold text-base sm:text-lg text-[#062A5A]">
+                {FIRM_DETAILS.founder}
+              </span>
+              <span className="text-[11px] xs:text-xs uppercase tracking-wider font-semibold text-[#0969C7] mt-0.5">
+                {FIRM_DETAILS.founderTitle}
+              </span>
+              <span className="text-[11px] xs:text-xs text-[#667085] mt-0.5">
+                Andheri (W), Mumbai
+              </span>
+            </div>
+
+            {/* Right Column: Founder Narrative & Direct Contact Buttons */}
+            <div className="md:col-span-8 flex flex-col text-left">
+              <div className="inline-flex items-center gap-1.5 mb-1.5 text-[#0969C7]">
+                <Award size={15} />
+                <span className="text-[11px] xs:text-xs uppercase tracking-widest font-semibold">
+                  Leadership &amp; Practice Oversight
+                </span>
+              </div>
+
+              <h2 className="font-manrope text-[20px] xs:text-[24px] sm:text-[28px] md:text-[32px] font-bold text-[#062A5A] tracking-tight leading-tight mb-1">
+                Meet CA Krishna Panjiyar
+              </h2>
+
+              <h3 className="text-xs xs:text-sm sm:text-base font-semibold text-[#0969C7] mb-2.5 sm:mb-3">
+                Founder &amp; Chartered Accountant
+              </h3>
+
+              <p className="text-xs xs:text-sm sm:text-base text-[#172033]/90 leading-[1.65] mb-5 font-normal">
+                CA Krishna Panjiyar leads <strong className="font-semibold text-[#062A5A]">PANJIYAR KRISHNA &amp; CO.</strong> with a focus on accuracy, professional integrity, responsive service and long-term client relationships. Specializing in corporate taxation, GST litigation, and strategic bank financing, he brings direct partner oversight to every client file.
+              </p>
+
+              {/* Verified Contact Buttons */}
+              <div className="flex flex-col xs:flex-row flex-wrap items-stretch sm:items-center gap-2 xs:gap-2.5">
+                <a
+                  href={`tel:${FIRM_DETAILS.phone1}`}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 xs:px-5 xs:py-3 text-xs sm:text-sm font-semibold text-white bg-[#062A5A] hover:bg-[#031C3D] active:scale-[0.98] rounded-xl transition-all shadow-xs min-h-[44px]"
+                >
+                  <Phone size={14} className="text-[#F28C18]" />
+                  <span>Call {FIRM_DETAILS.phone1}</span>
+                </a>
+
+                <a
+                  href={`tel:${FIRM_DETAILS.phone2}`}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 xs:px-5 xs:py-3 text-xs sm:text-sm font-semibold text-[#062A5A] bg-[#EEF5FC] hover:bg-[#D9E2EC] active:scale-[0.98] border border-[#D9E2EC] rounded-xl transition-all min-h-[44px]"
+                >
+                  <Phone size={14} className="text-[#0969C7]" />
+                  <span>Call {FIRM_DETAILS.phone2}</span>
+                </a>
+
+                <a
+                  href={`mailto:${FIRM_DETAILS.email}`}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 xs:px-5 xs:py-3 text-xs sm:text-sm font-semibold text-[#172033] hover:text-[#062A5A] hover:bg-slate-100 active:scale-[0.98] border border-[#D9E2EC] rounded-xl transition-all min-h-[44px]"
+                >
+                  <Mail size={14} className="text-[#159447]" />
+                  <span>Email Us</span>
+                </a>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+  );
+};

@@ -1,0 +1,220 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Background Radial Gradient for Central Deep Blue Shield -->
+    <radialGradient id="icaiBlueGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#223E84" />
+      <stop offset="70%" stop-color="#192F69" />
+      <stop offset="100%" stop-color="#0F1E4A" />
+    </radialGradient>
+    <!-- Golden/Wheat Gradient for Garuda (Eagle) -->
+    <linearGradient id="garudaGold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FCE1A8" />
+      <stop offset="50%" stop-color="#E9C27D" />
+      <stop offset="100%" stop-color="#C89745" />
+    </linearGradient>
+    <linearGradient id="wingGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE7B8" />
+      <stop offset="60%" stop-color="#E7BC72" />
+      <stop offset="100%" stop-color="#BE8A38" />
+    </linearGradient>
+    <!-- Ribbon Gradient -->
+    <linearGradient id="ribbonGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#F2EDE4" />
+    </linearGradient>
+    <!-- Petal Border Bronze/Terracotta Gradient -->
+    <linearGradient id="bronzeBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C5763B" />
+      <stop offset="100%" stop-color="#934D1E" />
+    </linearGradient>
+
+    <!-- Circular path for "THE INSTITUTE OF CHARTERED ACCOUNTANTS OF INDIA" -->
+    <path id="textCirclePath" d="M 250, 250 m -218, 0 a 218,218 0 1,1 436,0 a 218,218 0 1,1 -436,0" />
+    <!-- Sanskrit Ribbon Path for "य एष सुप्तेषु जागर्ति" -->
+    <path id="sanskritRibbonPath" d="M 172, 362 Q 250, 400 328, 362" />
+  </defs>
+
+  <g id="icai-emblem-root">
+    <!-- 1. Outer Petals Floral Rosette (16 Fluted Petals) -->
+    <g id="petals" transform="translate(250, 250)">
+      <!-- 16 Fluted Petals surrounding the central emblem -->
+      <!-- Each petal has a scalloped fluted contour, ivory fill, fine red vertical radiating lines, and brown-terracotta border -->
+      <path d="M -30,-190 C -15,-205 15,-205 30,-190 C 42,-175 45,-165 35,-155 C 20,-145 -20,-145 -35,-155 C -45,-165 -42,-175 -30,-190 Z" fill="#FFFDF8" stroke="#A8572A" stroke-width="3" />
+      <path d="M 0,-158 L 0,-195 M -8,-160 L -12,-192 M 8,-160 L 12,-192 M -16,-162 L -20,-185 M 16,-162 L 20,-185" stroke="#D32F2F" stroke-width="1.6" opacity="0.85" />
+
+      <!-- Petal 2 (22.5 deg) -->
+      <g transform="rotate(22.5)">
+        <path d="M -30,-190 C -15,-205 15,-205 30,-190 C 42,-175 45,-165 35,-155 C 20,-145 -20,-145 -35,-155 C -45,-165 -42,-175 -30,-190 Z" fill="#FFFDF8" stroke="#A8572A" stroke-width="3" />
+        <path d="M 0,-158 L 0,-195 M -8,-160 L -12,-192 M 8,-160 L 12,-192 M -16,-162 L -20,-185 M 16,-162 L 20,-185" stroke="#D32F2F" stroke-width="1.6" opacity="0.85" />
+      </g>
+      <!-- Petal 3 (45 deg) -->
+      <g transform="rotate(45)">
+        <path d="M -30,-190 C -15,-205 15,-205 30,-190 C 42,-175 45,-165 35,-155 C 20,-145 -20,-145 -35,-155 C -45,-165 -42,-175 -30,-190 Z" fill="#FFFDF8" stroke="#A8572A" stroke-width="3" />
+        <path d="M 0,-158 L 0,-195 M -8,-160 L -12,-192 M 8,-160 L 12,-192 M -16,-162 L -20,-185 M 16,-162 L 20,-185" stroke="#D32F2F" stroke-width="1.6" opacity="0.85" />
+      </g>
+      <!-- Petal 4 (67.5 deg) -->
+      <g transform="rotate(67.5)">
+        <path d="M -30,-190 C -15,-205 15,-205 30,-190 C 42,-175 45,-165 35,-155 C 20,-145 -20,-145 -35,-155 C -45,-165 -42,-175 -30,-190 Z" fill="#FFFDF8" stroke="#A8572A" stroke-width="3" />
+        <path d="M 0,-158 L 0,-195 M -8,-160 L -12,-192 M 8,-160 L 12,-192 M -16,-162 L -20,-185 M 16,-162 L 20,-185" stroke="#D32F2F" stroke-width="1.6" opacity="0.85" />
+      </g>
+      <!-- Petal 5 (90 deg) -->
+      <g transform="rotate(90)">
+        <path d="M -30,-190 C -15,-205 15,-205 30,-190 C 42,-175 45,-165 35,-155 C 20,-145 -20,-145 -35,-155 C -45,-165 -42,-175 -30,-190 Z" fill="#FFFDF8" stroke="#A8572A" stroke-width="3" />
+        <path d="M 0,-158 L 0,-195 M -8,-160 L -12,-192 M 8,-160 L 12,-192 M -16,-162 L -20,-185 M 16,-162 L 20,-185" stroke="#D32F2F" stroke-width="1.6" opacity="0.85" />
+      </g>
+      <!-- Petal 6 (112.5 deg) -->
+      <g transform="rotate(112.5)">
+        <path d="M -30,-190 C -15,-205 15,-205 30,-190 C 42,-175 45,-165 35,-155 C 20,-145 -20,-145 -35,-155 C -45,-165 -42,-175 -30,-190 Z" fill="#FFFDF8" stroke="#A8572A" stroke-width="3" />
+        <path d="M 0,-158 L 0,-195 M -8,-160 L -12,-192 M 8,-160 L 12,-192 M -16,-162 L -20,-185 M 16,-162 L 20,-185" stroke="#D32F2F" stroke-width="1.6" opacity="0.85" />
+      </g>
+      <!-- Petal 7 (135 deg) -->
+      <g transform="rotate(135)">
+        <path d="M -30,-190 C -15,-205 15,-205 30,-190 C 42,-175 45,-165 35,-155 C 20,-145 -20,-145 -35,-155 C -45,-165 -42,-175 -30,-190 Z" fill="#FFFDF8" stroke="#A8572A" stroke-width="3" />
+        <path d="M 0,-158 L 0,-195 M -8,-160 L -12,-192 M 8,-160 L 12,-192 M -16,-162 L -20,-185 M 16,-162 L 20,-185" stroke="#D32F2F" stroke-width="1.6" opacity="0.85" />
+      </g>
+      <!-- Petal 8 (157.5 deg) -->
+      <g transform="rotate(157.5)">
+        <path d="M -30,-190 C -15,-205 15,-205 30,-190 C 42,-175 45,-165 35,-155 C 20,-145 -20,-145 -35,-155 C -45,-165 -42,-175 -30,-190 Z" fill="#FFFDF8" stroke="#A8572A" stroke-width="3" />
+        <path d="M 0,-158 L 0,-195 M -8,-160 L -12,-192 M 8,-160 L 12,-192 M -16,-162 L -20,-185 M 16,-162 L 20,-185" stroke="#D32F2F" stroke-width="1.6" opacity="0.85" />
+      </g>
+      <!-- Petal 9 (180 deg) -->
+      <g transform="rotate(180)">
+        <path d="M -30,-190 C -15,-205 15,-205 30,-190 C 42,-175 45,-165 35,-155 C 20,-145 -20,-145 -35,-155 C -45,-165 -42,-175 -30,-190 Z" fill="#FFFDF8" stroke="#A8572A" stroke-width="3" />
+        <path d="M 0,-158 L 0,-195 M -8,-160 L -12,-192 M 8,-160 L 12,-192 M -16,-162 L -20,-185 M 16,-162 L 20,-185" stroke="#D32F2F" stroke-width="1.6" opacity="0.85" />
+      </g>
+      <!-- Petal 10 (202.5 deg) -->
+      <g transform="rotate(202.5)">
+        <path d="M -30,-190 C -15,-205 15,-205 30,-190 C 42,-175 45,-165 35,-155 C 20,-145 -20,-145 -35,-155 C -45,-165 -42,-175 -30,-190 Z" fill="#FFFDF8" stroke="#A8572A" stroke-width="3" />
+        <path d="M 0,-158 L 0,-195 M -8,-160 L -12,-192 M 8,-160 L 12,-192 M -16,-162 L -20,-185 M 16,-162 L 20,-185" stroke="#D32F2F" stroke-width="1.6" opacity="0.85" />
+      </g>
+      <!-- Petal 11 (225 deg) -->
+      <g transform="rotate(225)">
+        <path d="M -30,-190 C -15,-205 15,-205 30,-190 C 42,-175 45,-165 35,-155 C 20,-145 -20,-145 -35,-155 C -45,-165 -42,-175 -30,-190 Z" fill="#FFFDF8" stroke="#A8572A" stroke-width="3" />
+        <path d="M 0,-158 L 0,-195 M -8,-160 L -12,-192 M 8,-160 L 12,-192 M -16,-162 L -20,-185 M 16,-162 L 20,-185" stroke="#D32F2F" stroke-width="1.6" opacity="0.85" />
+      </g>
+      <!-- Petal 12 (247.5 deg) -->
+      <g transform="rotate(247.5)">
+        <path d="M -30,-190 C -15,-205 15,-205 30,-190 C 42,-175 45,-165 35,-155 C 20,-145 -20,-145 -35,-155 C -45,-165 -42,-175 -30,-190 Z" fill="#FFFDF8" stroke="#A8572A" stroke-width="3" />
+        <path d="M 0,-158 L 0,-195 M -8,-160 L -12,-192 M 8,-160 L 12,-192 M -16,-162 L -20,-185 M 16,-162 L 20,-185" stroke="#D32F2F" stroke-width="1.6" opacity="0.85" />
+      </g>
+      <!-- Petal 13 (270 deg) -->
+      <g transform="rotate(270)">
+        <path d="M -30,-190 C -15,-205 15,-205 30,-190 C 42,-175 45,-165 35,-155 C 20,-145 -20,-145 -35,-155 C -45,-165 -42,-175 -30,-190 Z" fill="#FFFDF8" stroke="#A8572A" stroke-width="3" />
+        <path d="M 0,-158 L 0,-195 M -8,-160 L -12,-192 M 8,-160 L 12,-192 M -16,-162 L -20,-185 M 16,-162 L 20,-185" stroke="#D32F2F" stroke-width="1.6" opacity="0.85" />
+      </g>
+      <!-- Petal 14 (292.5 deg) -->
+      <g transform="rotate(292.5)">
+        <path d="M -30,-190 C -15,-205 15,-205 30,-190 C 42,-175 45,-165 35,-155 C 20,-145 -20,-145 -35,-155 C -45,-165 -42,-175 -30,-190 Z" fill="#FFFDF8" stroke="#A8572A" stroke-width="3" />
+        <path d="M 0,-158 L 0,-195 M -8,-160 L -12,-192 M 8,-160 L 12,-192 M -16,-162 L -20,-185 M 16,-162 L 20,-185" stroke="#D32F2F" stroke-width="1.6" opacity="0.85" />
+      </g>
+      <!-- Petal 15 (315 deg) -->
+      <g transform="rotate(315)">
+        <path d="M -30,-190 C -15,-205 15,-205 30,-190 C 42,-175 45,-165 35,-155 C 20,-145 -20,-145 -35,-155 C -45,-165 -42,-175 -30,-190 Z" fill="#FFFDF8" stroke="#A8572A" stroke-width="3" />
+        <path d="M 0,-158 L 0,-195 M -8,-160 L -12,-192 M 8,-160 L 12,-192 M -16,-162 L -20,-185 M 16,-162 L 20,-185" stroke="#D32F2F" stroke-width="1.6" opacity="0.85" />
+      </g>
+      <!-- Petal 16 (337.5 deg) -->
+      <g transform="rotate(337.5)">
+        <path d="M -30,-190 C -15,-205 15,-205 30,-190 C 42,-175 45,-165 35,-155 C 20,-145 -20,-145 -35,-155 C -45,-165 -42,-175 -30,-190 Z" fill="#FFFDF8" stroke="#A8572A" stroke-width="3" />
+        <path d="M 0,-158 L 0,-195 M -8,-160 L -12,-192 M 8,-160 L 12,-192 M -16,-162 L -20,-185 M 16,-162 L 20,-185" stroke="#D32F2F" stroke-width="1.6" opacity="0.85" />
+      </g>
+    </g>
+
+    <!-- 2. Concentric Decorative Borders -->
+    <circle cx="250" cy="250" r="150" fill="none" stroke="#D87834" stroke-width="4.5" />
+    <circle cx="250" cy="250" r="145" fill="none" stroke="#FFFFFF" stroke-width="2" />
+
+    <!-- 3. Central Deep Royal Blue Disc (ICAI Core Shield) -->
+    <circle cx="250" cy="250" r="142" fill="url(#icaiBlueGrad)" stroke="#192F69" stroke-width="2" />
+
+    <!-- 4. Green Pedestal Base under Garuda -->
+    <ellipse cx="250" cy="355" rx="55" ry="18" fill="#159447" stroke="#0E6830" stroke-width="1.5" />
+
+    <!-- 5. Majestic Garuda (Vedic Eagle / Bird of Vigilance) -->
+    <!-- Left Wing (Spread with intricate layered plumage) -->
+    <g id="left-wing">
+      <!-- Outer Primary Feathers -->
+      <path d="M 220, 270 C 190, 260 140, 240 138, 175 C 137, 140 160, 130 168, 142 C 172, 160 185, 205 212, 235 Z" fill="url(#wingGold)" stroke="#A07227" stroke-width="1.2" />
+      <!-- Feather Strands Layer 1 -->
+      <path d="M 148, 155 C 158, 195 185, 240 215, 255" fill="none" stroke="#8E631F" stroke-width="1.2" />
+      <path d="M 158, 170 C 168, 205 192, 248 218, 260" fill="none" stroke="#8E631F" stroke-width="1.2" />
+      <path d="M 170, 185 C 180, 218 200, 255 220, 265" fill="none" stroke="#8E631F" stroke-width="1.2" />
+      <!-- Inner Secondary Feathers Covert -->
+      <path d="M 215, 240 C 180, 245 155, 235 150, 205 C 175, 230 195, 245 220, 255 Z" fill="#FADCA2" stroke="#A07227" stroke-width="1" />
+      <path d="M 218, 255 C 185, 265 165, 260 160, 235 C 180, 255 200, 262 222, 268 Z" fill="#FADCA2" stroke="#A07227" stroke-width="1" />
+      <path d="M 220, 270 C 195, 282 178, 275 172, 255 C 190, 275 208, 280 224, 282 Z" fill="#ECC37A" stroke="#A07227" stroke-width="1" />
+      <path d="M 222, 285 C 202, 298 188, 290 182, 275 C 198, 290 212, 292 225, 292 Z" fill="#E2B467" stroke="#A07227" stroke-width="1" />
+    </g>
+
+    <!-- Right Wing (Symmetrical Spread Feathers) -->
+    <g id="right-wing">
+      <!-- Outer Primary Feathers -->
+      <path d="M 280, 270 C 310, 260 360, 240 362, 175 C 363, 140 340, 130 332, 142 C 328, 160 315, 205 288, 235 Z" fill="url(#wingGold)" stroke="#A07227" stroke-width="1.2" />
+      <!-- Feather Strands Layer 1 -->
+      <path d="M 352, 155 C 342, 195 315, 240 285, 255" fill="none" stroke="#8E631F" stroke-width="1.2" />
+      <path d="M 342, 170 C 332, 205 308, 248 282, 260" fill="none" stroke="#8E631F" stroke-width="1.2" />
+      <path d="M 330, 185 C 320, 218 300, 255 280, 265" fill="none" stroke="#8E631F" stroke-width="1.2" />
+      <!-- Inner Secondary Feathers Covert -->
+      <path d="M 285, 240 C 320, 245 345, 235 350, 205 C 325, 230 305, 245 280, 255 Z" fill="#FADCA2" stroke="#A07227" stroke-width="1" />
+      <path d="M 282, 255 C 315, 265 335, 260 340, 235 C 320, 255 300, 262 278, 268 Z" fill="#FADCA2" stroke="#A07227" stroke-width="1" />
+      <path d="M 280, 270 C 305, 282 322, 275 328, 255 C 310, 275 292, 280 276, 282 Z" fill="#ECC37A" stroke="#A07227" stroke-width="1" />
+      <path d="M 278, 285 C 298, 298 312, 290 318, 275 C 302, 290 288, 292 275, 292 Z" fill="#E2B467" stroke="#A07227" stroke-width="1" />
+    </g>
+
+    <!-- Garuda Body & Head (Facing Left as in ICAI Official Emblem) -->
+    <!-- Torso / Chest with Scaled Plumage -->
+    <path d="M 230, 222 C 224, 250 218, 285 224, 318 C 228, 335 240, 345 250, 345 C 260, 345 272, 335 276, 318 C 282, 285 276, 250 270, 222 Z" fill="url(#garudaGold)" stroke="#A07227" stroke-width="1.5" />
+    
+    <!-- Fine Torso Feather Scales -->
+    <g stroke="#976922" stroke-width="1" fill="none" opacity="0.8">
+      <path d="M 238, 240 Q 250, 246 262, 240" />
+      <path d="M 235, 252 Q 250, 258 265, 252" />
+      <path d="M 233, 264 Q 250, 270 267, 264" />
+      <path d="M 232, 276 Q 250, 282 268, 276" />
+      <path d="M 232, 288 Q 250, 294 268, 288" />
+      <path d="M 234, 300 Q 250, 306 266, 300" />
+      <path d="M 238, 312 Q 250, 317 262, 312" />
+      <path d="M 242, 324 Q 250, 328 258, 324" />
+    </g>
+
+    <!-- Neck & Head (Facing Left with Aquiline Curved Beak) -->
+    <path d="M 242, 222 C 238, 205 235, 185 245, 172 C 255, 168 268, 172 272, 188 C 275, 202 268, 218 258, 222 Z" fill="url(#garudaGold)" stroke="#A07227" stroke-width="1.3" />
+    <!-- Beak Hooked Forward-Left -->
+    <path d="M 240, 182 C 226, 185 220, 192 222, 198 C 226, 200 234, 194 242, 190 Z" fill="#D39F38" stroke="#875816" stroke-width="1.2" />
+    <!-- Vigilant Eye -->
+    <circle cx="248" cy="182" r="3.2" fill="#FFFFFF" stroke="#68410B" stroke-width="0.8" />
+    <circle cx="247" cy="182" r="1.8" fill="#1A1A1A" />
+
+    <!-- Garuda Legs and Talons Gripping Green Mound -->
+    <path d="M 235, 335 L 232, 350 M 238, 336 L 238, 352 M 242, 336 L 244, 351" stroke="#A07227" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M 265, 335 L 268, 350 M 262, 336 L 262, 352 M 258, 336 L 256, 351" stroke="#A07227" stroke-width="2.5" stroke-linecap="round" />
+
+    <!-- 6. Traditional Flowing Motto Ribbon (Scroll) at Base -->
+    <!-- Scroll Folds on Left and Right -->
+    <path d="M 130, 330 L 160, 336 L 155, 362 L 125, 354 Z" fill="#E8DFD3" stroke="#A83232" stroke-width="1.5" />
+    <path d="M 370, 330 L 340, 336 L 345, 362 L 375, 354 Z" fill="#E8DFD3" stroke="#A83232" stroke-width="1.5" />
+    <!-- Ribbon Ends Notch Cut -->
+    <polygon points="125,354 135,342 127,330 142,333 138,358" fill="#D32F2F" />
+    <polygon points="375,354 365,342 373,330 358,333 362,358" fill="#D32F2F" />
+
+    <!-- Main Curved Banner Body -->
+    <path d="M 152, 342 Q 250, 385 348, 342 L 354, 375 Q 250, 420 146, 375 Z" fill="url(#ribbonGrad)" stroke="#B71C1C" stroke-width="2" />
+    <!-- Inner Red Boundary Lines on Ribbon -->
+    <path d="M 154, 346 Q 250, 388 346, 346" fill="none" stroke="#D32F2F" stroke-width="1" />
+    <path d="M 150, 371 Q 250, 415 350, 371" fill="none" stroke="#D32F2F" stroke-width="1" />
+
+    <!-- Sanskrit Motto: य एष सुप्तेषु जागर्ति (Kathopanishad: "Ya esha supteshu jagarti" - That which is vigilant while everyone is asleep) -->
+    <text font-family="'Noto Sans Devanagari', 'Sanskrit Text', 'Arial Unicode MS', serif" font-size="14.5" font-weight="bold" fill="#B71C1C">
+      <textPath href="#sanskritRibbonPath" startOffset="50%" text-anchor="middle">
+        य एष सुप्तेषु जागर्ति
+      </textPath>
+    </text>
+
+    <!-- 7. Outer Circular Lettering: "THE INSTITUTE OF CHARTERED ACCOUNTANTS OF INDIA" -->
+    <!-- Rendered in classic serif typography with golden-bronze shadow & clean legibility -->
+    <text font-family="'Libre Baskerville', 'Times New Roman', Georgia, serif" font-size="19" font-weight="700" letter-spacing="3.2px" fill="#A45520" stroke="#7A3C13" stroke-width="0.5">
+      <textPath href="#textCirclePath" startOffset="25%" text-anchor="middle">
+        THE INSTITUTE OF CHARTERED ACCOUNTANTS OF INDIA
+      </textPath>
+    </text>
+  </g>
+</svg>

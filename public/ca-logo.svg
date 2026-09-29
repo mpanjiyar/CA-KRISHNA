@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="46" fill="#FFFFFF" stroke="#0969C7" stroke-width="2" />
+  <path d="M 24,34 A 30,30 0 0,1 77,38" stroke="#F28C18" stroke-width="5" stroke-linecap="round" fill="none" />
+  <path d="M 76,66 A 30,30 0 0,1 23,62" stroke="#159447" stroke-width="5" stroke-linecap="round" fill="none" />
+  <text x="49" y="59" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="35" letter-spacing="-1.2px" fill="#062A5A" text-anchor="middle">CA</text>
+  <circle cx="72" cy="38" r="3.6" fill="#159447" />
+</svg>
