@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowRight, CheckCircle2, Shield, Landmark, Scale, FileText } from 'lucide-react';
-import { FIRM_DETAILS } from '../data/firmData';
 import { CaEmblem } from './CaLogo';
+import { useFirmData } from '../context/FirmDataContext';
 
 interface AboutSectionProps {
   onLearnMore: () => void;
@@ -12,6 +12,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
   onLearnMore,
   onOpenConsultation
 }) => {
+  const { firmDetails, websiteText } = useFirmData();
   return (
     <section className="w-full bg-white py-10 sm:py-16 lg:py-20 border-b border-[#D9E2EC]">
       <div className="max-w-7xl mx-auto px-3.5 xs:px-4 sm:px-6 lg:px-8">
@@ -27,15 +28,15 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
             </div>
 
             <h2 className="font-manrope text-[22px] xs:text-[26px] sm:text-[32px] lg:text-[38px] font-bold text-[#062A5A] tracking-tight leading-[1.18] mb-3.5 sm:mb-5">
-              Your Trusted Partner in Taxation, Compliance &amp; Growth
+              {firmDetails.mainPositioning}
             </h2>
 
             <p className="text-xs xs:text-sm sm:text-[16px] text-[#172033]/90 leading-[1.65] mb-4 sm:mb-5">
-              At <strong className="font-semibold text-[#062A5A]">PANJIYAR KRISHNA &amp; CO.</strong>, we combine professional Chartered Accountancy expertise with a practical understanding of business, taxation, accounting and regulatory compliance. Our focus is to provide accurate, transparent and dependable financial solutions that help individuals and businesses make informed decisions and grow with confidence.
+              {websiteText.aboutPillarsText}
             </p>
 
             <p className="text-xs xs:text-sm text-[#667085] leading-[1.6] mb-6 sm:mb-7">
-              Based in Andheri (W), Mumbai, our practice serves a diverse portfolio spanning ambitious startups, established manufacturers, retail merchants, service professionals, and corporate entities nationwide through robust digital audit workflows and direct partner advisory.
+              Based in {firmDetails.address.locality}, {firmDetails.address.city}, our practice serves a diverse portfolio spanning ambitious startups, established manufacturers, retail merchants, service professionals, and corporate entities nationwide through robust digital audit workflows and direct partner advisory.
             </p>
 
             {/* 3 Core Commitments */}
@@ -175,10 +176,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
               </div>
               <div className="text-left min-w-0 flex-1">
                 <h5 className="font-manrope font-bold text-xs xs:text-sm text-[#062A5A] leading-tight truncate">
-                  {FIRM_DETAILS.founder}
+                  {firmDetails.founder}
                 </h5>
                 <p className="text-[10.5px] xs:text-xs text-[#0969C7] font-medium mt-0.5 truncate">
-                  {FIRM_DETAILS.founderTitle}
+                  {firmDetails.founderTitle}
                 </p>
               </div>
               <span className="text-[10px] xs:text-[11px] font-semibold text-[#159447] bg-[#159447]/10 px-2 py-0.5 rounded-full shrink-0">

@@ -1,8 +1,8 @@
 import React from 'react';
 import { ShieldCheck, Target } from 'lucide-react';
-import { FIRM_DETAILS } from '../data/firmData';
 import { CaEmblem } from './CaLogo';
 import { useMedia } from '../context/MediaContext';
+import { useFirmData } from '../context/FirmDataContext';
 
 interface AboutFullPageProps {
   onOpenConsultation: () => void;
@@ -16,13 +16,14 @@ export const AboutFullPage: React.FC<AboutFullPageProps> = ({
   onNavigateToContact
 }) => {
   const { settings } = useMedia();
+  const { firmDetails } = useFirmData();
   return (
     <div className="w-full bg-white text-left min-h-screen py-8 sm:py-12">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Breadcrumb */}
         <div className="text-xs text-[#667085] mb-6 flex items-center gap-1.5 flex-wrap">
-          <span>Home</span> / <span className="text-[#0969C7] font-semibold">About PANJIYAR KRISHNA &amp; CO.</span>
+          <span>Home</span> / <span className="text-[#0969C7] font-semibold">About {firmDetails.name}</span>
         </div>
 
         {/* H1 & Header */}
@@ -35,11 +36,11 @@ export const AboutFullPage: React.FC<AboutFullPageProps> = ({
           </div>
 
           <h1 className="font-manrope text-[28px] sm:text-[38px] lg:text-[44px] font-bold text-[#062A5A] tracking-tight leading-[1.12] mb-4 sm:mb-5">
-            About PANJIYAR KRISHNA &amp; CO.
+            About {firmDetails.name}
           </h1>
 
           <p className="text-base sm:text-lg text-[#172033]/90 leading-relaxed max-w-3xl font-normal">
-            PANJIYAR KRISHNA &amp; CO. is an established Chartered Accountancy firm headquartered in Andheri (W), Mumbai. We provide end-to-end accounting, taxation, GST, audit, corporate compliance, and business financing solutions across India with a relentless focus on accuracy and client trust.
+            {firmDetails.name} is an established Chartered Accountancy firm headquartered in {firmDetails.address.locality}, {firmDetails.address.city}. We provide end-to-end accounting, taxation, GST, audit, corporate compliance, and business financing solutions across India with a relentless focus on accuracy and client trust.
           </p>
         </div>
 
@@ -49,11 +50,11 @@ export const AboutFullPage: React.FC<AboutFullPageProps> = ({
             Our Firm
           </h2>
           <p className="text-sm sm:text-base text-[#172033]/85 leading-relaxed mb-5 font-normal">
-            At PANJIYAR KRISHNA &amp; CO., we combine professional Chartered Accountancy expertise with a practical understanding of business, taxation, accounting and regulatory compliance. Our focus is to provide accurate, transparent and dependable financial solutions that help individuals and businesses make informed decisions and grow with confidence.
+            At {firmDetails.name}, we combine professional Chartered Accountancy expertise with a practical understanding of business, taxation, accounting and regulatory compliance. Our focus is to provide accurate, transparent and dependable financial solutions that help individuals and businesses make informed decisions and grow with confidence.
           </p>
           <div className="p-5 sm:p-6 rounded-2xl bg-[#EEF5FC] border border-[#D9E2EC] text-xs sm:text-sm text-[#062A5A] leading-relaxed">
             <p>
-              &ldquo;{FIRM_DETAILS.supportingPositioning}&rdquo;
+              &ldquo;{firmDetails.supportingPositioning}&rdquo;
             </p>
           </div>
         </section>
@@ -66,7 +67,7 @@ export const AboutFullPage: React.FC<AboutFullPageProps> = ({
                 {settings.founderPhoto ? (
                   <img
                     src={settings.founderPhoto}
-                    alt={FIRM_DETAILS.founder}
+                    alt={firmDetails.founder}
                     className="w-full h-full object-cover rounded-full"
                   />
                 ) : (
@@ -74,42 +75,42 @@ export const AboutFullPage: React.FC<AboutFullPageProps> = ({
                 )}
               </div>
               <h3 className="font-brand font-bold text-base sm:text-lg text-[#062A5A]">
-                {FIRM_DETAILS.founder}
+                {firmDetails.founder}
               </h3>
               <p className="text-xs uppercase tracking-wider font-semibold text-[#0969C7]">
-                {FIRM_DETAILS.founderTitle}
+                {firmDetails.founderTitle}
               </p>
             </div>
 
             <div className="md:col-span-8">
               <h2 className="font-manrope text-xl sm:text-2xl font-bold text-[#062A5A] mb-1.5 tracking-tight">
-                CA Krishna Panjiyar
+                {firmDetails.founder}
               </h2>
               <p className="text-xs font-semibold text-[#0969C7] uppercase tracking-wider mb-3">
-                Founder &amp; Chartered Accountant
+                {firmDetails.founderTitle}
               </p>
               <p className="text-xs sm:text-sm text-[#172033]/90 leading-relaxed mb-5">
-                CA Krishna Panjiyar leads PANJIYAR KRISHNA &amp; CO. with a focus on accuracy, professional integrity, responsive service and long-term client relationships. Under his leadership, the firm has established a reputation for meticulous regulatory documentation, proactive tax planning, and strategic loan syndication.
+                {firmDetails.founder} leads {firmDetails.name} with a focus on accuracy, professional integrity, responsive service and long-term client relationships. Under his leadership, the firm has established a reputation for meticulous regulatory documentation, proactive tax planning, and strategic loan syndication.
               </p>
 
               <div className="flex flex-wrap items-center gap-2.5">
                 <a
-                  href={`tel:${FIRM_DETAILS.phone1}`}
+                  href={`tel:${firmDetails.phone1}`}
                   className="px-4 py-2 text-xs font-semibold bg-[#062A5A] text-white rounded-lg hover:bg-[#031C3D] min-h-[38px] flex items-center"
                 >
-                  Call {FIRM_DETAILS.phone1}
+                  Call {firmDetails.phone1}
                 </a>
                 <a
-                  href={`tel:${FIRM_DETAILS.phone2}`}
+                  href={`tel:${firmDetails.phone2}`}
                   className="px-4 py-2 text-xs font-semibold bg-[#EEF5FC] text-[#062A5A] border border-[#D9E2EC] rounded-lg min-h-[38px] flex items-center"
                 >
-                  Call {FIRM_DETAILS.phone2}
+                  Call {firmDetails.phone2}
                 </a>
                 <a
-                  href={`mailto:${FIRM_DETAILS.email}`}
+                  href={`mailto:${firmDetails.email}`}
                   className="px-4 py-2 text-xs font-semibold text-[#0969C7] hover:underline min-h-[38px] flex items-center break-all"
                 >
-                  {FIRM_DETAILS.email}
+                  {firmDetails.email}
                 </a>
               </div>
             </div>

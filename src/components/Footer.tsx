@@ -2,7 +2,7 @@ import React from 'react';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import { BrandHeaderLockup } from './CaLogo';
 import { PageRoute } from '../types';
-import { useSiteContent } from '../context/SiteContentContext';
+import { useFirmData } from '../context/FirmDataContext';
 
 interface FooterProps {
   onNavigate: (route: PageRoute, serviceId?: string) => void;
@@ -10,9 +10,7 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenConsultation }) => {
-  const { state } = useSiteContent();
-  const { firmDetails, services } = state;
-
+  const { firmDetails, services } = useFirmData();
   return (
     <footer className="w-full bg-[#031C3D] text-white border-t border-[#062A5A] pb-16 md:pb-0">
       <div className="max-w-7xl mx-auto px-3.5 xs:px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 lg:pt-16 pb-10">
@@ -38,13 +36,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenConsultation }
             </div>
           </div>
 
-          {/* Column 2: Core Services (lg:col-span-3) */}
-          <div className="lg:col-span-3 flex flex-col text-left">
+          {/* Column 2: Services (lg:col-span-2) */}
+          <div className="lg:col-span-2 flex flex-col text-left">
             <h4 className="font-manrope font-bold text-xs uppercase tracking-wider text-[#F28C18] mb-3 sm:mb-4">
-              Practice Areas
+              Services
             </h4>
             <ul className="space-y-1.5 xs:space-y-2 text-xs xs:text-sm text-slate-300">
-              {services.slice(0, 5).map((srv) => (
+              {services.slice(0, 6).map((srv) => (
                 <li key={srv.id}>
                   <button
                     onClick={() => onNavigate('service-detail', srv.id)}
@@ -54,48 +52,70 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenConsultation }
                   </button>
                 </li>
               ))}
-              <li>
-                <button
-                  onClick={() => onNavigate('services')}
-                  className="hover:text-white transition-colors py-1 text-left text-sky-400 font-medium min-h-[32px] inline-flex items-center"
-                >
-                  View All Services &rarr;
-                </button>
-              </li>
             </ul>
           </div>
 
-          {/* Column 3: Regional & Strategic Links (lg:col-span-2) */}
+          {/* Column 3: Business & Advisory (lg:col-span-2) */}
           <div className="lg:col-span-2 flex flex-col text-left">
             <h4 className="font-manrope font-bold text-xs uppercase tracking-wider text-[#F28C18] mb-3 sm:mb-4">
-              Regional Desks
+              Business
             </h4>
             <ul className="space-y-1.5 xs:space-y-2 text-xs xs:text-sm text-slate-300">
-              {state.offices.slice(0, 4).map((off) => (
-                <li key={off.id}>
-                  <button
-                    onClick={() => onNavigate(off.isHeadquarter ? 'location-andheri' : 'contact')}
-                    className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
-                  >
-                    {off.city} {off.isHeadquarter ? '(HQ)' : 'Desk'}
-                  </button>
-                </li>
-              ))}
               <li>
                 <button
-                  onClick={() => onNavigate('industries')}
+                  onClick={() => onNavigate('service-detail', 'registrations-licenses')}
                   className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
                 >
-                  Industries We Serve
+                  Registrations
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('service-detail', 'registrations-licenses')}
+                  className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
+                >
+                  Licenses
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('service-detail', 'loan-financing')}
+                  className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
+                >
+                  Loan &amp; Financing
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('service-detail', 'startup-advisory')}
+                  className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
+                >
+                  Startup Advisory
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('service-detail', 'accounting')}
+                  className="hover:text-white transition-colors py-1 text-left min-h-[32px] inline-flex items-center"
+                >
+                  Financial Statements
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('location-andheri')}
+                  className="hover:text-white transition-colors py-1 text-left text-sky-400 font-medium min-h-[32px] inline-flex items-center"
+                >
+                  Andheri CA Office
                 </button>
               </li>
             </ul>
           </div>
 
-          {/* Column 4: Contact & Office (lg:col-span-3) */}
-          <div className="sm:col-span-2 lg:col-span-3 flex flex-col text-left">
+          {/* Column 4: Contact & Office (lg:col-span-4) */}
+          <div className="sm:col-span-2 lg:col-span-4 flex flex-col text-left">
             <h4 className="font-manrope font-bold text-xs uppercase tracking-wider text-[#F28C18] mb-3 sm:mb-4">
-              Contact &amp; Head Office
+              Contact &amp; Office
             </h4>
 
             <div className="space-y-3 text-xs xs:text-sm text-slate-300">
@@ -105,14 +125,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenConsultation }
                   <a href={`tel:${firmDetails.phone1}`} className="hover:underline text-white font-medium py-1">
                     {firmDetails.phone1}
                   </a>
-                  {firmDetails.phone2 && (
-                    <>
-                      <span>/</span>
-                      <a href={`tel:${firmDetails.phone2}`} className="hover:underline text-white font-medium py-1">
-                        {firmDetails.phone2}
-                      </a>
-                    </>
-                  )}
+                  <span>/</span>
+                  <a href={`tel:${firmDetails.phone2}`} className="hover:underline text-white font-medium py-1">
+                    {firmDetails.phone2}
+                  </a>
                 </div>
               </div>
 
@@ -126,7 +142,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenConsultation }
               <div className="flex items-start gap-2 pt-1">
                 <MapPin size={15} className="text-emerald-400 shrink-0 mt-0.5" />
                 <span className="leading-relaxed">
-                  {firmDetails.address?.full || '102, Shourie Complex, Bombay Bazaar, Andheri (W), Mumbai – 400058'}
+                  {firmDetails.address.full}
                 </span>
               </div>
             </div>

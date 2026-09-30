@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Phone, Mail, User, CheckCircle2, ShieldCheck, Sparkles, AlertCircle } from 'lucide-react';
-import { FIRM_DETAILS, CORE_SERVICES } from '../data/firmData';
+import { useFirmData } from '../context/FirmDataContext';
 
 interface ConsultationModalProps {
   isOpen: boolean;
@@ -13,6 +13,7 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
   onClose,
   defaultService
 }) => {
+  const { services, firmDetails } = useFirmData();
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -232,7 +233,7 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
                     onChange={(e) => setFormData({ ...formData, service: e.target.value })}
                     className="w-full px-3 py-2.5 min-h-[44px] rounded-xl border border-[#D9E2EC] text-xs sm:text-sm focus:border-[#0969C7] focus:ring-2 focus:ring-[#0969C7]/20 outline-hidden bg-white"
                   >
-                    {CORE_SERVICES.map((s) => (
+                    {services.map((s) => (
                       <option key={s.id} value={s.name}>
                         {s.name}
                       </option>
@@ -295,11 +296,11 @@ export const ConsultationModal: React.FC<ConsultationModalProps> = ({
               <div className="pt-2 flex flex-col xs:flex-row items-start xs:items-center justify-between text-xs text-[#667085] gap-1">
                 <span>Prefer immediate assistance?</span>
                 <a
-                  href={`tel:${FIRM_DETAILS.phone1}`}
+                  href={`tel:${firmDetails.phone1}`}
                   className="font-bold text-[#062A5A] hover:underline flex items-center gap-1"
                 >
                   <Phone size={12} className="text-[#F28C18]" />
-                  <span>Call {FIRM_DETAILS.phone1}</span>
+                  <span>Call {firmDetails.phone1}</span>
                 </a>
               </div>
 

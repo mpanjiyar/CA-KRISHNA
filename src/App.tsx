@@ -20,6 +20,8 @@ import { TestimonialsSection } from './components/TestimonialsSection';
 import { FaqSection } from './components/FaqSection';
 import { FinalHomeCta } from './components/FinalHomeCta';
 import { ContactSection } from './components/ContactSection';
+import { ProjectsSection } from './components/ProjectsSection';
+import { LocationsSection } from './components/LocationsSection';
 import { Footer } from './components/Footer';
 import { MobileBottomBar } from './components/MobileBottomBar';
 import { ConsultationModal } from './components/ConsultationModal';
@@ -162,6 +164,14 @@ export default function App() {
             />
 
             <ProcessTimeline />
+
+            <ProjectsSection
+              onOpenConsultation={() => handleOpenConsultation('Client Project Mandate')}
+            />
+
+            <LocationsSection
+              onOpenConsultation={() => handleOpenConsultation('Regional Office Consultation')}
+            />
 
             <TestimonialsSection />
 

@@ -50,7 +50,7 @@ export const OUR_OFFICES: OfficeLocation[] = [
     region: 'North',
     isHeadquarter: false,
     address: 'Connaught Place & Noida Corporate Desk',
-    phone: '+91 600310815',
+    phone: '+91 6000310815',
     email: 'cakrishanpanjiyar@gmail.com',
     hours: 'Mon - Sat: 9:30 AM – 6:30 PM (IST)',
     services: [
@@ -92,7 +92,7 @@ export const OUR_OFFICES: OfficeLocation[] = [
     region: 'West',
     isHeadquarter: false,
     address: 'SG Highway Commercial Hub',
-    phone: '+91 600310815',
+    phone: '+91 6000310815',
     email: 'cakrishanpanjiyar@gmail.com',
     hours: 'Mon - Sat: 9:30 AM – 6:30 PM (IST)',
     services: [

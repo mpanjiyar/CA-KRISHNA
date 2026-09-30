@@ -10,7 +10,7 @@ import {
   Rocket,
   ArrowRight
 } from 'lucide-react';
-import { useSiteContent } from '../context/SiteContentContext';
+import { useFirmData } from '../context/FirmDataContext';
 
 interface CoreServicesProps {
   onSelectService: (serviceId: string) => void;
@@ -21,9 +21,7 @@ export const CoreServices: React.FC<CoreServicesProps> = ({
   onSelectService,
   onOpenConsultation
 }) => {
-  const { state } = useSiteContent();
-  const services = state.services;
-
+  const { services } = useFirmData();
   // Mapping icons to service cards
   const getServiceIcon = (id: string) => {
     switch (id) {
@@ -71,7 +69,7 @@ export const CoreServices: React.FC<CoreServicesProps> = ({
           </p>
         </div>
 
-        {/* Dynamic Service Cards Grid: 1 col on mobile, 2 on tablet, 4 on desktop */}
+        {/* 8 Service Cards Grid: 1 col on mobile, 2 on tablet, 4 on desktop */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           {services.map((service) => (
             <div
@@ -115,7 +113,7 @@ export const CoreServices: React.FC<CoreServicesProps> = ({
               Looking for tailored advisory for your enterprise?
             </h4>
             <p className="text-[11px] xs:text-xs sm:text-sm text-[#667085] mt-0.5">
-              Discuss specific tax, audit or financing mandates with {state.firmDetails.founder}.
+              Discuss specific tax, audit or financing mandates with CA Krishna Panjiyar.
             </p>
           </div>
           <button

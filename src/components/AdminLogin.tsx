@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { OfficialFirmLogo } from './CaLogo';
-import { FIRM_DETAILS } from '../data/firmData';
+import { useFirmData } from '../context/FirmDataContext';
 
 interface AdminLoginProps {
   onBackToWebsite: () => void;
@@ -20,6 +20,7 @@ interface AdminLoginProps {
 
 export const AdminLogin: React.FC<AdminLoginProps> = ({ onBackToWebsite }) => {
   const { login } = useAdminAuth();
+  const { firmDetails } = useFirmData();
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -74,7 +75,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onBackToWebsite }) => {
             </div>
 
             <span className="font-brand font-bold text-lg text-[#062A5A]">
-              PANJIYAR KRISHNA &amp; CO.
+              {firmDetails.name}
             </span>
             <span className="text-[11px] font-semibold text-[#0969C7] tracking-wider uppercase mb-1">
               Central Administration Console
@@ -153,7 +154,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onBackToWebsite }) => {
 
       {/* Footer */}
       <footer className="max-w-6xl w-full mx-auto text-center text-xs text-slate-400 z-10">
-        &copy; {new Date().getFullYear()} {FIRM_DETAILS.name} &middot; All Rights Reserved.
+        &copy; {new Date().getFullYear()} {firmDetails.name} &middot; All Rights Reserved.
       </footer>
     </div>
   );

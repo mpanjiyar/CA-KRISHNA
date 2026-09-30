@@ -6,9 +6,9 @@ export const FIRM_DETAILS = {
   founder: 'CA Krishna Panjiyar',
   founderTitle: 'Founder & Chartered Accountant',
   tagline: 'Accuracy | Integrity | Growth',
-  phone1: '600310815',
+  phone1: '6000310815',
   phone2: '8876808572',
-  phones: ['600310815', '8876808572'],
+  phones: ['6000310815', '8876808572'],
   email: 'cakrishanpanjiyar@gmail.com',
   address: {
     line1: '102, Shourie Complex, Bombay Bazaar',
@@ -568,7 +568,7 @@ export const GENERAL_FAQS = [
   },
   {
     question: 'How can I book a consultation?',
-    answer: 'You can book a consultation directly through the "Book a Consultation" button on this website, call CA Krishna Panjiyar directly at 600310815 or 8876808572, or email us at cakrishanpanjiyar@gmail.com.'
+    answer: 'You can book a consultation directly through the "Book a Consultation" button on this website, call CA Krishna Panjiyar directly at 6000310815 or 8876808572, or email us at cakrishanpanjiyar@gmail.com.'
   }
 ];
 

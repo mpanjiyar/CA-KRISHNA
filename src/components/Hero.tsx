@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, CheckCircle2, PhoneCall } from 'lucide-react';
+import { ArrowRight, CheckCircle2, PhoneCall, ArrowDown } from 'lucide-react';
 import { CaEmblem } from './CaLogo';
-import { useSiteContent } from '../context/SiteContentContext';
+import { useFirmData } from '../context/FirmDataContext';
 
 interface HeroProps {
   onOpenConsultation: () => void;
@@ -12,8 +12,7 @@ export const Hero: React.FC<HeroProps> = ({
   onOpenConsultation,
   onExploreServices
 }) => {
-  const { state } = useSiteContent();
-  const { firmDetails } = state;
+  const { firmDetails, websiteText } = useFirmData();
   const [hasScrolled, setHasScrolled] = useState(false);
 
   useEffect(() => {
@@ -27,7 +26,6 @@ export const Hero: React.FC<HeroProps> = ({
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
   return (
     <section className="relative w-full bg-white overflow-hidden pt-5 pb-10 sm:pt-8 sm:pb-14 lg:py-18 border-b border-[#D9E2EC]">
       {/* Background Graphic: Visiting-Card Inspired Curved & Diagonal Navy Shapes */}
@@ -50,7 +48,7 @@ export const Hero: React.FC<HeroProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 sm:gap-10 lg:gap-12 items-center">
           
           {/* Left Column: Headline, Description & Actions */}
-          <div className="lg:col-span-7 flex flex-col text-left">
+          <div className="lg:col-span-7 flex flex-col text-left animate-fade-slide-up">
             
             {/* Professional Kicker with Card Brand Accent */}
             <div className="inline-flex items-center gap-1.5 xs:gap-2 mb-2.5 sm:mb-3 text-[#062A5A] flex-wrap">
@@ -60,18 +58,18 @@ export const Hero: React.FC<HeroProps> = ({
               </span>
               <span className="text-slate-300">/</span>
               <span className="text-[10px] xs:text-[11px] sm:text-xs uppercase tracking-wider font-semibold text-[#0969C7]">
-                {firmDetails.designation || 'Chartered Accountants'}
+                {firmDetails.designation}
               </span>
             </div>
 
             {/* H1 - Balanced responsive typography for 320px–430px */}
             <h1 className="font-manrope text-[22px] xs:text-[26px] sm:text-[34px] md:text-[42px] lg:text-[48px] font-extrabold text-[#062A5A] tracking-tight leading-[1.18] mb-3 sm:mb-5 text-balance">
-              Chartered Accountants for Taxation, Compliance &amp; Business Growth
+              {websiteText.heroHeadline}
             </h1>
 
             {/* Supporting Text */}
             <p className="text-xs xs:text-sm sm:text-base md:text-lg text-[#172033]/85 leading-[1.65] mb-5 sm:mb-7 max-w-2xl font-normal">
-              <strong className="font-semibold text-[#062A5A]">{firmDetails.name}</strong> is a premier Chartered Accountancy firm providing accounting, taxation, GST, audit, compliance, financing and business advisory services across India.
+              {websiteText.heroSubheadline}
             </p>
 
             {/* CTA Buttons - Stacks cleanly on mobile, inline on sm+ */}
@@ -112,7 +110,7 @@ export const Hero: React.FC<HeroProps> = ({
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 size={14} className="text-[#159447] shrink-0" />
-                <span>{firmDetails.address?.locality || 'Andheri (W)'}, {firmDetails.address?.city || 'Mumbai'}</span>
+                <span>Andheri (W), Mumbai</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 size={14} className="text-[#0969C7] shrink-0" />
@@ -123,9 +121,9 @@ export const Hero: React.FC<HeroProps> = ({
           </div>
 
           {/* Right Column: CA India Logo Treatment with Visiting Card Geometry */}
-          <div className="lg:col-span-5 flex flex-col items-center justify-center w-full max-w-full">
+          <div className="lg:col-span-5 flex flex-col items-center justify-center w-full max-w-full animate-fade-slide-up" style={{ animationDelay: '100ms' }}>
             {/* Visiting Card Visual Container */}
-            <div className="relative w-full max-w-[400px] bg-gradient-to-br from-[#062A5A] via-[#031C3D] to-[#062A5A] rounded-2xl shadow-xl overflow-hidden p-4 xs:p-5 sm:p-7 text-white border border-[#0969C7]/30 transition-transform duration-200 hover:shadow-2xl">
+            <div className="relative w-full max-w-[400px] bg-gradient-to-br from-[#062A5A] via-[#031C3D] to-[#062A5A] rounded-2xl shadow-xl overflow-hidden p-4 xs:p-5 sm:p-7 text-white border border-[#0969C7]/30 card-hover-lift">
               
               {/* Card Geometric Lines and Curves */}
               <div className="absolute top-0 right-0 w-44 h-44 bg-gradient-to-bl from-[#0969C7]/30 to-transparent rounded-bl-full pointer-events-none" />
@@ -135,20 +133,13 @@ export const Hero: React.FC<HeroProps> = ({
               <div className="absolute top-0 left-5 sm:left-7 w-16 sm:w-20 h-1.5 bg-[#F28C18]" />
 
               {/* Main Card Content */}
-              <div className="relative z-10 flex flex-col items-center text-center">
-                {/* CA Emblem Presentation */}
-                <div className="p-2.5 xs:p-3 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/15 mb-3 shadow-inner">
-                  <CaEmblem source="hero" sizePx={64} className="xs:hidden" />
-                  <CaEmblem source="hero" sizePx={72} className="hidden xs:block sm:hidden" />
-                  <CaEmblem source="hero" sizePx={84} className="hidden sm:block" />
-                </div>
-
+              <div className="relative z-10 flex flex-col items-center text-center pt-2">
                 {/* Firm Name */}
                 <h3 className="font-brand text-lg xs:text-xl sm:text-2xl font-bold tracking-tight text-white mb-0.5">
                   {firmDetails.name}
                 </h3>
                 <p className="text-[11px] xs:text-xs sm:text-sm text-[#EEF5FC] font-medium tracking-widest uppercase mb-2.5 sm:mb-3">
-                  {firmDetails.designation || 'Chartered Accountants'}
+                  {firmDetails.designation}
                 </p>
 
                 {/* Card Hairline Divider */}
@@ -166,16 +157,56 @@ export const Hero: React.FC<HeroProps> = ({
                 </div>
 
                 {/* Visiting Card Front Tagline Pill */}
-                <div className="w-full bg-white/10 backdrop-blur-sm rounded-xl py-2 px-3 border border-white/10 mt-1">
-                  <p className="text-[10.5px] xs:text-xs text-[#F7F9FC] font-medium tracking-wider">
+                <div className="bg-[#031C3D]/90 px-3 py-1.5 xs:py-2 rounded-lg border border-[#0969C7]/40 w-full">
+                  <p className="font-manrope text-[11px] xs:text-xs sm:text-sm font-bold tracking-wider uppercase text-[#F28C18]">
                     {firmDetails.tagline}
                   </p>
                 </div>
+
+                {/* Office Address on Card */}
+                <p className="text-[10px] xs:text-[11px] text-slate-300 mt-2.5 sm:mt-3 leading-relaxed font-light">
+                  {firmDetails.address.line1}, {firmDetails.address.line2}
+                </p>
               </div>
 
+              {/* Secure Certificate Tag */}
+              <div className="mt-3.5 sm:mt-4 pt-2.5 border-t border-white/10 flex items-center justify-between text-[10px] xs:text-[11px] text-slate-300">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#159447]" />
+                  Verified ICAI Practice
+                </span>
+                <span className="text-[#F28C18] font-semibold">
+                  PAN India Desk
+                </span>
+              </div>
+            </div>
+
+            {/* Tagline Underneath as specified: Accuracy | Integrity | Growth */}
+            <div className="mt-3 text-center">
+              <span className="font-manrope text-[11px] xs:text-xs sm:text-sm font-bold tracking-wider text-[#062A5A] uppercase">
+                Accuracy &nbsp;|&nbsp; Integrity &nbsp;|&nbsp; Growth
+              </span>
             </div>
           </div>
 
+        </div>
+
+        {/* Top-of-Page Scroll Indication ("↓ Scroll to Explore") */}
+        <div
+          className={`mt-8 sm:mt-12 flex flex-col items-center justify-center transition-all duration-300 ${
+            hasScrolled ? 'opacity-0 pointer-events-none -translate-y-2' : 'opacity-100 translate-y-0'
+          }`}
+        >
+          <button
+            onClick={onExploreServices}
+            aria-label="Scroll to explore services"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-600 hover:text-[#062A5A] transition-all text-xs font-semibold group cursor-pointer shadow-2xs"
+          >
+            <span className="text-[11px] xs:text-xs uppercase tracking-wider">Scroll to Explore</span>
+            <span className="w-5 h-5 rounded-full bg-[#062A5A]/10 text-[#062A5A] flex items-center justify-center group-hover:bg-[#062A5A] group-hover:text-white transition-colors">
+              <ArrowDown className="w-3 h-3 animate-bounce" />
+            </span>
+          </button>
         </div>
       </div>
     </section>

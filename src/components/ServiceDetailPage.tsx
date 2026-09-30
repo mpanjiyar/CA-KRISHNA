@@ -7,8 +7,9 @@ import {
   ArrowRight,
   ChevronDown
 } from 'lucide-react';
-import { CORE_SERVICES, FIRM_DETAILS, PROCESS_STEPS } from '../data/firmData';
+import { PROCESS_STEPS } from '../data/firmData';
 import { ServiceItem } from '../types';
+import { useFirmData } from '../context/FirmDataContext';
 
 interface ServiceDetailPageProps {
   serviceId: string;
@@ -23,10 +24,23 @@ export const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({
   onSelectRelated,
   onOpenConsultation
 }) => {
-  const service: ServiceItem = CORE_SERVICES.find((s) => s.id === serviceId) || CORE_SERVICES[0];
+  const { services, firmDetails } = useFirmData();
+  const service: ServiceItem = services.find((s) => s.id === serviceId) || services[0] || {
+    id: 'custom-service',
+    name: 'Chartered Accountancy Service',
+    category: 'Advisory',
+    shortDesc: 'Comprehensive professional advisory.',
+    fullDesc: 'Comprehensive Chartered Accountancy service.',
+    subServices: [],
+    documentsRequired: [],
+    targetAudience: [],
+    deliverables: [],
+    faqs: [],
+    relatedServiceIds: []
+  };
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
-  const relatedServices = CORE_SERVICES.filter((s) => service.relatedServiceIds.includes(s.id));
+  const relatedServices = services.filter((s) => (service.relatedServiceIds || []).includes(s.id));
 
   return (
     <div className="w-full bg-white text-left min-h-screen py-8 sm:py-12">
@@ -72,11 +86,11 @@ export const ServiceDetailPage: React.FC<ServiceDetailPageProps> = ({
             </button>
 
             <a
-              href={`tel:${FIRM_DETAILS.phone1}`}
+              href={`tel:${firmDetails.phone1}`}
               className="inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-medium text-[#062A5A] bg-[#EEF5FC] hover:bg-[#D9E2EC] rounded-xl transition-colors border border-[#D9E2EC] min-h-[44px]"
             >
               <PhoneCall size={15} className="text-[#F28C18]" />
-              <span>Direct Call: {FIRM_DETAILS.phone1}</span>
+              <span>Direct Call: {firmDetails.phone1}</span>
             </a>
           </div>
         </div>

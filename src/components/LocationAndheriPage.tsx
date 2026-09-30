@@ -1,6 +1,6 @@
 import React from 'react';
 import { MapPin, Phone, Mail, Clock, ArrowRight } from 'lucide-react';
-import { FIRM_DETAILS } from '../data/firmData';
+import { useFirmData } from '../context/FirmDataContext';
 
 interface LocationAndheriPageProps {
   onOpenConsultation: () => void;
@@ -11,6 +11,7 @@ export const LocationAndheriPage: React.FC<LocationAndheriPageProps> = ({
   onOpenConsultation,
   onSelectService
 }) => {
+  const { firmDetails, websiteText, services } = useFirmData();
   return (
     <div className="w-full bg-white text-left min-h-screen py-8 sm:py-12">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -30,11 +31,11 @@ export const LocationAndheriPage: React.FC<LocationAndheriPageProps> = ({
           </div>
 
           <h1 className="font-manrope text-[28px] sm:text-[38px] lg:text-[44px] font-bold text-[#062A5A] tracking-tight leading-[1.12] mb-4">
-            Chartered Accountants in Andheri, Mumbai
+            {websiteText.andheriHeadline}
           </h1>
 
           <p className="text-base sm:text-lg text-[#172033]/90 leading-relaxed max-w-3xl mb-6 sm:mb-8 font-normal">
-            Looking for an established Chartered Accountant in Andheri West? <strong className="font-semibold text-[#062A5A]">PANJIYAR KRISHNA &amp; CO.</strong> provides trusted income tax filing, corporate audit, GST compliance, company registration, and loan documentation services from our office at Bombay Bazaar, Andheri (W), Mumbai.
+            {websiteText.andheriDescription}
           </p>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
@@ -47,11 +48,11 @@ export const LocationAndheriPage: React.FC<LocationAndheriPageProps> = ({
             </button>
 
             <a
-              href={`tel:${FIRM_DETAILS.phone1}`}
+              href={`tel:${firmDetails.phone1}`}
               className="inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold text-[#062A5A] bg-[#EEF5FC] hover:bg-[#D9E2EC] rounded-xl transition-colors border border-[#D9E2EC] min-h-[44px]"
             >
               <Phone size={15} className="text-[#F28C18]" />
-              <span>Call: {FIRM_DETAILS.phone1}</span>
+              <span>Call: {firmDetails.phone1}</span>
             </a>
           </div>
         </div>
@@ -202,12 +203,12 @@ export const LocationAndheriPage: React.FC<LocationAndheriPageProps> = ({
                 <div className="text-xs sm:text-sm">
                   <strong className="text-[#062A5A] block mb-0.5">Direct Lines:</strong>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <a href={`tel:${FIRM_DETAILS.phone1}`} className="text-[#062A5A] font-semibold hover:underline">
-                      {FIRM_DETAILS.phone1}
+                    <a href={`tel:${firmDetails.phone1}`} className="text-[#062A5A] font-semibold hover:underline">
+                      {firmDetails.phone1}
                     </a>
                     <span>/</span>
-                    <a href={`tel:${FIRM_DETAILS.phone2}`} className="text-[#062A5A] font-semibold hover:underline">
-                      {FIRM_DETAILS.phone2}
+                    <a href={`tel:${firmDetails.phone2}`} className="text-[#062A5A] font-semibold hover:underline">
+                      {firmDetails.phone2}
                     </a>
                   </div>
                 </div>
@@ -217,8 +218,8 @@ export const LocationAndheriPage: React.FC<LocationAndheriPageProps> = ({
                 <Mail className="w-5 h-5 text-[#0969C7] shrink-0 mt-0.5" />
                 <div className="text-xs sm:text-sm">
                   <strong className="text-[#062A5A] block mb-0.5">Email:</strong>
-                  <a href={`mailto:${FIRM_DETAILS.email}`} className="text-[#062A5A] hover:underline break-all">
-                    {FIRM_DETAILS.email}
+                  <a href={`mailto:${firmDetails.email}`} className="text-[#062A5A] hover:underline break-all">
+                    {firmDetails.email}
                   </a>
                 </div>
               </div>
@@ -240,10 +241,10 @@ export const LocationAndheriPage: React.FC<LocationAndheriPageProps> = ({
         <div className="p-6 sm:p-8 rounded-2xl bg-[#062A5A] text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
           <div>
             <h3 className="font-manrope font-bold text-lg sm:text-xl lg:text-2xl text-white mb-1">
-              Contact CA Krishna Panjiyar in Andheri
+              Contact {firmDetails.founder} in Andheri
             </h3>
             <p className="text-xs sm:text-sm text-slate-300">
-              Founder &amp; Chartered Accountant &middot; Practice Office at Shourie Complex
+              {firmDetails.founderTitle} &middot; Practice Office at Shourie Complex
             </p>
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -254,7 +255,7 @@ export const LocationAndheriPage: React.FC<LocationAndheriPageProps> = ({
               Book Consultation
             </button>
             <a
-              href={`tel:${FIRM_DETAILS.phone1}`}
+              href={`tel:${firmDetails.phone1}`}
               className="flex-1 sm:flex-none px-5 py-3 text-xs sm:text-sm font-semibold bg-[#0969C7] text-white hover:bg-[#085cb0] rounded-xl transition-colors text-center min-h-[44px]"
             >
               Call Now

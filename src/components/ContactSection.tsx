@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
 import { Phone, Mail, MapPin, Clock, CheckCircle2, Send, ExternalLink, AlertCircle } from 'lucide-react';
 import { CaEmblem } from './CaLogo';
-import { useSiteContent } from '../context/SiteContentContext';
+import { useFirmData } from '../context/FirmDataContext';
 
 export const ContactSection: React.FC = () => {
-  const { state } = useSiteContent();
-  const { firmDetails, services } = state;
-
+  const { firmDetails, services } = useFirmData();
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
     email: '',
-    serviceRequired: services[0]?.name || 'Income Tax Services',
+    serviceRequired: 'Income Tax Services',
     message: ''
   });
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -46,11 +44,11 @@ export const ContactSection: React.FC = () => {
           </div>
 
           <h1 className="font-manrope text-[24px] xs:text-[28px] sm:text-[36px] lg:text-[42px] font-bold text-[#062A5A] tracking-tight leading-tight mb-2 sm:mb-3">
-            Contact {firmDetails.name}
+            Contact PANJIYAR KRISHNA &amp; CO.
           </h1>
 
           <p className="text-xs xs:text-sm sm:text-base text-[#667085] max-w-2xl leading-relaxed">
-            Reach out to our {firmDetails.address?.locality || 'Andheri (W)'}, {firmDetails.address?.city || 'Mumbai'} office for tax consultation, statutory audits, GST advisory, and business financing solutions.
+            Reach out to our Andheri (W), Mumbai office for tax consultation, statutory audits, GST advisory, and business financing solutions.
           </p>
         </div>
 
@@ -97,14 +95,12 @@ export const ContactSection: React.FC = () => {
                     >
                       {firmDetails.phone1}
                     </a>
-                    {firmDetails.phone2 && (
-                      <a
-                        href={`tel:${firmDetails.phone2}`}
-                        className="font-manrope font-bold text-sm xs:text-base text-[#062A5A] hover:text-[#0969C7] transition-colors py-0.5"
-                      >
-                        {firmDetails.phone2}
-                      </a>
-                    )}
+                    <a
+                      href={`tel:${firmDetails.phone2}`}
+                      className="font-manrope font-bold text-sm xs:text-base text-[#062A5A] hover:text-[#0969C7] transition-colors py-0.5"
+                    >
+                      {firmDetails.phone2}
+                    </a>
                   </div>
                   <span className="text-[10px] xs:text-[11px] text-[#667085] mt-0.5 block">
                     Click to initiate a phone call directly
@@ -143,10 +139,10 @@ export const ContactSection: React.FC = () => {
                     Verified Office Address
                   </h4>
                   <p className="text-xs xs:text-sm font-medium text-[#172033] leading-relaxed">
-                    {firmDetails.address?.full || '102, Shourie Complex, Bombay Bazaar, Andheri (W), Mumbai – 400058'}
+                    {firmDetails.address.full}
                   </p>
-                  <span className="text-[10px] xs:text-[11px] text-[#0969C7] mt-1 block font-semibold">
-                    Head Office &middot; In-Person Consultations by Appointment
+                  <span className="text-[10px] xs:text-[11px] text-[#667085] mt-0.5 block">
+                    Conveniently accessible via Andheri Railway &amp; Metro Stations
                   </span>
                 </div>
               </div>
@@ -158,13 +154,13 @@ export const ContactSection: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="text-[11px] xs:text-xs font-bold uppercase tracking-wider text-[#667085] mb-1">
-                    Office Hours
+                    Consultation Hours
                   </h4>
-                  <p className="text-xs xs:text-sm font-medium text-[#172033]">
-                    {firmDetails.workingHours || 'Mon - Sat: 9:30 AM – 7:00 PM (IST)'}
+                  <p className="text-xs xs:text-sm text-[#172033]">
+                    {firmDetails.workingHours}
                   </p>
                   <span className="text-[10px] xs:text-[11px] text-[#667085] mt-0.5 block">
-                    Sunday: Prior appointment only for urgent ROC filings
+                    Prior appointments recommended for in-person meetings
                   </span>
                 </div>
               </div>
@@ -173,146 +169,182 @@ export const ContactSection: React.FC = () => {
 
           </div>
 
-          {/* Right Column: Interactive Consultation Request Form */}
-          <div className="lg:col-span-7 flex flex-col text-left">
-            <div className="bg-white rounded-2xl border border-[#D9E2EC] p-5 sm:p-8 shadow-xs">
-              <h3 className="font-manrope font-bold text-lg sm:text-xl text-[#062A5A] mb-1">
-                Schedule a Consultation
-              </h3>
-              <p className="text-xs sm:text-sm text-[#667085] mb-6">
-                Fill in your contact coordinates below. Our partners will get back to you with structured next steps.
-              </p>
+          {/* Right Column: Contact Form */}
+          <div className="lg:col-span-7 bg-[#F7F9FC] rounded-2xl p-4 xs:p-5 sm:p-7 md:p-8 border border-[#D9E2EC] shadow-sm text-left">
+            <h3 className="font-manrope font-bold text-lg xs:text-xl sm:text-2xl text-[#062A5A] mb-1.5">
+              Request a Professional Consultation
+            </h3>
+            <p className="text-xs xs:text-sm text-[#667085] mb-5">
+              Complete this brief inquiry form and our Chartered Accountancy desk will connect with you promptly.
+            </p>
 
-              {submitted ? (
-                <div className="p-6 sm:p-8 rounded-2xl bg-emerald-50 border border-emerald-200 text-center animate-in fade-in">
-                  <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <CheckCircle2 size={32} />
-                  </div>
-                  <h4 className="font-manrope font-bold text-lg text-emerald-900 mb-1">
-                    Consultation Request Registered
-                  </h4>
-                  <p className="text-xs sm:text-sm text-emerald-700 max-w-md mx-auto mb-5">
-                    Thank you, {formData.name}. Our practice desk has logged your mandate for {formData.serviceRequired}. We will reach out shortly.
-                  </p>
-                  <button
-                    onClick={() => {
-                      setSubmitted(false);
-                      setFormData({
-                        name: '',
-                        phone: '',
-                        email: '',
-                        serviceRequired: services[0]?.name || 'Income Tax Services',
-                        message: ''
-                      });
-                    }}
-                    className="px-5 py-2.5 bg-[#062A5A] text-white text-xs font-semibold rounded-xl hover:bg-[#031C3D] transition-colors"
-                  >
-                    Submit Another Query
-                  </button>
+            {validationError && (
+              <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
+                <AlertCircle size={16} className="shrink-0" />
+                <span>{validationError}</span>
+              </div>
+            )}
+
+            {submitted ? (
+              <div className="p-5 sm:p-8 rounded-xl bg-white border border-[#159447]/30 text-center space-y-3 animate-in fade-in">
+                <div className="w-12 h-12 rounded-full bg-[#159447]/10 text-[#159447] flex items-center justify-center mx-auto">
+                  <CheckCircle2 size={28} />
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {validationError && (
-                    <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
-                      <AlertCircle size={16} className="shrink-0" />
-                      <span>{validationError}</span>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                        Your Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="e.g. Rajesh Sharma"
-                        className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#0969C7]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                        Mobile / WhatsApp Number *
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        placeholder="e.g. +91 98765 43210"
-                        className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#0969C7]"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                        Email Address (Optional)
-                      </label>
-                      <input
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="rajesh@example.com"
-                        className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#0969C7]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                        Service Practice Area *
-                      </label>
-                      <select
-                        value={formData.serviceRequired}
-                        onChange={(e) => setFormData({ ...formData, serviceRequired: e.target.value })}
-                        className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-1 focus:ring-[#0969C7]"
-                      >
-                        {services.map((srv) => (
-                          <option key={srv.id} value={srv.name}>
-                            {srv.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
+                <h4 className="font-manrope font-bold text-lg sm:text-xl text-[#062A5A]">
+                  Thank You, {formData.name}!
+                </h4>
+                <p className="text-xs sm:text-sm text-[#667085] max-w-md mx-auto leading-relaxed">
+                  Your consultation request regarding <strong className="text-[#062A5A]">{formData.serviceRequired}</strong> has been received by CA Krishna Panjiyar. We will call you at <strong className="text-[#062A5A]">{formData.phone}</strong> shortly.
+                </p>
+                <button
+                  onClick={() => {
+                    setSubmitted(false);
+                    setFormData({ name: '', phone: '', email: '', serviceRequired: 'Income Tax Services', message: '' });
+                  }}
+                  className="px-5 py-2.5 text-xs font-semibold text-[#062A5A] bg-[#EEF5FC] hover:bg-[#D9E2EC] rounded-xl transition-colors min-h-[44px]"
+                >
+                  Send Another Inquiry
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-3.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  {/* Name */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                      Case Summary or Specific Query
+                    <label className="block text-[11px] xs:text-xs font-semibold uppercase tracking-wider text-[#172033] mb-1">
+                      Your Full Name *
                     </label>
-                    <textarea
-                      rows={3}
-                      value={formData.message}
-                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      placeholder="Briefly state your tax notice, incorporation requirement, or CMA financing requirement..."
-                      className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#0969C7]"
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Rajesh Sharma"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-3.5 py-2.5 sm:py-3 min-h-[44px] rounded-xl bg-white border border-[#D9E2EC] focus:border-[#0969C7] focus:ring-2 focus:ring-[#0969C7]/20 outline-hidden text-xs xs:text-sm text-[#172033] transition-colors"
                     />
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full py-3 px-4 rounded-xl bg-[#062A5A] hover:bg-[#031C3D] text-white font-semibold text-xs sm:text-sm shadow-xs flex items-center justify-center gap-2 transition-all active:scale-[0.99] min-h-[46px]"
-                  >
-                    {isSubmitting ? (
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      <>
-                        <Send size={15} className="text-[#F28C18]" />
-                        <span>Send Consultation Mandate</span>
-                      </>
-                    )}
-                  </button>
-                </form>
-              )}
-            </div>
+                  {/* Phone */}
+                  <div>
+                    <label className="block text-[11px] xs:text-xs font-semibold uppercase tracking-wider text-[#172033] mb-1">
+                      Contact Phone Number *
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="e.g. 98200XXXXX"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      className="w-full px-3.5 py-2.5 sm:py-3 min-h-[44px] rounded-xl bg-white border border-[#D9E2EC] focus:border-[#0969C7] focus:ring-2 focus:ring-[#0969C7]/20 outline-hidden text-xs xs:text-sm text-[#172033] transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  {/* Email */}
+                  <div>
+                    <label className="block text-[11px] xs:text-xs font-semibold uppercase tracking-wider text-[#172033] mb-1">
+                      Email Address (Optional)
+                    </label>
+                    <input
+                      type="email"
+                      placeholder="e.g. rajesh@company.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full px-3.5 py-2.5 sm:py-3 min-h-[44px] rounded-xl bg-white border border-[#D9E2EC] focus:border-[#0969C7] focus:ring-2 focus:ring-[#0969C7]/20 outline-hidden text-xs xs:text-sm text-[#172033] transition-colors"
+                    />
+                  </div>
+
+                  {/* Service Required */}
+                  <div>
+                    <label className="block text-[11px] xs:text-xs font-semibold uppercase tracking-wider text-[#172033] mb-1">
+                      Service Required *
+                    </label>
+                    <select
+                      value={formData.serviceRequired}
+                      onChange={(e) => setFormData({ ...formData, serviceRequired: e.target.value })}
+                      className="w-full px-3.5 py-2.5 sm:py-3 min-h-[44px] rounded-xl bg-white border border-[#D9E2EC] focus:border-[#0969C7] focus:ring-2 focus:ring-[#0969C7]/20 outline-hidden text-xs xs:text-sm text-[#172033] transition-colors"
+                    >
+                      {services.map((s) => (
+                        <option key={s.id} value={s.name}>
+                          {s.name}
+                        </option>
+                      ))}
+                      <option value="Other Advisory">Other Advisory / Litigation</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Message */}
+                <div>
+                  <label className="block text-[11px] xs:text-xs font-semibold uppercase tracking-wider text-[#172033] mb-1">
+                    Brief Requirement / Context
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="Tell us about your tax filing, business entity, audit requirement, or loan proposal..."
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl bg-white border border-[#D9E2EC] focus:border-[#0969C7] focus:ring-2 focus:ring-[#0969C7]/20 outline-hidden text-xs xs:text-sm text-[#172033] transition-colors resize-none"
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-3 px-5 min-h-[44px] text-xs xs:text-sm font-semibold text-white bg-[#062A5A] hover:bg-[#031C3D] active:scale-[0.99] rounded-xl transition-all duration-150 flex items-center justify-center gap-2 shadow-xs disabled:opacity-70"
+                >
+                  {isSubmitting ? (
+                    <span>Submitting Inquiry...</span>
+                  ) : (
+                    <>
+                      <span>Request Consultation</span>
+                      <Send size={15} />
+                    </>
+                  )}
+                </button>
+
+                <p className="text-[10px] xs:text-[11px] text-[#667085] text-center mt-1.5">
+                  Information shared is governed by strict ICAI confidentiality and professional privilege.
+                </p>
+              </form>
+            )}
           </div>
 
+        </div>
+
+        {/* Below: Google Map based on verified office address */}
+        <div className="rounded-2xl border border-[#D9E2EC] overflow-hidden shadow-sm">
+          <div className="bg-[#F7F9FC] px-4 xs:px-5 sm:px-6 py-3.5 border-b border-[#D9E2EC] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-left">
+            <div>
+              <h4 className="font-manrope font-bold text-xs xs:text-sm sm:text-base text-[#062A5A]">
+                Office Location Map &middot; Andheri West, Mumbai
+              </h4>
+              <p className="text-[11px] xs:text-xs text-[#667085]">
+                102, Shourie Complex, Bombay Bazaar, Andheri (W), Mumbai – 400058
+              </p>
+            </div>
+            <a
+              href="https://maps.google.com/?q=102+Shourie+Complex+Bombay+Bazaar+Andheri+West+Mumbai+400058"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0969C7] hover:underline py-1"
+            >
+              <span>Open in Google Maps</span>
+              <ExternalLink size={13} />
+            </a>
+          </div>
+
+          <div className="w-full h-64 xs:h-72 sm:h-80 md:h-96 bg-slate-100 relative">
+            <iframe
+              title="PANJIYAR KRISHNA & CO. Office Location"
+              src="https://maps.google.com/maps?q=102%20Shourie%20Complex%20Bombay%20Bazaar%20Andheri%20West%20Mumbai%20400058&t=&z=15&ie=UTF8&iwloc=&output=embed"
+              className="w-full h-full border-0"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
         </div>
 
       </div>

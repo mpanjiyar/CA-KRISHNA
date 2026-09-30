@@ -12,7 +12,7 @@ import {
   FileSpreadsheet,
   CheckCircle2
 } from 'lucide-react';
-import { FIRM_DETAILS } from '../data/firmData';
+import { useFirmData } from '../context/FirmDataContext';
 
 interface SpecializedSectionsProps {
   onOpenConsultation: () => void;
@@ -23,6 +23,7 @@ export const SpecializedSections: React.FC<SpecializedSectionsProps> = ({
   onOpenConsultation,
   onSelectService
 }) => {
+  const { firmDetails } = useFirmData();
   return (
     <div className="w-full">
       {/* 1. Accounting Section */}
@@ -304,7 +305,7 @@ export const SpecializedSections: React.FC<SpecializedSectionsProps> = ({
               </h2>
 
               <p className="text-xs xs:text-sm sm:text-base text-[#667085] leading-relaxed mb-5">
-                From business structuring and registration to accounting, taxation and ongoing compliance, <strong className="font-semibold text-[#062A5A]">PANJIYAR KRISHNA &amp; CO.</strong> provides practical support to help startups establish strong financial systems.
+                From business structuring and registration to accounting, taxation and ongoing compliance, <strong className="font-semibold text-[#062A5A]">{firmDetails.name}</strong> provides practical support to help startups establish strong financial systems.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-6 text-xs sm:text-sm text-[#172033]">

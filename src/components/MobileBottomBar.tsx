@@ -1,18 +1,17 @@
 import React from 'react';
 import { Phone, Calendar } from 'lucide-react';
 import { WhatsAppOfficialIcon } from './FloatingContactPanel';
-import { useSiteContent } from '../context/SiteContentContext';
+import { useFirmData } from '../context/FirmDataContext';
 
 interface MobileBottomBarProps {
   onOpenConsultation: () => void;
 }
 
 export const MobileBottomBar: React.FC<MobileBottomBarProps> = ({ onOpenConsultation }) => {
-  const { state } = useSiteContent();
-  const { firmDetails } = state;
-
-  // WhatsApp direct link using the firm's primary contact number
-  const whatsappUrl = `https://wa.me/91${firmDetails.phone1}?text=${encodeURIComponent(
+  const { firmDetails } = useFirmData();
+  const phone = firmDetails.phone1 || '6000310815';
+  // WhatsApp direct link using the firm's primary verified contact number
+  const whatsappUrl = `https://wa.me/91${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
     `Hello ${firmDetails.founder}, I would like to schedule a Chartered Accountancy consultation regarding taxation and compliance.`
   )}`;
 
@@ -24,9 +23,9 @@ export const MobileBottomBar: React.FC<MobileBottomBarProps> = ({ onOpenConsulta
       <div className="grid grid-cols-3 gap-2 text-center">
         {/* [ CALL ] */}
         <a
-          href={`tel:${firmDetails.phone1}`}
+          href={`tel:${phone}`}
           className="flex flex-col items-center justify-center py-2 px-2 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 transition-all min-h-[46px]"
-          aria-label={`Call ${firmDetails.phone1}`}
+          aria-label={`Call ${phone}`}
         >
           <Phone size={16} className="text-[#F28C18] mb-0.5" />
           <span className="text-[11px] font-bold uppercase tracking-wider">CALL</span>

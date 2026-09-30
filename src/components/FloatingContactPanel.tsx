@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Phone, Mail } from 'lucide-react';
-import { FIRM_DETAILS } from '../data/firmData';
+import { useFirmData } from '../context/FirmDataContext';
 
 /**
  * Official WhatsApp SVG Icon with authentic speech bubble and telephone handset inside
@@ -26,14 +26,15 @@ export const WhatsAppOfficialIcon: React.FC<{ className?: string }> = ({ classNa
  * Accessible labels, tooltip previews on desktop hover (flying out to the left), responsive sizing on mobile/tablet.
  */
 export const FloatingContactPanel: React.FC = () => {
+  const { firmDetails } = useFirmData();
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
 
-  const phoneNum = FIRM_DETAILS.phone1 || '600310815';
+  const phoneNum = firmDetails.phone1 || '6000310815';
   const cleanPhone = phoneNum.replace(/[^0-9+]/g, '');
-  const emailAddr = FIRM_DETAILS.email || 'cakrishanpanjiyar@gmail.com';
+  const emailAddr = firmDetails.email || 'cakrishanpanjiyar@gmail.com';
   
   const whatsappUrl = `https://wa.me/91${cleanPhone.replace(/^\+91/, '')}?text=${encodeURIComponent(
-    'Hello CA Krishna Panjiyar, I would like to inquire about your Chartered Accountancy services.'
+    `Hello ${firmDetails.founder}, I would like to inquire about your Chartered Accountancy services.`
   )}`;
 
   return (

@@ -11,11 +11,11 @@ import {
   Sparkles, 
   Briefcase
 } from 'lucide-react';
-import { FIRM_DETAILS, CORE_SERVICES } from '../data/firmData';
+import { FIRM_DETAILS } from '../data/firmData';
 import { BrandHeaderLockup } from './CaLogo';
 import { WhatsAppOfficialIcon } from './FloatingContactPanel';
 import { PageRoute } from '../types';
-import { useSiteContent } from '../context/SiteContentContext';
+import { useFirmData } from '../context/FirmDataContext';
 
 interface HeaderProps {
   currentRoute: PageRoute;
@@ -28,8 +28,7 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigate,
   onOpenConsultation
 }) => {
-  const { state } = useSiteContent();
-  const { firmDetails, services } = state;
+  const { firmDetails, services } = useFirmData();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [servicesMenuOpen, setServicesMenuOpen] = useState(false);
   const [mobileServicesExpanded, setMobileServicesExpanded] = useState(false);
@@ -127,18 +126,14 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 {firmDetails.phone1}
               </a>
-              {firmDetails.phone2 && (
-                <>
-                  <span className="text-slate-400 hidden sm:inline">/</span>
-                  <a
-                    href={`tel:${firmDetails.phone2}`}
-                    className="font-semibold text-xs hover:text-[#F28C18] transition-colors focus-visible:underline hidden sm:flex items-center min-h-[30px]"
-                    aria-label={`Call ${firmDetails.phone2}`}
-                  >
-                    {firmDetails.phone2}
-                  </a>
-                </>
-              )}
+              <span className="text-slate-400 hidden sm:inline">/</span>
+              <a
+                href={`tel:${firmDetails.phone2}`}
+                className="font-semibold text-xs hover:text-[#F28C18] transition-colors focus-visible:underline hidden sm:flex items-center min-h-[30px]"
+                aria-label={`Call ${firmDetails.phone2}`}
+              >
+                {firmDetails.phone2}
+              </a>
             </div>
 
             <span className="hidden lg:inline text-slate-500">|</span>
@@ -460,7 +455,7 @@ export const Header: React.FC<HeaderProps> = ({
                   {/* Submenu with 44px minimum touch targets */}
                   {mobileServicesExpanded && (
                     <div className="p-2 bg-white space-y-1 text-xs text-[#667085] border-t border-slate-100">
-                      {CORE_SERVICES.map((s) => (
+                      {services.map((s) => (
                         <button
                           key={s.id}
                           onClick={() => handleNav('service-detail', s.id)}
