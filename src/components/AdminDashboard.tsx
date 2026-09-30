@@ -40,12 +40,15 @@ import { useFirmData, ProjectItem } from '../context/FirmDataContext';
 import { OfficialFirmLogo, BrandHeaderLockup } from './CaLogo';
 import { ServiceItem } from '../types';
 import { OfficeLocation } from '../data/indiaMapData';
+import { ClientVaultContainer } from './ClientVault/ClientVaultContainer';
+import { UniversalImageCard } from './Admin/UniversalImageCard';
+import { processImageUpload } from '../utils/imageManager';
 
 interface AdminDashboardProps {
   onBackToWebsite: () => void;
 }
 
-type TabType = 'logos' | 'media' | 'content' | 'services' | 'projects' | 'locations' | 'contact' | 'preview' | 'backup';
+type TabType = 'vault' | 'logos' | 'media' | 'content' | 'services' | 'projects' | 'locations' | 'contact' | 'preview' | 'backup';
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite }) => {
   const { logout, lastLoginTime } = useAdminAuth();
@@ -58,10 +61,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
     updateFavicon,
     updateFounderPhoto, 
     updateOfficePhoto,
+    updateHeroBadge,
+    updateAboutBanner,
     updateMediaItem, 
+    deleteMediaItem,
     resetToDefaults: resetMediaDefaults,
     exportBackup,
-    importBackup
+    importBackup,
+    cloudConnected,
+    lastSyncTime,
+    isSyncing: isMediaSyncing
   } = useMedia();
 
   // Full Firm Data Context
@@ -313,6 +322,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
           <div className="flex items-center gap-1 sm:gap-2 py-2 whitespace-nowrap min-w-max">
             
             <button
+              onClick={() => setActiveTab('vault')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                activeTab === 'vault'
+                  ? 'bg-gradient-to-r from-[#062A5A] to-[#0A3D78] text-white shadow-2xs ring-1 ring-[#F28C18]/60'
+                  : 'text-[#062A5A] bg-[#062A5A]/5 hover:bg-[#062A5A]/10 border border-[#062A5A]/15'
+              }`}
+            >
+              <ShieldCheck size={15} className="text-[#F28C18]" />
+              <span>Client Vault</span>
+              <span className="text-[9px] uppercase tracking-wider font-extrabold bg-[#F28C18] text-white px-1.5 py-0.5 rounded shadow-2xs">
+                SECURE
+              </span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('logos')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 activeTab === 'logos'
@@ -438,6 +462,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
 
       {/* Main Container Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+
+        {/* --------------------------------------------------------------------------------- */}
+        {/* TAB 0: CLIENT VAULT (SECURE ACCESS & USER ROLES CONTROL) */}
+        {/* --------------------------------------------------------------------------------- */}
+        {activeTab === 'vault' && (
+          <div className="animate-in fade-in duration-150">
+            <ClientVaultContainer />
+          </div>
+        )}
 
         {/* --------------------------------------------------------------------------------- */}
         {/* TAB 1: LOGOS & FAVICON (HEADER, FOOTER, FAVICON) */}

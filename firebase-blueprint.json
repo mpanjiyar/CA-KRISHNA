@@ -1,0 +1,58 @@
+{
+  "entities": {
+    "SiteConfig": {
+      "title": "SiteConfig",
+      "description": "Public website content, firm details, media assets, services, and projects synchronized in real time",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "data": { "type": "object" },
+        "updatedAt": { "type": "string" },
+        "updatedBy": { "type": "string" }
+      },
+      "required": ["id", "updatedAt"]
+    },
+    "VaultUser": {
+      "title": "VaultUser",
+      "description": "Client Vault user or staff account record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "fullName": { "type": "string" },
+        "email": { "type": "string" },
+        "company": { "type": "string" },
+        "accountType": { "type": "string" },
+        "status": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "fullName", "email", "accountType"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Security and change audit event record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "action": { "type": "string" },
+        "userId": { "type": "string" },
+        "details": { "type": "string" }
+      },
+      "required": ["id", "timestamp", "action"]
+    }
+  },
+  "firestore": {
+    "/site_content/{docId}": {
+      "schema": "#/entities/SiteConfig",
+      "description": "Global website content, media assets, and firm configurations broadcast live"
+    },
+    "/vault_users/{userId}": {
+      "schema": "#/entities/VaultUser",
+      "description": "Client vault users and permission profiles"
+    },
+    "/audit_logs/{logId}": {
+      "schema": "#/entities/AuditLog",
+      "description": "Audit trail logs for administrative changes"
+    }
+  }
+}

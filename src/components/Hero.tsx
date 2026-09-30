@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowRight, CheckCircle2, PhoneCall, ArrowDown } from 'lucide-react';
 import { CaEmblem } from './CaLogo';
 import { useFirmData } from '../context/FirmDataContext';
+import { useMedia } from '../context/MediaContext';
 
 interface HeroProps {
   onOpenConsultation: () => void;
@@ -13,6 +14,7 @@ export const Hero: React.FC<HeroProps> = ({
   onExploreServices
 }) => {
   const { firmDetails, websiteText } = useFirmData();
+  const { settings } = useMedia();
   const [hasScrolled, setHasScrolled] = useState(false);
 
   useEffect(() => {
@@ -134,6 +136,15 @@ export const Hero: React.FC<HeroProps> = ({
 
               {/* Main Card Content */}
               <div className="relative z-10 flex flex-col items-center text-center pt-2">
+                {/* Official Firm Crest / Hero Badge */}
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/10 backdrop-blur-xs p-2 border border-white/20 shadow-md flex items-center justify-center mb-2.5 overflow-hidden">
+                  <img
+                    src={settings.heroBadge || settings.headerLogo || '/icai-emblem.svg'}
+                    alt="Official Firm Crest"
+                    className="w-full h-full object-contain filter drop-shadow-xs"
+                  />
+                </div>
+
                 {/* Firm Name */}
                 <h3 className="font-brand text-lg xs:text-xl sm:text-2xl font-bold tracking-tight text-white mb-0.5">
                   {firmDetails.name}

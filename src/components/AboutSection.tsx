@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowRight, CheckCircle2, Shield, Landmark, Scale, FileText } from 'lucide-react';
 import { CaEmblem } from './CaLogo';
 import { useFirmData } from '../context/FirmDataContext';
+import { useMedia } from '../context/MediaContext';
 
 interface AboutSectionProps {
   onLearnMore: () => void;
@@ -13,6 +14,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
   onOpenConsultation
 }) => {
   const { firmDetails, websiteText } = useFirmData();
+  const { settings } = useMedia();
   return (
     <section className="w-full bg-white py-10 sm:py-16 lg:py-20 border-b border-[#D9E2EC]">
       <div className="max-w-7xl mx-auto px-3.5 xs:px-4 sm:px-6 lg:px-8">
@@ -101,6 +103,21 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
                 {/* Visual architectural blueprint lines */}
                 <div className="absolute top-0 right-0 w-44 h-44 bg-[#0969C7]/20 rounded-full blur-2xl pointer-events-none" />
                 <div className="absolute bottom-0 left-0 w-28 h-28 bg-[#F28C18]/10 rounded-full blur-xl pointer-events-none" />
+
+                {(settings.officePhoto || settings.aboutBanner) && (
+                  <div className="relative mb-3.5 rounded-xl overflow-hidden border border-white/20 shadow-md aspect-video max-h-44 bg-slate-900">
+                    <img
+                      src={settings.officePhoto || settings.aboutBanner}
+                      alt="PANJIYAR KRISHNA & CO. Office"
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-2 text-[10px] text-white font-medium flex items-center justify-between">
+                      <span>Andheri (W), Mumbai Practice</span>
+                      <span className="text-[#F28C18] text-[9px] uppercase tracking-wider font-bold">Verified Office</span>
+                    </div>
+                  </div>
+                )}
 
                 {/* Workspace Header Graphic */}
                 <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3.5">
