@@ -1,43 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Star, MessageSquarePlus, CheckCircle2, ThumbsUp, ShieldCheck, ChevronLeft, ChevronRight, X, Sparkles } from 'lucide-react';
-import { TESTIMONIALS as DEFAULT_TESTIMONIALS } from '../data/firmData';
-
-export interface ReviewItem {
-  id: string;
-  name: string;
-  role: string;
-  company: string;
-  location: string;
-  rating: number;
-  content: string;
-  date: string;
-  verified?: boolean;
-}
-
-const STORAGE_KEY = 'panjiyar_client_reviews_v1';
+import { Star, MessageSquarePlus, CheckCircle2, ThumbsUp, ShieldCheck, ChevronLeft, ChevronRight, X, Sparkles, Trash2 } from 'lucide-react';
+import { useFirmData, ReviewItem } from '../context/FirmDataContext';
+import { useAdminAuth } from '../context/AdminAuthContext';
 
 export const TestimonialsSection: React.FC = () => {
-  const [reviews, setReviews] = useState<ReviewItem[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        return JSON.parse(saved);
-      }
-    } catch {
-      // Fallback
-    }
-    return DEFAULT_TESTIMONIALS.map((t, idx) => ({
-      id: `default-${idx}`,
-      name: t.name,
-      role: t.role,
-      company: t.company,
-      location: t.location,
-      rating: t.rating || 5,
-      content: t.content,
-      date: 'Recent',
-      verified: true
-    }));
-  });
+  const { reviews, addReview, deleteReview } = useFirmData();
+  const { isAuthenticated } = useAdminAuth();
 
   const [activeIdx, setActiveIdx] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -64,15 +32,15 @@ export const TestimonialsSection: React.FC = () => {
 
   const handleNext = () => {
     setIsAutoPlay(false);
-    setActiveIdx((prev) => (prev + 1) % reviews.length);
+    setActiveIdx((prev) => (prev + 1) % (reviews.length || 1));
   };
 
   const handlePrev = () => {
     setIsAutoPlay(false);
-    setActiveIdx((prev) => (prev - 1 + reviews.length) % reviews.length);
+    setActiveIdx((prev) => (prev - 1 + reviews.length) % (reviews.length || 1));
   };
 
-  const handleSubmitReview = (e: React.FormEvent) => {
+  const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!authorName.trim() || !reviewContent.trim()) return;
 
@@ -88,13 +56,7 @@ export const TestimonialsSection: React.FC = () => {
       verified: true
     };
 
-    const updated = [newReview, ...reviews];
-    setReviews(updated);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    } catch {
-      // Ignore
-    }
+    await addReview(newReview);
 
     setIsSubmitted(true);
     setTimeout(() => {
@@ -139,142 +101,156 @@ export const TestimonialsSection: React.FC = () => {
                   ICAI Professional Standard
                 </span>
               </div>
-              <p className="text-xs text-slate-500 line-clamp-1">
-                Verified feedback from enterprises, business founders, and professionals across India.
+              <p className="text-xs text-slate-500 mt-0.5">
+                Authentic testimonials from corporate directors, business founders &amp; professionals across India.
               </p>
             </div>
           </div>
 
-          {/* Right Action: Rating Score badge + Write Review Button */}
-          <div className="flex items-center gap-2 sm:gap-3 self-start sm:self-auto shrink-0">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-lg border border-slate-200 shadow-2xs text-xs font-semibold text-slate-800">
-              <span className="text-amber-500 font-bold">{avgRating}</span>
+          {/* Right Action: Write a Review Button */}
+          <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+            <div className="flex items-center gap-1 text-xs font-bold text-slate-700 mr-1 bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
+              <span className="text-[#062A5A] text-sm">{avgRating}</span>
               <div className="flex text-amber-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
-                ))}
+                <Star className="w-3.5 h-3.5 fill-amber-400" />
               </div>
-              <span className="text-[11px] text-slate-400 font-normal">({reviews.length})</span>
+              <span className="text-slate-400 font-normal">({reviews.length} reviews)</span>
             </div>
 
             <button
-              onClick={() => {
-                setIsAutoPlay(false);
-                setIsModalOpen(true);
-              }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-[#062A5A] hover:bg-[#031C3D] active:scale-95 rounded-lg shadow-2xs transition-all border border-[#062A5A] hover:border-[#F28C18]"
+              onClick={() => setIsModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#062A5A] bg-white border border-[#D9E2EC] hover:bg-[#EEF5FC] hover:border-[#0969C7] rounded-lg shadow-2xs transition-all active:scale-95"
             >
-              <MessageSquarePlus className="w-3.5 h-3.5 text-[#F28C18]" />
+              <MessageSquarePlus className="w-3.5 h-3.5 text-[#0969C7]" />
               <span>Write a Review</span>
             </button>
           </div>
         </div>
 
-        {/* Compact 2-Card View with Smooth Slide & Controls */}
-        <div 
-          className="relative group"
-          onMouseEnter={() => setIsAutoPlay(false)}
-          onMouseLeave={() => setIsAutoPlay(true)}
-        >
-          {/* Active Cards Grid (Shows 2 on md+, 1 on mobile) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-            {[0, 1].map((offset) => {
-              const itemIdx = (activeIdx + offset) % reviews.length;
-              const r = reviews[itemIdx];
-              if (!r) return null;
+        {/* Reviews Carousel Container */}
+        <div className="relative">
+          {reviews.length === 0 ? (
+            <div className="py-12 text-center bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-xs">
+              No client reviews published yet. Be the first to share your experience!
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {reviews.map((r, idx) => {
+                // Show 3 reviews centered around activeIdx on desktop, 1 on mobile
+                const isMobileActive = idx === activeIdx;
+                return (
+                  <div
+                    key={r.id}
+                    className={`bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-xs transition-all duration-300 flex flex-col justify-between ${
+                      isMobileActive ? 'block' : 'hidden md:flex'
+                    }`}
+                  >
+                    <div>
+                      {/* Top Rating & Badge */}
+                      <div className="flex items-center justify-between mb-2.5">
+                        <div className="flex items-center gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-3.5 h-3.5 ${
+                                i < r.rating
+                                  ? 'text-amber-400 fill-amber-400'
+                                  : 'text-slate-200 fill-slate-200'
+                              }`}
+                            />
+                          ))}
+                        </div>
 
-              return (
-                <div
-                  key={`${r.id}-${itemIdx}`}
-                  className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/90 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between relative overflow-hidden group/card hover:border-[#0969C7]/40"
-                >
-                  <div className="absolute top-0 left-0 h-0.5 w-0 group-hover/card:w-full bg-gradient-to-r from-[#062A5A] via-[#0969C7] to-[#F28C18] transition-all duration-500" />
+                        <div className="flex items-center gap-1.5">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                            Verified Engagement
+                          </span>
 
-                  {/* Top rating & verified pill */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-3.5 h-3.5 ${
-                              i < r.rating
-                                ? 'text-amber-400 fill-amber-400'
-                                : 'text-slate-200 fill-slate-200'
-                            }`}
-                          />
-                        ))}
+                          {/* Instant Admin Delete Button */}
+                          {isAuthenticated && (
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                if (window.confirm(`Delete review from "${r.name}" (${r.company})?`)) {
+                                  await deleteReview(r.id);
+                                }
+                              }}
+                              className="p-1 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                              title="Admin: Delete this review"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          )}
+                        </div>
                       </div>
 
-                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                        Verified Engagement
-                      </span>
-                    </div>
-
-                    <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed font-normal line-clamp-3 mb-3">
-                      &ldquo;{r.content}&rdquo;
-                    </p>
-                  </div>
-
-                  {/* Author Meta */}
-                  <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
-                    <div className="min-w-0 pr-2">
-                      <h4 className="font-semibold text-slate-900 truncate text-xs">
-                        {r.name}
-                      </h4>
-                      <p className="text-[11px] text-slate-500 truncate">
-                        {r.role} &bull; {r.company}
+                      <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed font-normal line-clamp-3 mb-3">
+                        &ldquo;{r.content}&rdquo;
                       </p>
                     </div>
-                    <span className="shrink-0 text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-0.5 rounded border border-slate-100">
-                      {r.location}
-                    </span>
+
+                    {/* Author Meta */}
+                    <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
+                      <div className="min-w-0 pr-2">
+                        <h4 className="font-semibold text-slate-900 truncate text-xs">
+                          {r.name}
+                        </h4>
+                        <p className="text-[11px] text-slate-500 truncate">
+                          {r.role} &bull; {r.company}
+                        </p>
+                      </div>
+                      <span className="shrink-0 text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-0.5 rounded border border-slate-100">
+                        {r.location}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* Navigation Arrows & Dot Indicators */}
-          <div className="flex items-center justify-between mt-3.5 px-1">
-            {/* Dots */}
-            <div className="flex items-center gap-1.5">
-              {reviews.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => {
-                    setIsAutoPlay(false);
-                    setActiveIdx(i);
-                  }}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    i === activeIdx
-                      ? 'w-5 bg-[#062A5A]'
-                      : 'w-1.5 bg-slate-300 hover:bg-slate-400'
-                  }`}
-                  aria-label={`Go to slide ${i + 1}`}
-                />
-              ))}
-            </div>
+          {reviews.length > 1 && (
+            <div className="flex items-center justify-between mt-3.5 px-1">
+              {/* Dots */}
+              <div className="flex items-center gap-1.5">
+                {reviews.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      setIsAutoPlay(false);
+                      setActiveIdx(i);
+                    }}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      i === activeIdx
+                        ? 'w-5 bg-[#062A5A]'
+                        : 'w-1.5 bg-slate-300 hover:bg-slate-400'
+                    }`}
+                    aria-label={`Go to slide ${i + 1}`}
+                  />
+                ))}
+              </div>
 
-            {/* Prev / Next Buttons */}
-            <div className="flex items-center gap-1.5">
-              <button
-                onClick={handlePrev}
-                className="w-7 h-7 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-[#062A5A] hover:bg-slate-50 flex items-center justify-center transition-colors shadow-2xs active:scale-90"
-                aria-label="Previous review"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                onClick={handleNext}
-                className="w-7 h-7 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-[#062A5A] hover:bg-slate-50 flex items-center justify-center transition-colors shadow-2xs active:scale-90"
-                aria-label="Next review"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
+              {/* Prev / Next Buttons */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={handlePrev}
+                  className="w-7 h-7 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-[#062A5A] hover:bg-slate-50 flex items-center justify-center transition-colors shadow-2xs active:scale-90"
+                  aria-label="Previous review"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={handleNext}
+                  className="w-7 h-7 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-[#062A5A] hover:bg-slate-50 flex items-center justify-center transition-colors shadow-2xs active:scale-90"
+                  aria-label="Next review"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
         </div>
 

@@ -16,6 +16,18 @@ export interface ProjectItem {
   year: string;
 }
 
+export interface ReviewItem {
+  id: string;
+  name: string;
+  role: string;
+  company: string;
+  location: string;
+  rating: number;
+  content: string;
+  date: string;
+  verified?: boolean;
+}
+
 export const INITIAL_PROJECTS: ProjectItem[] = [
   {
     id: 'proj-1',
@@ -74,6 +86,64 @@ export const INITIAL_PROJECTS: ProjectItem[] = [
   }
 ];
 
+export const INITIAL_REVIEWS: ReviewItem[] = [
+  {
+    id: 'rev-1',
+    name: 'Rajesh V. Sharma',
+    role: 'Managing Director',
+    company: 'Horizon Engineering & Trading',
+    location: 'Andheri West, Mumbai',
+    rating: 5,
+    content: 'PANJIYAR KRISHNA & CO. streamlined our entire multi-state GST and quarterly TDS compliance without a single hitch. CA Krishna Panjiyar brings deep precision and genuine care to every consultation.',
+    date: 'Sep 2026',
+    verified: true
+  },
+  {
+    id: 'rev-2',
+    name: 'Neelam K. Mehta',
+    role: 'Co-Founder & COO',
+    company: 'Apex Precision Components',
+    location: 'Mumbai, MH',
+    rating: 5,
+    content: 'Preparing our CMA data and loan documentation for a working capital limit enhancement was executed flawlessly. The bank approved our facility within record time thanks to their impeccable financial compilation.',
+    date: 'Aug 2026',
+    verified: true
+  },
+  {
+    id: 'rev-3',
+    name: 'Amitava Sen',
+    role: 'Principal Architect',
+    company: 'CloudBridge Solutions',
+    location: 'Bengaluru / Mumbai',
+    rating: 5,
+    content: 'As a fast-growing IT consultancy, navigating international service invoices and 15CA/CB documentation felt daunting until we partnered with PANJIYAR KRISHNA & CO. Their PAN India support is truly responsive.',
+    date: 'Jul 2026',
+    verified: true
+  },
+  {
+    id: 'rev-4',
+    name: 'Dr. Sunita Deshmukh',
+    role: 'Medical Director',
+    company: 'Lifeline Health Clinic',
+    location: 'Pune / Mumbai',
+    rating: 5,
+    content: 'Accurate, transparent, and highly accessible. When we received an unexpected income tax notice, their team analysed our ledgers, prepared a point-by-point reply, and resolved it smoothly.',
+    date: 'Jun 2026',
+    verified: true
+  },
+  {
+    id: 'rev-5',
+    name: 'Vikram Mehta',
+    role: 'Co-Founder & CEO',
+    company: 'FinStack Tech Labs',
+    location: 'Bengaluru / Mumbai',
+    rating: 5,
+    content: 'From DPIIT registration and startup valuation to CMA data preparation for our bank line, PANJIYAR KRISHNA & CO. delivered institutional-grade accuracy under very tight investor deadlines.',
+    date: 'May 2026',
+    verified: true
+  }
+];
+
 export interface WebsiteTextConfig {
   heroKicker: string;
   heroHeadline: string;
@@ -109,6 +179,11 @@ interface FirmDataContextType {
   updateProject: (id: string, updated: Partial<ProjectItem>) => Promise<void>;
   addProject: (newProject: ProjectItem) => Promise<void>;
   deleteProject: (id: string) => Promise<void>;
+  reviews: ReviewItem[];
+  addReview: (newReview: ReviewItem) => Promise<void>;
+  updateReview: (id: string, updated: Partial<ReviewItem>) => Promise<void>;
+  deleteReview: (id: string) => Promise<void>;
+  resetReviewsToDefault: () => Promise<void>;
   offices: OfficeLocation[];
   updateOffice: (id: string, updated: Partial<OfficeLocation>) => Promise<void>;
   addOffice: (newOffice: OfficeLocation) => Promise<void>;
@@ -122,11 +197,12 @@ interface FirmDataContextType {
 }
 
 const STORAGE_KEYS = {
-  FIRM_DETAILS: 'panjiyar_firm_details_v3',
-  SERVICES: 'panjiyar_services_v3',
-  PROJECTS: 'panjiyar_projects_v3',
-  OFFICES: 'panjiyar_offices_v3',
-  WEBSITE_TEXT: 'panjiyar_website_text_v3'
+  FIRM_DETAILS: 'panjiyar_firm_details_v4',
+  SERVICES: 'panjiyar_services_v4',
+  PROJECTS: 'panjiyar_projects_v4',
+  REVIEWS: 'panjiyar_reviews_v4',
+  OFFICES: 'panjiyar_offices_v4',
+  WEBSITE_TEXT: 'panjiyar_website_text_v4'
 };
 
 const FirmDataContext = createContext<FirmDataContextType | undefined>(undefined);
@@ -170,6 +246,19 @@ export const FirmDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       // Ignored
     }
     return INITIAL_PROJECTS;
+  });
+
+  const [reviews, setReviews] = useState<ReviewItem[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.REVIEWS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {
+      // Ignored
+    }
+    return INITIAL_REVIEWS;
   });
 
   const [offices, setOffices] = useState<OfficeLocation[]>(() => {
@@ -229,6 +318,12 @@ export const FirmDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(data.projects));
             } catch {}
           }
+          if (Array.isArray(data.reviews)) {
+            setReviews(data.reviews);
+            try {
+              localStorage.setItem(STORAGE_KEYS.REVIEWS, JSON.stringify(data.reviews));
+            } catch {}
+          }
           if (Array.isArray(data.offices) && data.offices.length > 0) {
             setOffices(data.offices);
             try {
@@ -261,6 +356,7 @@ export const FirmDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             if (key === 'firmDetails') setFirmDetails((p) => ({ ...p, ...payload }));
             if (key === 'services') setServices(payload);
             if (key === 'projects') setProjects(payload);
+            if (key === 'reviews') setReviews(payload);
             if (key === 'offices') setOffices(payload);
             if (key === 'websiteText') setWebsiteText((p) => ({ ...p, ...payload }));
           }
@@ -278,11 +374,11 @@ export const FirmDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setIsSyncing(true);
     try {
       const docRef = doc(db, 'site_content', 'firm_content');
-      await setDoc(docRef, { ...partialData, updatedAt: new Date().toISOString() }, { merge: true });
+      await setDoc(docRef, { ...partialData, lastUpdatedAt: new Date().toISOString() }, { merge: true });
       setCloudConnected(true);
       setLastSyncTime(new Date().toLocaleTimeString());
-    } catch (e) {
-      console.warn('Cloud sync offline fallback active:', e);
+    } catch (err) {
+      console.warn('Could not sync firm data to Cloud Firestore immediately:', err);
     } finally {
       setIsSyncing(false);
     }
@@ -292,11 +388,10 @@ export const FirmDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         const bc = new BroadcastChannel('panjiyar_firm_data_sync_channel');
-        bc.postMessage({ type: 'FIRM_DATA_SYNC', payload: { key, payload } });
+        bc.postMessage({ type: 'FIRM_DATA_SYNC', key, payload });
         bc.close();
       }
     } catch {}
-    window.dispatchEvent(new CustomEvent('panjiyar_data_updated', { detail: { key, payload } }));
   };
 
   const updateFirmDetails = async (partial: Partial<FirmDetailsType>) => {
@@ -379,6 +474,46 @@ export const FirmDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     await syncToCloud({ projects: newList });
   };
 
+  // Reviews Management
+  const addReview = async (newReview: ReviewItem) => {
+    const newList = [newReview, ...reviews];
+    setReviews(newList);
+    try {
+      localStorage.setItem(STORAGE_KEYS.REVIEWS, JSON.stringify(newList));
+    } catch {}
+    broadcastLocal('reviews', newList);
+    await syncToCloud({ reviews: newList });
+  };
+
+  const updateReview = async (id: string, updated: Partial<ReviewItem>) => {
+    const newList = reviews.map((r) => (r.id === id ? { ...r, ...updated } : r));
+    setReviews(newList);
+    try {
+      localStorage.setItem(STORAGE_KEYS.REVIEWS, JSON.stringify(newList));
+    } catch {}
+    broadcastLocal('reviews', newList);
+    await syncToCloud({ reviews: newList });
+  };
+
+  const deleteReview = async (id: string) => {
+    const newList = reviews.filter((r) => r.id !== id);
+    setReviews(newList);
+    try {
+      localStorage.setItem(STORAGE_KEYS.REVIEWS, JSON.stringify(newList));
+    } catch {}
+    broadcastLocal('reviews', newList);
+    await syncToCloud({ reviews: newList });
+  };
+
+  const resetReviewsToDefault = async () => {
+    setReviews(INITIAL_REVIEWS);
+    try {
+      localStorage.setItem(STORAGE_KEYS.REVIEWS, JSON.stringify(INITIAL_REVIEWS));
+    } catch {}
+    broadcastLocal('reviews', INITIAL_REVIEWS);
+    await syncToCloud({ reviews: INITIAL_REVIEWS });
+  };
+
   const updateOffice = async (id: string, updated: Partial<OfficeLocation>) => {
     const newList = offices.map((o) => (o.id === id ? { ...o, ...updated } : o));
     setOffices(newList);
@@ -413,6 +548,7 @@ export const FirmDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setFirmDetails(FIRM_DETAILS);
     setServices(CORE_SERVICES);
     setProjects(INITIAL_PROJECTS);
+    setReviews(INITIAL_REVIEWS);
     setOffices(OUR_OFFICES);
     setWebsiteText(INITIAL_WEBSITE_TEXT);
 
@@ -420,6 +556,7 @@ export const FirmDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       localStorage.removeItem(STORAGE_KEYS.FIRM_DETAILS);
       localStorage.removeItem(STORAGE_KEYS.SERVICES);
       localStorage.removeItem(STORAGE_KEYS.PROJECTS);
+      localStorage.removeItem(STORAGE_KEYS.REVIEWS);
       localStorage.removeItem(STORAGE_KEYS.OFFICES);
       localStorage.removeItem(STORAGE_KEYS.WEBSITE_TEXT);
     } catch {}
@@ -427,6 +564,7 @@ export const FirmDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     broadcastLocal('firmDetails', FIRM_DETAILS);
     broadcastLocal('services', CORE_SERVICES);
     broadcastLocal('projects', INITIAL_PROJECTS);
+    broadcastLocal('reviews', INITIAL_REVIEWS);
     broadcastLocal('offices', OUR_OFFICES);
     broadcastLocal('websiteText', INITIAL_WEBSITE_TEXT);
 
@@ -434,6 +572,7 @@ export const FirmDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       firmDetails: FIRM_DETAILS,
       services: CORE_SERVICES,
       projects: INITIAL_PROJECTS,
+      reviews: INITIAL_REVIEWS,
       offices: OUR_OFFICES,
       websiteText: INITIAL_WEBSITE_TEXT
     });
@@ -452,6 +591,11 @@ export const FirmDataProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         updateProject,
         addProject,
         deleteProject,
+        reviews,
+        addReview,
+        updateReview,
+        deleteReview,
+        resetReviewsToDefault,
         offices,
         updateOffice,
         addOffice,

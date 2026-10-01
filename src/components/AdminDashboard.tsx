@@ -32,11 +32,14 @@ import {
   FileSpreadsheet,
   Save,
   X,
-  Type
+  Type,
+  Star,
+  MessageSquareQuote,
+  Search
 } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { useMedia, ManagedMedia } from '../context/MediaContext';
-import { useFirmData, ProjectItem } from '../context/FirmDataContext';
+import { useFirmData, ProjectItem, ReviewItem } from '../context/FirmDataContext';
 import { OfficialFirmLogo, BrandHeaderLockup } from './CaLogo';
 import { ServiceItem } from '../types';
 import { OfficeLocation } from '../data/indiaMapData';
@@ -49,7 +52,7 @@ interface AdminDashboardProps {
   onBackToWebsite: () => void;
 }
 
-type TabType = 'vault' | 'logos' | 'media' | 'content' | 'services' | 'projects' | 'locations' | 'contact' | 'preview' | 'backup';
+type TabType = 'vault' | 'logos' | 'media' | 'reviews' | 'content' | 'services' | 'projects' | 'locations' | 'contact' | 'preview' | 'backup';
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite }) => {
   const { logout, lastLoginTime } = useAdminAuth();
@@ -86,6 +89,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
     updateProject,
     addProject,
     deleteProject,
+    reviews,
+    addReview,
+    updateReview,
+    deleteReview,
+    resetReviewsToDefault,
     offices,
     updateOffice,
     addOffice,
@@ -106,6 +114,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
   const [isCreatingProject, setIsCreatingProject] = useState(false);
   const [editingOffice, setEditingOffice] = useState<OfficeLocation | null>(null);
   const [isCreatingOffice, setIsCreatingOffice] = useState(false);
+  const [editingReview, setEditingReview] = useState<ReviewItem | null>(null);
+  const [isCreatingReview, setIsCreatingReview] = useState(false);
+  const [reviewToDelete, setReviewToDelete] = useState<ReviewItem | null>(null);
+  const [reviewSearchQuery, setReviewSearchQuery] = useState('');
+  const [reviewRatingFilter, setReviewRatingFilter] = useState<number | 'all'>('all');
+
+  const filteredReviews = reviews.filter((r) => {
+    const matchesSearch =
+      r.name.toLowerCase().includes(reviewSearchQuery.toLowerCase()) ||
+      r.company.toLowerCase().includes(reviewSearchQuery.toLowerCase()) ||
+      r.content.toLowerCase().includes(reviewSearchQuery.toLowerCase());
+    const matchesRating = reviewRatingFilter === 'all' || r.rating === reviewRatingFilter;
+    return matchesSearch && matchesRating;
+  });
 
   // Form input temps
   const [mediaUrlInput, setMediaUrlInput] = useState('');
@@ -383,6 +405,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
               <span>Website Images</span>
               <span className="text-[10px] bg-white/20 text-current px-1.5 rounded">
                 {settings.customMedia.length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('reviews')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                activeTab === 'reviews'
+                  ? 'bg-[#062A5A] text-white shadow-2xs'
+                  : 'text-slate-600 hover:text-[#062A5A] hover:bg-slate-100'
+              }`}
+            >
+              <Star size={15} className="text-[#F28C18]" />
+              <span>Reviews &amp; Trust</span>
+              <span className="text-[10px] bg-white/20 text-current px-1.5 rounded font-mono">
+                {reviews.length}
               </span>
             </button>
 
@@ -725,6 +762,209 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
                     onToast={showToast}
                   />
                 ))}
+            </div>
+          </div>
+        )}
+
+        {/* --------------------------------------------------------------------------------- */}
+        {/* TAB: CLIENT REVIEWS & TRUST MANAGEMENT */}
+        {/* --------------------------------------------------------------------------------- */}
+        {activeTab === 'reviews' && (
+          <div className="space-y-6 animate-in fade-in duration-150">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="font-manrope font-bold text-xl text-[#062A5A] flex items-center gap-2">
+                  <Star className="w-5 h-5 text-[#F28C18] fill-[#F28C18]" />
+                  <span>Client Reviews &amp; Trust Management</span>
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                  Manage published testimonials and client ratings featured in the public Client Reviews &amp; Trust section.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (window.confirm('Reset all client reviews back to official firm default testimonials?')) {
+                      await resetReviewsToDefault();
+                      showToast('✓ Restored official firm reviews to default.');
+                    }
+                  }}
+                  className="px-3.5 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-600 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                >
+                  <RotateCcw size={13} />
+                  <span>Restore Defaults</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsCreatingReview(true);
+                    setEditingReview({
+                      id: `rev-${Date.now()}`,
+                      name: '',
+                      role: 'Director / Founder',
+                      company: '',
+                      location: 'Mumbai, MH',
+                      rating: 5,
+                      content: '',
+                      date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+                      verified: true
+                    });
+                  }}
+                  className="px-4 py-2 rounded-xl bg-[#062A5A] hover:bg-[#031C3D] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all active:scale-[0.98]"
+                >
+                  <Plus size={15} className="text-[#F28C18]" />
+                  <span>Add Client Review</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Metrics Bar */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Total Reviews</span>
+                <p className="text-2xl font-bold text-[#062A5A] mt-1">{reviews.length}</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Average Rating</span>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <p className="text-2xl font-bold text-[#062A5A]">
+                    {(reviews.reduce((acc, curr) => acc + curr.rating, 0) / (reviews.length || 1)).toFixed(1)}
+                  </p>
+                  <div className="flex items-center text-amber-400">
+                    <Star size={16} className="fill-amber-400" />
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Verified Clients</span>
+                <p className="text-2xl font-bold text-emerald-600 mt-1">
+                  {reviews.filter(r => r.verified !== false).length}
+                </p>
+              </div>
+              <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Live Status</span>
+                <div className="flex items-center gap-1.5 mt-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-xs font-bold text-slate-700">Real-Time Synced</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Search & Filter Bar */}
+            <div className="p-3 bg-white rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xs">
+              <div className="relative w-full sm:w-72">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search reviews by client or company..."
+                  value={reviewSearchQuery}
+                  onChange={(e) => setReviewSearchQuery(e.target.value)}
+                  className="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-1 focus:ring-[#0969C7]"
+                />
+              </div>
+
+              <div className="flex items-center gap-1.5 w-full sm:w-auto">
+                <span className="text-xs font-semibold text-slate-500 mr-1">Filter Stars:</span>
+                {(['all', 5, 4, 3] as const).map((starVal) => (
+                  <button
+                    key={starVal}
+                    type="button"
+                    onClick={() => setReviewRatingFilter(starVal)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors ${
+                      reviewRatingFilter === starVal
+                        ? 'bg-[#062A5A] text-white'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    {starVal === 'all' ? 'All' : `${starVal} ★`}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Reviews Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredReviews.length === 0 ? (
+                <div className="col-span-full py-12 text-center bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-xs">
+                  No reviews matched your search criteria.
+                </div>
+              ) : (
+                filteredReviews.map((rev) => (
+                  <div
+                    key={rev.id}
+                    className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-slate-300 shadow-2xs flex flex-col justify-between transition-all"
+                  >
+                    <div>
+                      {/* Rating & Actions Header */}
+                      <div className="flex items-center justify-between gap-2 mb-3">
+                        <div className="flex items-center gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              size={14}
+                              className={i < rev.rating ? 'text-amber-400 fill-amber-400' : 'text-slate-200'}
+                            />
+                          ))}
+                          <span className="ml-1 text-xs font-bold text-slate-700">{rev.rating}.0</span>
+                          {rev.verified !== false && (
+                            <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                              <CheckCircle2 size={11} className="text-emerald-600" /> Verified
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Edit & Delete Action Buttons */}
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsCreatingReview(false);
+                              setEditingReview({ ...rev });
+                            }}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-[#0969C7] hover:bg-slate-100 transition-colors"
+                            title="Edit Review"
+                          >
+                            <Edit2 size={14} />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setReviewToDelete(rev)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                            title="Delete Review"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Review Quote Body */}
+                      <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed font-normal italic mb-4">
+                        &ldquo;{rev.content}&rdquo;
+                      </p>
+                    </div>
+
+                    {/* Author Footer */}
+                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                      <div>
+                        <h4 className="font-bold text-slate-900 text-xs">{rev.name}</h4>
+                        <p className="text-[11px] text-slate-500">
+                          {rev.role} &bull; {rev.company}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-0.5 rounded border border-slate-100 block">
+                          {rev.location}
+                        </span>
+                        <span className="text-[10px] text-slate-400 mt-0.5 block">{rev.date}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         )}
@@ -1989,6 +2229,193 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
               >
                 <Save size={14} className="text-[#F28C18]" />
                 <span>Save Changes</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --------------------------------------------------------------------------------- */}
+      {/* MODAL: DELETE REVIEW CONFIRMATION */}
+      {/* --------------------------------------------------------------------------------- */}
+      {reviewToDelete && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 text-left animate-in zoom-in-95">
+            <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mb-4">
+              <Trash2 size={24} />
+            </div>
+
+            <h3 className="font-manrope font-bold text-lg text-slate-900 mb-2">
+              Delete Client Review?
+            </h3>
+
+            <p className="text-xs text-slate-600 mb-4 leading-relaxed">
+              Are you sure you want to permanently delete the review from <strong className="text-slate-900">{reviewToDelete.name}</strong> ({reviewToDelete.company})? This will immediately remove it from the public Client Reviews &amp; Trust section across all devices in real time.
+            </p>
+
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 mb-5 text-xs text-slate-600 italic">
+              &ldquo;{reviewToDelete.content}&rdquo;
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setReviewToDelete(null)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={async () => {
+                  const clientName = reviewToDelete.name;
+                  await deleteReview(reviewToDelete.id);
+                  setReviewToDelete(null);
+                  showToast(`✓ Review from "${clientName}" deleted and removed from the website across all devices.`);
+                }}
+                className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all active:scale-[0.98]"
+              >
+                <Trash2 size={14} />
+                <span>Confirm Delete Review</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --------------------------------------------------------------------------------- */}
+      {/* MODAL: EDIT / CREATE CLIENT REVIEW */}
+      {/* --------------------------------------------------------------------------------- */}
+      {editingReview && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 text-left my-8 animate-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <h3 className="font-manrope font-bold text-lg text-[#062A5A] flex items-center gap-2">
+                <Star size={18} className="text-[#F28C18] fill-[#F28C18]" />
+                <span>{isCreatingReview ? 'Add New Client Review' : 'Edit Client Review'}</span>
+              </h3>
+              <button
+                onClick={() => setEditingReview(null)}
+                className="p-1 rounded-lg hover:bg-slate-100 text-slate-400"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="space-y-3.5 text-xs max-h-[75vh] overflow-y-auto pr-1">
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Client Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={editingReview.name}
+                  onChange={(e) => setEditingReview({ ...editingReview, name: e.target.value })}
+                  placeholder="e.g. Rajesh V. Sharma"
+                  className="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-1 focus:ring-[#0969C7]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Role / Designation</label>
+                  <input
+                    type="text"
+                    value={editingReview.role}
+                    onChange={(e) => setEditingReview({ ...editingReview, role: e.target.value })}
+                    placeholder="e.g. Managing Director"
+                    className="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-1 focus:ring-[#0969C7]"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Company / Enterprise</label>
+                  <input
+                    type="text"
+                    value={editingReview.company}
+                    onChange={(e) => setEditingReview({ ...editingReview, company: e.target.value })}
+                    placeholder="e.g. Horizon Engineering"
+                    className="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-1 focus:ring-[#0969C7]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Location / City</label>
+                  <input
+                    type="text"
+                    value={editingReview.location}
+                    onChange={(e) => setEditingReview({ ...editingReview, location: e.target.value })}
+                    placeholder="e.g. Andheri West, Mumbai"
+                    className="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-1 focus:ring-[#0969C7]"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Star Rating (1 - 5)</label>
+                  <select
+                    value={editingReview.rating}
+                    onChange={(e) => setEditingReview({ ...editingReview, rating: Number(e.target.value) })}
+                    className="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-1 focus:ring-[#0969C7] bg-white"
+                  >
+                    <option value={5}>5 Stars ★★★★★ (Exceptional)</option>
+                    <option value={4}>4 Stars ★★★★☆ (Very Good)</option>
+                    <option value={3}>3 Stars ★★★☆☆ (Good)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Review Quote / Testimonial Text *</label>
+                <textarea
+                  rows={4}
+                  required
+                  value={editingReview.content}
+                  onChange={(e) => setEditingReview({ ...editingReview, content: e.target.value })}
+                  placeholder="Enter detailed client quote describing professional Chartered Accountancy experience..."
+                  className="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-1 focus:ring-[#0969C7]"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <input
+                  type="checkbox"
+                  id="verified-engagement"
+                  checked={editingReview.verified !== false}
+                  onChange={(e) => setEditingReview({ ...editingReview, verified: e.target.checked })}
+                  className="w-4 h-4 rounded text-[#0969C7] focus:ring-[#0969C7]"
+                />
+                <label htmlFor="verified-engagement" className="text-xs font-medium text-slate-700">
+                  Mark as Verified Client Engagement
+                </label>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-2 mt-4">
+              <button
+                type="button"
+                onClick={() => setEditingReview(null)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  if (editingReview.name.trim() && editingReview.content.trim()) {
+                    if (isCreatingReview) {
+                      await addReview(editingReview);
+                      showToast(`✓ Review from "${editingReview.name}" published live!`);
+                    } else {
+                      await updateReview(editingReview.id, editingReview);
+                      showToast(`✓ Review from "${editingReview.name}" updated!`);
+                    }
+                    setEditingReview(null);
+                  }
+                }}
+                className="px-5 py-2.5 rounded-xl bg-[#062A5A] hover:bg-[#031C3D] text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all active:scale-[0.98]"
+              >
+                <Save size={14} className="text-[#F28C18]" />
+                <span>Save Review</span>
               </button>
             </div>
           </div>
