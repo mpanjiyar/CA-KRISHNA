@@ -46,7 +46,7 @@ import { OfficeLocation } from '../data/indiaMapData';
 import { ClientVaultContainer } from './ClientVault/ClientVaultContainer';
 import { UniversalImageCard } from './Admin/UniversalImageCard';
 import { processImageUpload } from '../utils/imageManager';
-import { uploadImageFile } from '../lib/storageService';
+import { uploadImageFile, processDirectUrl } from '../lib/storageService';
 
 interface AdminDashboardProps {
   onBackToWebsite: () => void;
@@ -1842,13 +1842,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Option B: Or Enter Direct Cloud / CDN Image URL
+                  Option B: Or Enter Stored Path (/uploads/...) or Direct Cloud/CDN URL
                 </label>
                 <input
-                  type="url"
+                  type="text"
                   value={mediaUrlInput}
                   onChange={(e) => setMediaUrlInput(e.target.value)}
-                  placeholder="https://example.com/photo.jpg or cloud storage URL"
+                  placeholder="/uploads/image.jpg or https://example.com/photo.jpg"
                   className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#0969C7] bg-white"
                 />
               </div>
@@ -1870,10 +1870,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
               <button
                 type="button"
                 onClick={async () => {
-                  await updateMediaItem(editingMediaItem.id, mediaUrlInput.trim());
-                  showToast(`✓ Changes saved successfully: ${editingMediaItem.name} saved and synchronized in real time.`);
-                  setEditingMediaItem(null);
-                  setMediaUrlInput('');
+                  const raw = mediaUrlInput.trim();
+                  try {
+                    let finalUrl = raw;
+                    if (raw && !raw.startsWith('data:')) {
+                      const res = await processDirectUrl(raw);
+                      finalUrl = res.url;
+                    }
+                    await updateMediaItem(editingMediaItem.id, finalUrl);
+                    showToast(`✓ Changes saved successfully: ${editingMediaItem.name} saved and synchronized in real time.`);
+                    setEditingMediaItem(null);
+                    setMediaUrlInput('');
+                  } catch (err: unknown) {
+                    const msg = err instanceof Error ? err.message : 'Invalid image URL';
+                    showToast(`Error: ${msg}`);
+                  }
                 }}
                 className="px-5 py-2.5 rounded-xl bg-[#062A5A] hover:bg-[#031C3D] text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all active:scale-[0.98]"
               >

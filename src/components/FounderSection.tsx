@@ -7,6 +7,11 @@ import { useFirmData } from '../context/FirmDataContext';
 export const FounderSection: React.FC = () => {
   const { settings } = useMedia();
   const { firmDetails } = useFirmData();
+  const [imageError, setImageError] = React.useState(false);
+
+  React.useEffect(() => {
+    setImageError(false);
+  }, [settings.founderPhoto]);
   return (
     <section className="w-full bg-[#F7F9FC] py-10 sm:py-16 lg:py-20 border-b border-[#D9E2EC]">
       <div className="max-w-5xl mx-auto px-3.5 xs:px-4 sm:px-6 lg:px-8">
@@ -26,12 +31,15 @@ export const FounderSection: React.FC = () => {
                 {/* Circular Profile Frame with ICAI Colors or Uploaded Photo */}
                 <div className="w-24 h-24 xs:w-28 xs:h-28 sm:w-34 sm:h-34 rounded-full bg-gradient-to-br from-[#062A5A] to-[#0969C7] p-1 shadow-sm flex items-center justify-center overflow-hidden">
                   <div className="w-full h-full rounded-full bg-white flex flex-col items-center justify-center p-2 text-center overflow-hidden">
-                    {settings.founderPhoto ? (
+                    {settings.founderPhoto && !imageError ? (
                       <img
                         key={settings.founderPhoto}
                         src={settings.founderPhoto}
                         alt={firmDetails.founder}
                         className="w-full h-full object-cover rounded-full"
+                        onError={() => setImageError(true)}
+                        loading="lazy"
+                        decoding="async"
                       />
                     ) : (
                       <>

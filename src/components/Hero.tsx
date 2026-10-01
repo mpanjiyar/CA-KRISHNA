@@ -143,6 +143,12 @@ export const Hero: React.FC<HeroProps> = ({
                     src={settings.heroBadge || settings.headerLogo || '/icai-emblem.svg'}
                     alt="Official Firm Crest"
                     className="w-full h-full object-contain filter drop-shadow-xs"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (target.src !== '/icai-emblem.svg') {
+                        target.src = '/icai-emblem.svg';
+                      }
+                    }}
                   />
                 </div>
 

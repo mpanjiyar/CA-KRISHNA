@@ -177,8 +177,6 @@ export default function App() {
             <FinalHomeCta
               onOpenConsultation={() => handleOpenConsultation()}
             />
-
-            <ContactSection />
           </>
         )}
 

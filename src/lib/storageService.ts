@@ -1,6 +1,6 @@
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { app } from './firebase';
-import { processImageUpload, verifyImageUrl } from '../utils/imageManager';
+import { processImageUpload, verifyImageUrl, UrlValidationResult } from '../utils/imageManager';
 
 let storageInstance: ReturnType<typeof getStorage> | null = null;
 try {
@@ -11,18 +11,21 @@ try {
 
 export interface UploadResult {
   url: string;
-  source: 'firebase_storage' | 'optimized_cloud_payload' | 'cdn_url';
+  source: 'firebase_storage' | 'optimized_cloud_payload' | 'cdn_url' | 'local_path';
   sizeBytes: number;
+  format?: string;
+  width?: number;
+  height?: number;
 }
 
 /**
  * Universal Image Upload Handler
- * 1. Attempts to upload to Firebase Storage to get a permanent HTTPS download URL.
- * 2. If Firebase Storage bucket is unavailable (e.g. 404, not provisioned on GCP),
- *    gracefully falls back to optimized multi-pass compressed data URL (<250KB)
- *    which safely persists in Firestore documents without exceeding the 1MB limit.
+ * 1. Tries Firebase Storage to get a permanent HTTPS download URL if provisioned.
+ * 2. If Firebase Storage is unavailable (e.g. 404 on GCP),
+ *    gracefully falls back to optimized multi-pass compressed payload (<250KB)
+ *    which safely persists in Firestore documents and synchronizes in real time.
  */
-export async function uploadImageFile(file: File, folder: string = 'media'): Promise<UploadResult> {
+export async function uploadImageFile(file: File, folder: string = 'branding'): Promise<UploadResult> {
   if (!file) {
     throw new Error('No file provided for upload.');
   }
@@ -34,7 +37,6 @@ export async function uploadImageFile(file: File, folder: string = 'media'): Pro
       const storagePath = `${folder}/${Date.now()}_${cleanFileName}`;
       const storageRef = ref(storageInstance, storagePath);
 
-      // Set explicit content type metadata
       const metadata = { contentType: file.type || 'image/jpeg' };
       const uploadSnapshot = await uploadBytes(storageRef, file, metadata);
       const downloadUrl = await getDownloadURL(uploadSnapshot.ref);
@@ -43,41 +45,43 @@ export async function uploadImageFile(file: File, folder: string = 'media'): Pro
         return {
           url: downloadUrl,
           source: 'firebase_storage',
-          sizeBytes: file.size
+          sizeBytes: file.size,
+          format: file.type.replace('image/', '').toUpperCase()
         };
       }
-    } catch (storageError: unknown) {
-      // Firebase Storage bucket not provisioned on GCP or unavailable; continue to optimized payload
-      console.warn('Firebase Storage upload notice (using optimized cloud payload):', storageError);
+    } catch {
+      // Gracefully continue to optimized cloud payload
     }
   }
 
-  // 2. High-performance fallback: multi-pass compression (<250KB) for Firestore persistence
+  // 2. High-performance fallback: multi-pass compression for instant Firestore persistence
   const processed = await processImageUpload(file);
   return {
     url: processed.dataUrl,
     source: 'optimized_cloud_payload',
-    sizeBytes: processed.sizeBytes
+    sizeBytes: processed.sizeBytes,
+    format: processed.format,
+    width: processed.width,
+    height: processed.height
   };
 }
 
 /**
- * Handle direct URL input (Cloudinary, AWS S3, Imgur, Google Drive, etc.)
+ * Validate and process direct URL input (Cloudinary, AWS S3, Imgur, /uploads/image.jpg, etc.)
  */
 export async function processDirectUrl(url: string): Promise<UploadResult> {
-  const trimmed = url.trim();
-  if (!trimmed) {
-    throw new Error('URL cannot be empty.');
-  }
+  const result: UrlValidationResult = await verifyImageUrl(url);
 
-  const isValid = await verifyImageUrl(trimmed);
-  if (!isValid) {
-    throw new Error('Could not verify image from the provided URL. Please check the link.');
+  if (!result.valid) {
+    throw new Error(result.error || 'Failed to verify image from the provided URL.');
   }
 
   return {
-    url: trimmed,
-    source: 'cdn_url',
-    sizeBytes: trimmed.length
+    url: result.normalizedUrl,
+    source: result.isLocalPath ? 'local_path' : 'cdn_url',
+    sizeBytes: result.normalizedUrl.length,
+    width: result.width,
+    height: result.height,
+    format: result.normalizedUrl.split('.').pop()?.toUpperCase() || 'IMAGE'
   };
 }

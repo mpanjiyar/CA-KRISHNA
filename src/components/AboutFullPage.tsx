@@ -17,6 +17,11 @@ export const AboutFullPage: React.FC<AboutFullPageProps> = ({
 }) => {
   const { settings } = useMedia();
   const { firmDetails } = useFirmData();
+  const [imageError, setImageError] = React.useState(false);
+
+  React.useEffect(() => {
+    setImageError(false);
+  }, [settings.founderPhoto]);
   return (
     <div className="w-full bg-white text-left min-h-screen py-8 sm:py-12">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -64,12 +69,15 @@ export const AboutFullPage: React.FC<AboutFullPageProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 items-center">
             <div className="md:col-span-4 flex flex-col items-center text-center">
               <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white border border-[#D9E2EC] shadow-sm mb-3 flex items-center justify-center overflow-hidden p-1">
-                {settings.founderPhoto ? (
+                {settings.founderPhoto && !imageError ? (
                   <img
                     key={settings.founderPhoto}
                     src={settings.founderPhoto}
                     alt={firmDetails.founder}
                     className="w-full h-full object-cover rounded-full"
+                    onError={() => setImageError(true)}
+                    loading="lazy"
+                    decoding="async"
                   />
                 ) : (
                   <CaEmblem sizePx={72} />

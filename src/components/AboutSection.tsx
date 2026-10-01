@@ -112,6 +112,11 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
                       alt="PANJIYAR KRISHNA & CO. Office"
                       className="w-full h-full object-cover"
                       loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        const parent = e.currentTarget.parentElement;
+                        if (parent) parent.style.display = 'none';
+                      }}
                     />
                     <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-2 text-[10px] text-white font-medium flex items-center justify-between">
                       <span>Andheri (W), Mumbai Practice</span>

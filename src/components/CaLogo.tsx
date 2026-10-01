@@ -44,6 +44,12 @@ export const OfficialFirmLogo: React.FC<{
         className="w-full h-full object-contain drop-shadow-xs transition-all duration-200"
         loading="eager"
         decoding="async"
+        onError={(e) => {
+          const target = e.currentTarget;
+          if (target.src !== '/icai-emblem.svg') {
+            target.src = '/icai-emblem.svg';
+          }
+        }}
       />
     </div>
   );

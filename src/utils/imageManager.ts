@@ -1,9 +1,11 @@
 /**
- * Universal Image Processing and Validation Utility
- * Supports JPG, JPEG, PNG, WebP, SVG, GIF, ICO, AVIF, BMP
- * Handles multi-pass compression to guarantee all photos and logos
- * stay well within cloud document storage and memory constraints (<350KB),
- * while maintaining crisp resolution on Retina displays.
+ * Universal Image Processing and Validation Engine
+ * Supports JPG, JPEG, PNG, WebP, SVG, GIF, ICO, AVIF, BMP, TIFF
+ * - Local uploads (/uploads/image.jpg)
+ * - Stored cloud files
+ * - Direct image URLs & CDN links (https://example.com/image.jpg)
+ * - Multi-pass WebP/PNG compression guaranteeing payload safety under Firestore document limits (<250KB)
+ * - Real-time Retina display clarity with zero blur
  */
 
 export const SUPPORTED_IMAGE_TYPES = [
@@ -16,23 +18,47 @@ export const SUPPORTED_IMAGE_TYPES = [
   'image/x-icon',
   'image/vnd.microsoft.icon',
   'image/avif',
-  'image/bmp'
+  'image/bmp',
+  'image/tiff'
 ];
 
-export const SUPPORTED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.svg', '.gif', '.ico', '.avif', '.bmp'];
+export const SUPPORTED_EXTENSIONS = [
+  '.jpg',
+  '.jpeg',
+  '.png',
+  '.webp',
+  '.svg',
+  '.gif',
+  '.ico',
+  '.avif',
+  '.bmp',
+  '.tiff'
+];
 
-export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB upload limit
-export const TARGET_MAX_DATA_URL_LENGTH = 350000; // ~260KB binary data, well under Firestore 1MB limit
+export const MAX_FILE_SIZE_BYTES = 15 * 1024 * 1024; // 15 MB upload limit
+export const TARGET_MAX_DATA_URL_LENGTH = 320000; // ~240KB binary payload, well under Firestore 1MB document ceiling
 
 export interface ImageProcessResult {
   dataUrl: string;
   format: string;
   sizeBytes: number;
-  width?: number;
-  height?: number;
+  width: number;
+  height: number;
   isSvgOrGif: boolean;
 }
 
+export interface UrlValidationResult {
+  valid: boolean;
+  normalizedUrl: string;
+  width?: number;
+  height?: number;
+  error?: string;
+  isLocalPath: boolean;
+}
+
+/**
+ * Validate a selected File before reading
+ */
 export function validateImageFile(file: File): { valid: boolean; error?: string } {
   if (!file) {
     return { valid: false, error: 'No file selected.' };
@@ -45,7 +71,7 @@ export function validateImageFile(file: File): { valid: boolean; error?: string 
   if (!isTypeSupported && !isExtSupported) {
     return {
       valid: false,
-      error: `Unsupported image format (${file.type || extension}). Supported formats: JPG, JPEG, PNG, WebP, SVG, GIF, AVIF, ICO.`
+      error: `Unsupported image format (${file.type || extension}). Supported formats: JPG, JPEG, PNG, WebP, SVG, GIF, ICO, AVIF, BMP.`
     };
   }
 
@@ -53,7 +79,7 @@ export function validateImageFile(file: File): { valid: boolean; error?: string 
     const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
     return {
       valid: false,
-      error: `File is too large (${sizeMb} MB). Maximum allowed file size is 10 MB.`
+      error: `File is too large (${sizeMb} MB). Maximum allowed file size is 15 MB.`
     };
   }
 
@@ -61,7 +87,7 @@ export function validateImageFile(file: File): { valid: boolean; error?: string 
 }
 
 /**
- * Multi-pass compression for canvas to ensure dataUrl length < TARGET_MAX_DATA_URL_LENGTH
+ * Multi-pass progressive canvas compression
  */
 function compressToTarget(
   img: HTMLImageElement,
@@ -69,21 +95,21 @@ function compressToTarget(
 ): { dataUrl: string; width: number; height: number; format: string } {
   const isPng = fileType === 'image/png';
   const passes = [
-    { maxDim: 1000, quality: 0.85, mime: isPng ? 'image/png' : 'image/jpeg' },
-    { maxDim: 800, quality: 0.80, mime: isPng ? 'image/png' : 'image/jpeg' },
-    { maxDim: 800, quality: 0.75, mime: 'image/jpeg' },
-    { maxDim: 640, quality: 0.70, mime: 'image/jpeg' },
-    { maxDim: 500, quality: 0.65, mime: 'image/jpeg' }
+    { maxDim: 1200, quality: 0.88, mime: isPng ? 'image/png' : 'image/webp' },
+    { maxDim: 1000, quality: 0.82, mime: 'image/webp' },
+    { maxDim: 800, quality: 0.78, mime: 'image/webp' },
+    { maxDim: 640, quality: 0.72, mime: isPng ? 'image/png' : 'image/jpeg' },
+    { maxDim: 500, quality: 0.68, mime: 'image/jpeg' }
   ];
 
   let bestDataUrl = '';
-  let bestW = img.width;
-  let bestH = img.height;
+  let bestW = img.naturalWidth || img.width;
+  let bestH = img.naturalHeight || img.height;
   let bestFormat = fileType;
 
   for (const pass of passes) {
-    let w = img.width;
-    let h = img.height;
+    let w = img.naturalWidth || img.width;
+    let h = img.naturalHeight || img.height;
 
     if (w > pass.maxDim || h > pass.maxDim) {
       if (w > h) {
@@ -124,7 +150,7 @@ function compressToTarget(
 }
 
 /**
- * Process and optimize an uploaded file
+ * Process, validate, and optimize an uploaded file
  */
 export async function processImageUpload(file: File): Promise<ImageProcessResult> {
   const validation = validateImageFile(file);
@@ -136,36 +162,52 @@ export async function processImageUpload(file: File): Promise<ImageProcessResult
   const isGif = file.type === 'image/gif' || file.name.toLowerCase().endsWith('.gif');
   const isIco = file.type.includes('icon') || file.name.toLowerCase().endsWith('.ico');
 
-  // SVGs, GIFs, and ICOs are read directly to preserve vector paths and animation frames
+  // SVGs, GIFs, and ICOs are preserved directly to retain vectors and animation frames
   if (isSvg || isGif || isIco) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
         if (!result) {
-          reject(new Error('Failed reading file data.'));
+          reject(new Error('Failed reading file stream.'));
           return;
         }
 
-        // If SVG or GIF is extraordinarily large for a single cloud doc, warn
-        if (result.length > 700000) {
-          reject(new Error(`The ${isSvg ? 'SVG' : 'GIF'} is too large (${(result.length / 1024).toFixed(0)} KB data). Please use a file under 700 KB.`));
+        if (result.length > 800000) {
+          reject(new Error(`The ${isSvg ? 'SVG' : 'GIF'} is too large (${(result.length / 1024).toFixed(0)} KB). Please use a file under 800 KB.`));
           return;
         }
 
-        resolve({
-          dataUrl: result,
-          format: isSvg ? 'SVG' : isGif ? 'GIF' : 'ICO',
-          sizeBytes: Math.round(result.length * 0.75),
-          isSvgOrGif: true
-        });
+        const img = new Image();
+        img.onload = () => {
+          resolve({
+            dataUrl: result,
+            format: isSvg ? 'SVG' : isGif ? 'GIF' : 'ICO',
+            sizeBytes: Math.round(result.length * 0.75),
+            width: img.naturalWidth || 100,
+            height: img.naturalHeight || 100,
+            isSvgOrGif: true
+          });
+        };
+        img.onerror = () => {
+          // If ICO or SVG dimensions can't be decoded directly, still resolve safely
+          resolve({
+            dataUrl: result,
+            format: isSvg ? 'SVG' : isGif ? 'GIF' : 'ICO',
+            sizeBytes: Math.round(result.length * 0.75),
+            width: 64,
+            height: 64,
+            isSvgOrGif: true
+          });
+        };
+        img.src = result;
       };
-      reader.onerror = () => reject(new Error('Failed reading file stream.'));
+      reader.onerror = () => reject(new Error('Failed reading file stream from device.'));
       reader.readAsDataURL(file);
     });
   }
 
-  // Raster images (JPG, PNG, WebP, AVIF, BMP): multi-pass compression
+  // Raster images (JPG, PNG, WebP, AVIF, BMP, TIFF): Progressive compression
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -179,10 +221,11 @@ export async function processImageUpload(file: File): Promise<ImageProcessResult
       img.onload = () => {
         try {
           const compressed = compressToTarget(img, file.type);
+          const finalUrl = compressed.dataUrl || rawDataUrl;
           resolve({
-            dataUrl: compressed.dataUrl || rawDataUrl,
-            format: compressed.format,
-            sizeBytes: Math.round((compressed.dataUrl || rawDataUrl).length * 0.75),
+            dataUrl: finalUrl,
+            format: compressed.format.replace('image/', '').toUpperCase(),
+            sizeBytes: Math.round(finalUrl.length * 0.75),
             width: compressed.width,
             height: compressed.height,
             isSvgOrGif: false
@@ -206,17 +249,65 @@ export async function processImageUpload(file: File): Promise<ImageProcessResult
 }
 
 /**
- * Validate that an image URL (cloud/CDN or data URL) actually loads
+ * Validate that an image URL (cloud/CDN, local relative path, or data URL) actually decodes
  */
-export function verifyImageUrl(url: string): Promise<boolean> {
+export function verifyImageUrl(rawUrl: string, timeoutMs: number = 7000): Promise<UrlValidationResult> {
   return new Promise((resolve) => {
-    if (!url || typeof url !== 'string') {
-      resolve(false);
+    const trimmed = rawUrl.trim();
+    if (!trimmed) {
+      resolve({ valid: false, normalizedUrl: '', isLocalPath: false, error: 'URL cannot be empty.' });
       return;
     }
+
+    // Auto-normalize external URLs without protocol
+    let normalized = trimmed;
+    const isLocalPath = trimmed.startsWith('/') || trimmed.startsWith('./');
+    const isDataUrl = trimmed.startsWith('data:image/');
+
+    if (!isLocalPath && !isDataUrl && !trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+      normalized = 'https://' + trimmed;
+    }
+
     const img = new Image();
-    img.onload = () => resolve(true);
-    img.onerror = () => resolve(false);
-    img.src = url;
+    let hasTimedOut = false;
+
+    const timer = setTimeout(() => {
+      hasTimedOut = true;
+      img.src = '';
+      resolve({
+        valid: false,
+        normalizedUrl: normalized,
+        isLocalPath,
+        error: `Image verification timed out after ${timeoutMs / 1000}s. The URL may be unreachable or blocked.`
+      });
+    }, timeoutMs);
+
+    img.onload = () => {
+      if (hasTimedOut) return;
+      clearTimeout(timer);
+      resolve({
+        valid: true,
+        normalizedUrl: normalized,
+        width: img.naturalWidth || img.width,
+        height: img.naturalHeight || img.height,
+        isLocalPath
+      });
+    };
+
+    img.onerror = () => {
+      if (hasTimedOut) return;
+      clearTimeout(timer);
+      const errorMsg = isLocalPath
+        ? `Local file not found at "${normalized}". Please ensure the file exists in the public directory.`
+        : `Could not load image from "${normalized}". Please check that the URL is public, accessible, and points to a valid image.`;
+      resolve({
+        valid: false,
+        normalizedUrl: normalized,
+        isLocalPath,
+        error: errorMsg
+      });
+    };
+
+    img.src = normalized;
   });
 }
