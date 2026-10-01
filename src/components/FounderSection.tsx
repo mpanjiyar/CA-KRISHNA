@@ -28,6 +28,7 @@ export const FounderSection: React.FC = () => {
                   <div className="w-full h-full rounded-full bg-white flex flex-col items-center justify-center p-2 text-center overflow-hidden">
                     {settings.founderPhoto ? (
                       <img
+                        key={settings.founderPhoto}
                         src={settings.founderPhoto}
                         alt={firmDetails.founder}
                         className="w-full h-full object-cover rounded-full"

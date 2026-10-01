@@ -38,6 +38,7 @@ export const OfficialFirmLogo: React.FC<{
       aria-label={alt}
     >
       <img
+        key={logoUrl}
         src={logoUrl}
         alt={alt}
         className="w-full h-full object-contain drop-shadow-xs transition-all duration-200"

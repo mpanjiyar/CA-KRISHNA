@@ -107,6 +107,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
                 {(settings.officePhoto || settings.aboutBanner) && (
                   <div className="relative mb-3.5 rounded-xl overflow-hidden border border-white/20 shadow-md aspect-video max-h-44 bg-slate-900">
                     <img
+                      key={settings.officePhoto || settings.aboutBanner}
                       src={settings.officePhoto || settings.aboutBanner}
                       alt="PANJIYAR KRISHNA & CO. Office"
                       className="w-full h-full object-cover"

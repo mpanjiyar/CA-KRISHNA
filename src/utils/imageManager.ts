@@ -1,8 +1,9 @@
 /**
  * Universal Image Processing and Validation Utility
  * Supports JPG, JPEG, PNG, WebP, SVG, GIF, ICO, AVIF, BMP
- * Handles compression, preservation of SVGs and animated GIFs,
- * and robust size & format validation.
+ * Handles multi-pass compression to guarantee all photos and logos
+ * stay well within cloud document storage and memory constraints (<350KB),
+ * while maintaining crisp resolution on Retina displays.
  */
 
 export const SUPPORTED_IMAGE_TYPES = [
@@ -20,7 +21,8 @@ export const SUPPORTED_IMAGE_TYPES = [
 
 export const SUPPORTED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.svg', '.gif', '.ico', '.avif', '.bmp'];
 
-export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB upload limit
+export const TARGET_MAX_DATA_URL_LENGTH = 350000; // ~260KB binary data, well under Firestore 1MB limit
 
 export interface ImageProcessResult {
   dataUrl: string;
@@ -33,7 +35,7 @@ export interface ImageProcessResult {
 
 export function validateImageFile(file: File): { valid: boolean; error?: string } {
   if (!file) {
-    return { valid: false, error: 'No file provided.' };
+    return { valid: false, error: 'No file selected.' };
   }
 
   const extension = '.' + file.name.split('.').pop()?.toLowerCase();
@@ -43,7 +45,7 @@ export function validateImageFile(file: File): { valid: boolean; error?: string 
   if (!isTypeSupported && !isExtSupported) {
     return {
       valid: false,
-      error: `Unsupported image format (${file.type || extension}). Please upload JPG, JPEG, PNG, WebP, SVG, GIF, AVIF, or ICO.`
+      error: `Unsupported image format (${file.type || extension}). Supported formats: JPG, JPEG, PNG, WebP, SVG, GIF, AVIF, ICO.`
     };
   }
 
@@ -51,7 +53,7 @@ export function validateImageFile(file: File): { valid: boolean; error?: string 
     const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
     return {
       valid: false,
-      error: `File is too large (${sizeMb} MB). Maximum allowed size is 10 MB.`
+      error: `File is too large (${sizeMb} MB). Maximum allowed file size is 10 MB.`
     };
   }
 
@@ -59,12 +61,72 @@ export function validateImageFile(file: File): { valid: boolean; error?: string 
 }
 
 /**
+ * Multi-pass compression for canvas to ensure dataUrl length < TARGET_MAX_DATA_URL_LENGTH
+ */
+function compressToTarget(
+  img: HTMLImageElement,
+  fileType: string
+): { dataUrl: string; width: number; height: number; format: string } {
+  const isPng = fileType === 'image/png';
+  const passes = [
+    { maxDim: 1000, quality: 0.85, mime: isPng ? 'image/png' : 'image/jpeg' },
+    { maxDim: 800, quality: 0.80, mime: isPng ? 'image/png' : 'image/jpeg' },
+    { maxDim: 800, quality: 0.75, mime: 'image/jpeg' },
+    { maxDim: 640, quality: 0.70, mime: 'image/jpeg' },
+    { maxDim: 500, quality: 0.65, mime: 'image/jpeg' }
+  ];
+
+  let bestDataUrl = '';
+  let bestW = img.width;
+  let bestH = img.height;
+  let bestFormat = fileType;
+
+  for (const pass of passes) {
+    let w = img.width;
+    let h = img.height;
+
+    if (w > pass.maxDim || h > pass.maxDim) {
+      if (w > h) {
+        h = Math.round((h * pass.maxDim) / w);
+        w = pass.maxDim;
+      } else {
+        w = Math.round((w * pass.maxDim) / h);
+        h = pass.maxDim;
+      }
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) break;
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, w, h);
+
+    try {
+      const dataUrl = canvas.toDataURL(pass.mime, pass.quality);
+      bestDataUrl = dataUrl;
+      bestW = w;
+      bestH = h;
+      bestFormat = pass.mime;
+
+      if (dataUrl.length <= TARGET_MAX_DATA_URL_LENGTH) {
+        return { dataUrl, width: w, height: h, format: pass.mime };
+      }
+    } catch {
+      // Continue to next pass
+    }
+  }
+
+  return { dataUrl: bestDataUrl, width: bestW, height: bestH, format: bestFormat };
+}
+
+/**
  * Process and optimize an uploaded file
  */
-export async function processImageUpload(
-  file: File,
-  maxDimension: number = 1400
-): Promise<ImageProcessResult> {
+export async function processImageUpload(file: File): Promise<ImageProcessResult> {
   const validation = validateImageFile(file);
   if (!validation.valid) {
     throw new Error(validation.error);
@@ -84,10 +146,17 @@ export async function processImageUpload(
           reject(new Error('Failed reading file data.'));
           return;
         }
+
+        // If SVG or GIF is extraordinarily large for a single cloud doc, warn
+        if (result.length > 700000) {
+          reject(new Error(`The ${isSvg ? 'SVG' : 'GIF'} is too large (${(result.length / 1024).toFixed(0)} KB data). Please use a file under 700 KB.`));
+          return;
+        }
+
         resolve({
           dataUrl: result,
           format: isSvg ? 'SVG' : isGif ? 'GIF' : 'ICO',
-          sizeBytes: file.size,
+          sizeBytes: Math.round(result.length * 0.75),
           isSvgOrGif: true
         });
       };
@@ -96,7 +165,7 @@ export async function processImageUpload(
     });
   }
 
-  // Raster images (JPG, PNG, WebP, AVIF, BMP): optimize & compress for fast loading & reliable cloud sync
+  // Raster images (JPG, PNG, WebP, AVIF, BMP): multi-pass compression
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -108,64 +177,19 @@ export async function processImageUpload(
 
       const img = new Image();
       img.onload = () => {
-        let width = img.width;
-        let height = img.height;
-
-        // Downscale oversized images cleanly
-        if (width > maxDimension || height > maxDimension) {
-          if (width > height) {
-            height = Math.round((height * maxDimension) / width);
-            width = maxDimension;
-          } else {
-            width = Math.round((width * maxDimension) / height);
-            height = maxDimension;
-          }
-        }
-
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          resolve({
-            dataUrl: rawDataUrl,
-            format: file.type,
-            sizeBytes: file.size,
-            width: img.width,
-            height: img.height,
-            isSvgOrGif: false
-          });
-          return;
-        }
-
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-        ctx.drawImage(img, 0, 0, width, height);
-
-        // Prefer WebP or PNG/JPEG based on source transparency
-        const hasAlpha = file.type === 'image/png' || file.type === 'image/webp';
-        const targetMime = hasAlpha ? 'image/png' : 'image/jpeg';
-        const quality = 0.90;
-
         try {
-          const optimizedDataUrl = canvas.toDataURL(targetMime, quality);
+          const compressed = compressToTarget(img, file.type);
           resolve({
-            dataUrl: optimizedDataUrl,
-            format: targetMime,
-            sizeBytes: Math.round(optimizedDataUrl.length * 0.75),
-            width,
-            height,
+            dataUrl: compressed.dataUrl || rawDataUrl,
+            format: compressed.format,
+            sizeBytes: Math.round((compressed.dataUrl || rawDataUrl).length * 0.75),
+            width: compressed.width,
+            height: compressed.height,
             isSvgOrGif: false
           });
-        } catch {
-          resolve({
-            dataUrl: rawDataUrl,
-            format: file.type,
-            sizeBytes: file.size,
-            width,
-            height,
-            isSvgOrGif: false
-          });
+        } catch (err: unknown) {
+          const msg = err instanceof Error ? err.message : 'Compression error';
+          reject(new Error(`Failed to compress image: ${msg}`));
         }
       };
 

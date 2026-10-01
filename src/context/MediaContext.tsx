@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
 export interface ManagedMedia {
@@ -25,7 +25,7 @@ export interface MediaSettings {
   lastSavedAt?: string;
 }
 
-const MEDIA_STORAGE_KEY = 'panjiyar_media_settings_v3';
+const MEDIA_STORAGE_KEY = 'panjiyar_media_settings_v5';
 
 // Default initial system assets
 export const DEFAULT_MEDIA_SETTINGS: MediaSettings = {
@@ -110,6 +110,19 @@ export const DEFAULT_MEDIA_SETTINGS: MediaSettings = {
   ]
 };
 
+// Firestore document paths
+const FIRESTORE_DOCS = {
+  MAIN_SETTINGS: 'media_settings',
+  SLOT_HEADER_LOGO: 'media_header_logo',
+  SLOT_FOOTER_LOGO: 'media_footer_logo',
+  SLOT_FAVICON: 'media_favicon',
+  SLOT_FOUNDER_PHOTO: 'media_founder_photo',
+  SLOT_OFFICE_PHOTO: 'media_office_photo',
+  SLOT_HERO_BADGE: 'media_hero_badge',
+  SLOT_ABOUT_BANNER: 'media_about_banner',
+  SLOT_CUSTOM: 'media_custom_items'
+};
+
 interface MediaContextType {
   settings: MediaSettings;
   updateHeaderLogo: (url: string) => Promise<void>;
@@ -157,7 +170,7 @@ export const MediaProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return {
           ...DEFAULT_MEDIA_SETTINGS,
           ...parsed,
-          customMedia: parsed.customMedia || DEFAULT_MEDIA_SETTINGS.customMedia
+          customMedia: Array.isArray(parsed.customMedia) ? parsed.customMedia : DEFAULT_MEDIA_SETTINGS.customMedia
         };
       }
     } catch (e) {
@@ -167,7 +180,7 @@ export const MediaProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   });
 
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
-  const [cloudConnected, setCloudConnected] = useState<boolean>(false);
+  const [cloudConnected, setCloudConnected] = useState<boolean>(true);
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
 
   // Apply favicon to browser on mount and changes
@@ -177,43 +190,100 @@ export const MediaProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [settings.favicon]);
 
-  // Real-time synchronization across all devices and active users via Firestore onSnapshot
-  useEffect(() => {
-    const docRef = doc(db, 'site_content', 'media_settings');
+  // Helper to persist to localStorage safely and notify tabs
+  const persistLocally = useCallback((updated: MediaSettings) => {
+    try {
+      localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(updated));
+    } catch {
+      // Local quota protection
+    }
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const bc = new BroadcastChannel('panjiyar_media_sync_channel');
+        bc.postMessage({ type: 'MEDIA_UPDATE', payload: updated });
+        bc.close();
+      }
+    } catch {}
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('panjiyar_media_updated', { detail: updated }));
+    }
+  }, []);
 
-    const unsubscribe = onSnapshot(
-      docRef,
+  // Real-time synchronization across ALL devices and active users via Firestore onSnapshot
+  useEffect(() => {
+    const unsubscribers: (() => void)[] = [];
+
+    // 1. Primary real-time listener: /site_content/media_settings
+    const mainDocRef = doc(db, 'site_content', FIRESTORE_DOCS.MAIN_SETTINGS);
+    const mainUnsub = onSnapshot(
+      mainDocRef,
       (snapshot) => {
         setCloudConnected(true);
         if (snapshot.exists()) {
           const cloudData = snapshot.data() as Partial<MediaSettings>;
           setSettings((prev) => {
-            const merged: MediaSettings = {
+            const next: MediaSettings = {
               ...DEFAULT_MEDIA_SETTINGS,
               ...prev,
               ...cloudData,
-              customMedia: cloudData.customMedia || prev.customMedia || DEFAULT_MEDIA_SETTINGS.customMedia
+              customMedia: Array.isArray(cloudData.customMedia) && cloudData.customMedia.length > 0
+                ? cloudData.customMedia
+                : prev.customMedia
             };
-            try {
-              localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(merged));
-            } catch {
-              // Local storage failover
+            persistLocally(next);
+            if (next.favicon) {
+              applyFaviconToDocument(next.favicon);
             }
-            if (merged.favicon) {
-              applyFaviconToDocument(merged.favicon);
-            }
-            return merged;
+            return next;
           });
           setLastSyncTime(new Date().toLocaleTimeString());
         }
       },
-      (error) => {
-        console.warn('Firestore real-time media listener notice:', error.message);
-        setCloudConnected(false);
+      (err) => {
+        console.warn('Firestore real-time media listener warning:', err.message);
       }
     );
+    unsubscribers.push(mainUnsub);
 
-    // Cross-tab broadcast listener
+    // 2. Individual slot listeners for high resilience
+    const listenToSlot = (
+      docName: string,
+      field: keyof Omit<MediaSettings, 'customMedia' | 'lastSavedAt'>
+    ) => {
+      const slotRef = doc(db, 'site_content', docName);
+      const unsub = onSnapshot(
+        slotRef,
+        (snap) => {
+          if (snap.exists()) {
+            const d = snap.data();
+            if (d && typeof d.url === 'string') {
+              setSettings((prev) => {
+                if (prev[field] === d.url) return prev;
+                const next = { ...prev, [field]: d.url };
+                persistLocally(next);
+                if (field === 'favicon' && d.url) {
+                  applyFaviconToDocument(d.url);
+                }
+                return next;
+              });
+              setLastSyncTime(new Date().toLocaleTimeString());
+            }
+          }
+        },
+        () => {}
+      );
+      unsubscribers.push(unsub);
+    };
+
+    listenToSlot(FIRESTORE_DOCS.SLOT_HEADER_LOGO, 'headerLogo');
+    listenToSlot(FIRESTORE_DOCS.SLOT_FOOTER_LOGO, 'footerLogo');
+    listenToSlot(FIRESTORE_DOCS.SLOT_FAVICON, 'favicon');
+    listenToSlot(FIRESTORE_DOCS.SLOT_FOUNDER_PHOTO, 'founderPhoto');
+    listenToSlot(FIRESTORE_DOCS.SLOT_OFFICE_PHOTO, 'officePhoto');
+    listenToSlot(FIRESTORE_DOCS.SLOT_HERO_BADGE, 'heroBadge');
+    listenToSlot(FIRESTORE_DOCS.SLOT_ABOUT_BANNER, 'aboutBanner');
+
+    // 3. Cross-tab BroadcastChannel listener for local instantaneous refresh
     let bc: BroadcastChannel | null = null;
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
@@ -228,146 +298,157 @@ export const MediaProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           }
         };
       }
-    } catch {
-      // Ignored
-    }
+    } catch {}
 
     return () => {
-      unsubscribe();
+      unsubscribers.forEach((u) => u());
       bc?.close();
     };
-  }, []);
+  }, [persistLocally]);
 
-  // Central persistence handler (Cloud Firestore + Local Storage + BroadcastChannel)
-  const saveSettings = useCallback(async (newSettings: MediaSettings) => {
-    setIsSyncing(true);
-    const stampedSettings = {
-      ...newSettings,
-      lastSavedAt: new Date().toISOString()
-    };
+  // Central persistence method writing to BOTH media_settings and individual slot
+  const persistMediaChange = useCallback(
+    async (
+      updatedFields: Partial<MediaSettings>,
+      slotDocName?: string,
+      slotUrl?: string
+    ) => {
+      setIsSyncing(true);
+      const now = new Date().toISOString();
+      const nextSettings: MediaSettings = {
+        ...settings,
+        ...updatedFields,
+        lastSavedAt: now
+      };
 
-    setSettings(stampedSettings);
-    if (stampedSettings.favicon) {
-      applyFaviconToDocument(stampedSettings.favicon);
-    }
+      // 1. Immediately update React state and local storage
+      setSettings(nextSettings);
+      persistLocally(nextSettings);
 
-    // 1. Save to local storage for immediate persistence
-    try {
-      localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(stampedSettings));
-    } catch (err) {
-      console.warn('LocalStorage quota warning (handled via cloud):', err);
-    }
-
-    // 2. Broadcast immediately to all other local tabs
-    try {
-      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-        const bc = new BroadcastChannel('panjiyar_media_sync_channel');
-        bc.postMessage({ type: 'MEDIA_UPDATE', payload: stampedSettings });
-        bc.close();
+      if (nextSettings.favicon) {
+        applyFaviconToDocument(nextSettings.favicon);
       }
-    } catch {
-      // Ignored
-    }
-    window.dispatchEvent(new CustomEvent('panjiyar_media_updated', { detail: stampedSettings }));
 
-    // 3. Save to Cloud Firestore for real-time synchronization across ALL devices & users
-    try {
-      const docRef = doc(db, 'site_content', 'media_settings');
-      await setDoc(docRef, stampedSettings, { merge: true });
-      setCloudConnected(true);
-      setLastSyncTime(new Date().toLocaleTimeString());
-    } catch (cloudErr) {
-      console.warn('Could not sync to cloud Firestore immediately:', cloudErr);
-    } finally {
-      setIsSyncing(false);
-    }
-  }, []);
+      // 2. Persist to Cloud Firestore
+      try {
+        const promises: Promise<unknown>[] = [];
+
+        // Save main media_settings doc (real-time broadcast across all devices)
+        const mainDocRef = doc(db, 'site_content', FIRESTORE_DOCS.MAIN_SETTINGS);
+        promises.push(setDoc(mainDocRef, nextSettings, { merge: true }));
+
+        // Also save companion dedicated slot document
+        if (slotDocName && slotUrl !== undefined) {
+          const slotRef = doc(db, 'site_content', slotDocName);
+          promises.push(setDoc(slotRef, { url: slotUrl, updatedAt: now }, { merge: true }));
+        }
+
+        await Promise.all(promises);
+        setCloudConnected(true);
+        setLastSyncTime(new Date().toLocaleTimeString());
+      } catch (err: unknown) {
+        console.error('Failed to write to Cloud Firestore:', err);
+        throw err;
+      } finally {
+        setIsSyncing(false);
+      }
+    },
+    [settings, persistLocally]
+  );
 
   const updateHeaderLogo = async (url: string) => {
-    const updatedCustom = settings.customMedia.map((item) =>
-      item.id === 'header-logo' ? { ...item, url, updatedAt: 'Updated ' + new Date().toLocaleDateString() } : item
+    const updatedCustom = settings.customMedia.map((m) =>
+      m.id === 'header-logo' ? { ...m, url, updatedAt: 'Updated ' + new Date().toLocaleDateString() } : m
     );
-    await saveSettings({
-      ...settings,
-      headerLogo: url,
-      customMedia: updatedCustom
-    });
+    await persistMediaChange(
+      { headerLogo: url, customMedia: updatedCustom },
+      FIRESTORE_DOCS.SLOT_HEADER_LOGO,
+      url
+    );
   };
 
   const updateFooterLogo = async (url: string) => {
-    const updatedCustom = settings.customMedia.map((item) =>
-      item.id === 'footer-logo' ? { ...item, url, updatedAt: 'Updated ' + new Date().toLocaleDateString() } : item
+    const updatedCustom = settings.customMedia.map((m) =>
+      m.id === 'footer-logo' ? { ...m, url, updatedAt: 'Updated ' + new Date().toLocaleDateString() } : m
     );
-    await saveSettings({
-      ...settings,
-      footerLogo: url,
-      customMedia: updatedCustom
-    });
+    await persistMediaChange(
+      { footerLogo: url, customMedia: updatedCustom },
+      FIRESTORE_DOCS.SLOT_FOOTER_LOGO,
+      url
+    );
   };
 
   const updateFavicon = async (url: string) => {
-    const updatedCustom = settings.customMedia.map((item) =>
-      item.id === 'website-favicon' ? { ...item, url, updatedAt: 'Updated ' + new Date().toLocaleDateString() } : item
+    const updatedCustom = settings.customMedia.map((m) =>
+      m.id === 'website-favicon' ? { ...m, url, updatedAt: 'Updated ' + new Date().toLocaleDateString() } : m
     );
-    await saveSettings({
-      ...settings,
-      favicon: url,
-      customMedia: updatedCustom
-    });
+    await persistMediaChange(
+      { favicon: url, customMedia: updatedCustom },
+      FIRESTORE_DOCS.SLOT_FAVICON,
+      url
+    );
   };
 
   const updateFounderPhoto = async (url: string) => {
-    const updatedCustom = settings.customMedia.map((item) =>
-      item.id === 'founder-photo' ? { ...item, url, updatedAt: 'Updated ' + new Date().toLocaleDateString() } : item
+    const updatedCustom = settings.customMedia.map((m) =>
+      m.id === 'founder-photo' ? { ...m, url, updatedAt: 'Updated ' + new Date().toLocaleDateString() } : m
     );
-    await saveSettings({
-      ...settings,
-      founderPhoto: url,
-      customMedia: updatedCustom
-    });
+    await persistMediaChange(
+      { founderPhoto: url, customMedia: updatedCustom },
+      FIRESTORE_DOCS.SLOT_FOUNDER_PHOTO,
+      url
+    );
   };
 
   const updateOfficePhoto = async (url: string) => {
-    const updatedCustom = settings.customMedia.map((item) =>
-      item.id === 'office-photo' ? { ...item, url, updatedAt: 'Updated ' + new Date().toLocaleDateString() } : item
+    const updatedCustom = settings.customMedia.map((m) =>
+      m.id === 'office-photo' ? { ...m, url, updatedAt: 'Updated ' + new Date().toLocaleDateString() } : m
     );
-    await saveSettings({
-      ...settings,
-      officePhoto: url,
-      customMedia: updatedCustom
-    });
+    await persistMediaChange(
+      { officePhoto: url, customMedia: updatedCustom },
+      FIRESTORE_DOCS.SLOT_OFFICE_PHOTO,
+      url
+    );
   };
 
   const updateHeroBadge = async (url: string) => {
-    const updatedCustom = settings.customMedia.map((item) =>
-      item.id === 'hero-badge' ? { ...item, url, updatedAt: 'Updated ' + new Date().toLocaleDateString() } : item
+    const updatedCustom = settings.customMedia.map((m) =>
+      m.id === 'hero-badge' ? { ...m, url, updatedAt: 'Updated ' + new Date().toLocaleDateString() } : m
     );
-    await saveSettings({
-      ...settings,
-      heroBadge: url,
-      customMedia: updatedCustom
-    });
+    await persistMediaChange(
+      { heroBadge: url, customMedia: updatedCustom },
+      FIRESTORE_DOCS.SLOT_HERO_BADGE,
+      url
+    );
   };
 
   const updateAboutBanner = async (url: string) => {
-    const updatedCustom = settings.customMedia.map((item) =>
-      item.id === 'about-banner' ? { ...item, url, updatedAt: 'Updated ' + new Date().toLocaleDateString() } : item
+    const updatedCustom = settings.customMedia.map((m) =>
+      m.id === 'about-banner' ? { ...m, url, updatedAt: 'Updated ' + new Date().toLocaleDateString() } : m
     );
-    await saveSettings({
-      ...settings,
-      aboutBanner: url,
-      customMedia: updatedCustom
-    });
+    await persistMediaChange(
+      { aboutBanner: url, customMedia: updatedCustom },
+      FIRESTORE_DOCS.SLOT_ABOUT_BANNER,
+      url
+    );
   };
 
   const updateMediaItem = async (id: string, url: string) => {
+    if (id === 'header-logo') return updateHeaderLogo(url);
+    if (id === 'footer-logo') return updateFooterLogo(url);
+    if (id === 'website-favicon') return updateFavicon(url);
+    if (id === 'founder-photo') return updateFounderPhoto(url);
+    if (id === 'office-photo') return updateOfficePhoto(url);
+    if (id === 'hero-badge') return updateHeroBadge(url);
+    if (id === 'about-banner') return updateAboutBanner(url);
+
     let exists = false;
-    const updatedCustom = settings.customMedia.map((item) => {
-      if (item.id === id) {
+    const updatedCustom = settings.customMedia.map((m) => {
+      if (m.id === id) {
         exists = true;
-        return { ...item, url, updatedAt: 'Updated ' + new Date().toLocaleDateString() };
+        return { ...m, url, updatedAt: 'Updated ' + new Date().toLocaleDateString() };
       }
-      return item;
+      return m;
     });
 
     if (!exists) {
@@ -375,76 +456,34 @@ export const MediaProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         id,
         name: id.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
         category: 'banners',
-        description: 'Uploaded media asset',
+        description: 'Uploaded custom media asset',
         url,
         updatedAt: 'Added ' + new Date().toLocaleDateString()
       });
     }
 
-    let headerLogo = settings.headerLogo;
-    let footerLogo = settings.footerLogo;
-    let favicon = settings.favicon;
-    let founderPhoto = settings.founderPhoto;
-    let officePhoto = settings.officePhoto;
-    let heroBadge = settings.heroBadge;
-    let aboutBanner = settings.aboutBanner;
-
-    if (id === 'header-logo') headerLogo = url;
-    if (id === 'footer-logo') footerLogo = url;
-    if (id === 'website-favicon') favicon = url;
-    if (id === 'founder-photo') founderPhoto = url;
-    if (id === 'office-photo') officePhoto = url;
-    if (id === 'hero-badge') heroBadge = url;
-    if (id === 'about-banner') aboutBanner = url;
-
-    await saveSettings({
-      ...settings,
-      headerLogo,
-      footerLogo,
-      favicon,
-      founderPhoto,
-      officePhoto,
-      heroBadge,
-      aboutBanner,
-      customMedia: updatedCustom
-    });
+    await persistMediaChange({ customMedia: updatedCustom });
   };
 
   const deleteMediaItem = async (id: string) => {
-    // If it's one of the core slots, reset to blank or default
-    let headerLogo = settings.headerLogo;
-    let footerLogo = settings.footerLogo;
-    let favicon = settings.favicon;
-    let founderPhoto = settings.founderPhoto;
-    let officePhoto = settings.officePhoto;
-    let heroBadge = settings.heroBadge;
-    let aboutBanner = settings.aboutBanner;
+    if (id === 'header-logo') return updateHeaderLogo('/icai-emblem.svg');
+    if (id === 'footer-logo') return updateFooterLogo('/icai-emblem.svg');
+    if (id === 'website-favicon') return updateFavicon('/icai-emblem.svg');
+    if (id === 'founder-photo') return updateFounderPhoto('');
+    if (id === 'office-photo') return updateOfficePhoto('');
+    if (id === 'hero-badge') return updateHeroBadge('/icai-emblem.svg');
+    if (id === 'about-banner') return updateAboutBanner('');
 
-    if (id === 'header-logo') headerLogo = '/icai-emblem.svg';
-    if (id === 'footer-logo') footerLogo = '/icai-emblem.svg';
-    if (id === 'website-favicon') favicon = '/icai-emblem.svg';
-    if (id === 'founder-photo') founderPhoto = '';
-    if (id === 'office-photo') officePhoto = '';
-    if (id === 'hero-badge') heroBadge = '/icai-emblem.svg';
-    if (id === 'about-banner') aboutBanner = '';
+    const updatedCustom = settings.customMedia.filter((m) => m.id !== id);
+    await persistMediaChange({ customMedia: updatedCustom });
+  };
 
-    const updatedCustom = settings.customMedia.filter((item) => item.id !== id);
-
-    await saveSettings({
-      ...settings,
-      headerLogo,
-      footerLogo,
-      favicon,
-      founderPhoto,
-      officePhoto,
-      heroBadge,
-      aboutBanner,
-      customMedia: updatedCustom
-    });
+  const saveAllMediaSettings = async (newSettings: MediaSettings) => {
+    await persistMediaChange(newSettings);
   };
 
   const resetToDefaults = async () => {
-    await saveSettings(DEFAULT_MEDIA_SETTINGS);
+    await persistMediaChange(DEFAULT_MEDIA_SETTINGS);
   };
 
   const exportBackup = () => {
@@ -455,15 +494,13 @@ export const MediaProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       const parsed = JSON.parse(jsonStr);
       if (parsed && typeof parsed === 'object') {
-        await saveSettings({
+        await persistMediaChange({
           ...DEFAULT_MEDIA_SETTINGS,
           ...parsed
         });
         return true;
       }
-    } catch {
-      // Invalid JSON
-    }
+    } catch {}
     return false;
   };
 
@@ -480,7 +517,7 @@ export const MediaProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         updateAboutBanner,
         updateMediaItem,
         deleteMediaItem,
-        saveAllMediaSettings: saveSettings,
+        saveAllMediaSettings,
         resetToDefaults,
         exportBackup,
         importBackup,

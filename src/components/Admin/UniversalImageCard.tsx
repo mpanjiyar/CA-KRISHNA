@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Upload, Trash2, Save, RotateCcw, CheckCircle2, AlertCircle, ExternalLink, Image as ImageIcon } from 'lucide-react';
-import { processImageUpload, verifyImageUrl, SUPPORTED_EXTENSIONS } from '../../utils/imageManager';
+import { verifyImageUrl, SUPPORTED_EXTENSIONS } from '../../utils/imageManager';
+import { uploadImageFile, processDirectUrl } from '../../lib/storageService';
 
 interface UniversalImageCardProps {
   title: string;
@@ -62,10 +63,11 @@ export const UniversalImageCard: React.FC<UniversalImageCardProps> = ({
     setIsProcessing(true);
 
     try {
-      const result = await processImageUpload(file);
-      setDraftUrl(result.dataUrl);
+      const result = await uploadImageFile(file, 'branding');
+      setDraftUrl(result.url);
       setHasChanges(true);
-      onToast(`Image parsed successfully (${result.format}, ${(result.sizeBytes / 1024).toFixed(0)} KB). Click "Save Changes" to publish.`);
+      const isStorage = result.source === 'firebase_storage';
+      onToast(`Image staged (${isStorage ? 'Firebase Storage' : 'Optimized Payload'}, ${(result.sizeBytes / 1024).toFixed(0)} KB). Click "Save Changes" to publish.`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to process file';
       setErrorMessage(msg);
@@ -83,18 +85,19 @@ export const UniversalImageCard: React.FC<UniversalImageCardProps> = ({
     setErrorMessage(null);
     setIsProcessing(true);
 
-    const valid = await verifyImageUrl(pastedUrl.trim());
-    setIsProcessing(false);
-
-    if (!valid) {
-      setErrorMessage('The provided URL could not be decoded as a valid image. Please check the URL.');
-      return;
+    try {
+      const result = await processDirectUrl(pastedUrl.trim());
+      setDraftUrl(result.url);
+      setHasChanges(true);
+      setPastedUrl('');
+      onToast('Remote image verified and staged. Click "Save Changes" to publish.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Invalid URL';
+      setErrorMessage(msg);
+      onToast(`Error: ${msg}`);
+    } finally {
+      setIsProcessing(false);
     }
-
-    setDraftUrl(pastedUrl.trim());
-    setHasChanges(true);
-    setPastedUrl('');
-    onToast('Remote image loaded into preview. Click "Save Changes" to apply.');
   };
 
   const handleSave = async () => {

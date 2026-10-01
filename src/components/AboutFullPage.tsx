@@ -66,6 +66,7 @@ export const AboutFullPage: React.FC<AboutFullPageProps> = ({
               <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white border border-[#D9E2EC] shadow-sm mb-3 flex items-center justify-center overflow-hidden p-1">
                 {settings.founderPhoto ? (
                   <img
+                    key={settings.founderPhoto}
                     src={settings.founderPhoto}
                     alt={firmDetails.founder}
                     className="w-full h-full object-cover rounded-full"

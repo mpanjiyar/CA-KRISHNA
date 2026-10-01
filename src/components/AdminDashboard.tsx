@@ -43,6 +43,7 @@ import { OfficeLocation } from '../data/indiaMapData';
 import { ClientVaultContainer } from './ClientVault/ClientVaultContainer';
 import { UniversalImageCard } from './Admin/UniversalImageCard';
 import { processImageUpload } from '../utils/imageManager';
+import { uploadImageFile } from '../lib/storageService';
 
 interface AdminDashboardProps {
   onBackToWebsite: () => void;
@@ -205,9 +206,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
   };
 
   // Handle save contact changes
-  const handleSaveContact = (e: React.FormEvent) => {
+  const handleSaveContact = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateFirmDetails({
+    await updateFirmDetails({
       name: contactState.name,
       designation: contactState.designation,
       founder: contactState.founder,
@@ -229,14 +230,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
         full: `${contactState.line1}, ${contactState.line2}, ${contactState.city} – ${contactState.pincode}, ${contactState.state}`
       }
     });
-    showToast('Contact and Firm Information updated live!');
+    showToast('✓ Changes saved successfully: Contact & Practice profile updated and synchronized across all active devices.');
   };
 
   // Handle save website copy changes
-  const handleSaveCopy = (e: React.FormEvent) => {
+  const handleSaveCopy = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateWebsiteText(copyState);
-    showToast('Website Headlines and Text updated live across all pages!');
+    await updateWebsiteText(copyState);
+    showToast('✓ Changes saved successfully: Website headlines and copy updated and synchronized across all active devices.');
   };
 
   // Export Combined Backup (Media + Data)
@@ -288,6 +289,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
 
           {/* Right Action Controls */}
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Real-time Multi-Device Sync Indicator */}
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs text-slate-200">
+              <span className="relative flex h-2 w-2">
+                {cloudConnected ? (
+                  <>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </>
+                ) : (
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
+                )}
+              </span>
+              <span className="font-semibold text-[11px] text-white">
+                {cloudConnected ? 'Live Multi-Device Sync' : 'Local Fallback'}
+              </span>
+              {lastSyncTime && (
+                <span className="text-[10px] text-slate-300 font-mono hidden lg:inline">
+                  &middot; {lastSyncTime}
+                </span>
+              )}
+            </div>
+
             <button
               onClick={onBackToWebsite}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-white/10 hover:bg-white/20 rounded-lg transition-colors border border-white/15"
@@ -473,24 +496,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
         )}
 
         {/* --------------------------------------------------------------------------------- */}
-        {/* TAB 1: LOGOS & FAVICON (HEADER, FOOTER, FAVICON) */}
+        {/* TAB 1: LOGOS & FAVICON (HEADER, FOOTER, FAVICON, HERO BADGE) */}
         {/* --------------------------------------------------------------------------------- */}
         {activeTab === 'logos' && (
-          <div className="space-y-8 animate-in fade-in duration-150">
+          <div className="space-y-6 animate-in fade-in duration-150">
             <div className="bg-gradient-to-r from-[#EEF5FC] to-white p-5 rounded-2xl border border-[#D9E2EC] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h2 className="font-manrope font-bold text-lg sm:text-xl text-[#062A5A]">
-                  Company Logo, Footer Logo &amp; Favicon Management
+                  Brand Logos, Favicon &amp; Crest Management
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
-                  Manage the main header logo, separate high-contrast footer logo, and browser favicon. All changes immediately sync across every page, tab, and device.
+                  Supports all image formats (SVG, PNG, WebP, JPG, GIF, AVIF, ICO) with live preview, replacement, format validation, and instant real-time synchronization across all devices.
                 </p>
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
                 <button
-                  onClick={resetMediaDefaults}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-600 bg-white hover:bg-slate-100 rounded-xl border border-slate-300 transition-colors shadow-2xs"
+                  type="button"
+                  onClick={async () => {
+                    await resetMediaDefaults();
+                    showToast('✓ Changes saved successfully: Restored official ICAI vector emblems.');
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-600 bg-white hover:bg-slate-100 rounded-xl border border-slate-300 transition-colors shadow-2xs"
                 >
                   <RotateCcw size={14} />
                   <span>Restore Official ICAI Crest</span>
@@ -498,279 +525,81 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
               </div>
             </div>
 
-            {/* 3-Column Logo Cards: Header, Footer, Favicon */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              
-              {/* Card 1: Header Logo */}
-              <div className="bg-white rounded-2xl border border-[#D9E2EC] p-6 shadow-xs flex flex-col justify-between relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-[#0969C7]" />
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-[10px] uppercase tracking-wider font-bold text-[#0969C7] bg-[#EEF5FC] px-2 py-0.5 rounded">
-                      Header / Navbar Logo
-                    </span>
-                  </div>
-                  <h3 className="font-manrope font-bold text-base text-[#062A5A] mb-1">
-                    Company Header Logo
-                  </h3>
-                  <p className="text-xs text-slate-500 mb-4">
-                    Appears in sticky header, desktop lockup &amp; mobile drawer.
-                  </p>
+            {/* 4-Grid Logo Cards: Header, Footer, Favicon, Hero Badge */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <UniversalImageCard
+                title="Company Header Logo"
+                badge="Header / Navbar"
+                badgeColor="blue"
+                description="Primary emblem displayed on the top sticky navigation header and mobile drawer."
+                currentUrl={settings.headerLogo}
+                defaultUrl="/icai-emblem.svg"
+                recommendedAspect="Square (1:1) or Horizontal (SVG/PNG/WebP)"
+                dimensions="SVG, PNG, WebP, JPG, GIF up to 10MB"
+                onSave={async (url) => {
+                  await updateHeaderLogo(url);
+                }}
+                onDelete={async () => {
+                  await updateHeaderLogo('/icai-emblem.svg');
+                }}
+                onToast={showToast}
+              />
 
-                  <div className="p-4 rounded-xl bg-[#F7F9FC] border border-dashed border-slate-300 flex flex-col items-center justify-center min-h-[140px] mb-4 text-center">
-                    <div className="w-18 h-18 rounded-xl bg-white shadow-xs border border-slate-200 p-2 flex items-center justify-center mb-2">
-                      <OfficialFirmLogo source="header" sizePx={56} />
-                    </div>
-                    <span className="text-[11px] text-slate-400 truncate max-w-xs">
-                      {settings.headerLogo.startsWith('data:') ? 'Custom Upload Data File' : settings.headerLogo}
-                    </span>
-                  </div>
-                </div>
+              <UniversalImageCard
+                title="Footer Brand Logo"
+                badge="Footer Dark Mode"
+                badgeColor="amber"
+                description="Emblem displayed inside the dark navy global footer (#031C3D)."
+                currentUrl={settings.footerLogo}
+                defaultUrl="/icai-emblem.svg"
+                recommendedAspect="Square (1:1) or Horizontal"
+                dimensions="High-contrast SVG or transparent PNG"
+                darkPreviewBg={true}
+                onSave={async (url) => {
+                  await updateFooterLogo(url);
+                }}
+                onDelete={async () => {
+                  await updateFooterLogo('/icai-emblem.svg');
+                }}
+                onToast={showToast}
+              />
 
-                <div className="pt-3 border-t border-slate-100">
-                  <input
-                    ref={headerLogoRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        handleFileUpload(file, (url) => {
-                          updateHeaderLogo(url);
-                          showToast('Header Company Logo updated live!');
-                        });
-                      }
-                    }}
-                  />
-                  <button
-                    onClick={() => headerLogoRef.current?.click()}
-                    className="w-full py-2.5 px-4 rounded-xl bg-[#062A5A] hover:bg-[#031C3D] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors shadow-2xs"
-                  >
-                    <Upload size={14} className="text-[#F28C18]" />
-                    <span>Upload New Header Logo</span>
-                  </button>
+              <UniversalImageCard
+                title="Browser Tab Favicon"
+                badge="Favicon &amp; Tab"
+                badgeColor="emerald"
+                description="Icon shown in browser tabs, bookmarks, and mobile home screen shortcuts."
+                currentUrl={settings.favicon}
+                defaultUrl="/icai-emblem.svg"
+                recommendedAspect="Square (1:1)"
+                dimensions="SVG, ICO, or 32x32 / 64x64 PNG"
+                onSave={async (url) => {
+                  await updateFavicon(url);
+                }}
+                onDelete={async () => {
+                  await updateFavicon('/icai-emblem.svg');
+                }}
+                onToast={showToast}
+              />
 
-                  <div className="mt-2.5 flex gap-1.5">
-                    <input
-                      type="url"
-                      placeholder="Or paste cloud storage / CDN URL..."
-                      value={headerLogoUrlInput}
-                      onChange={(e) => setHeaderLogoUrlInput(e.target.value)}
-                      className="flex-1 text-[11px] px-2.5 py-1.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#0969C7]"
-                    />
-                    <button
-                      type="button"
-                      disabled={!headerLogoUrlInput.trim()}
-                      onClick={() => {
-                        if (headerLogoUrlInput.trim()) {
-                          updateHeaderLogo(headerLogoUrlInput.trim());
-                          showToast('Header Company Logo saved and broadcast in real time!');
-                          setHeaderLogoUrlInput('');
-                        }
-                      }}
-                      className="px-3 py-1.5 bg-[#062A5A] hover:bg-[#031C3D] disabled:opacity-40 text-white font-semibold text-[11px] rounded-lg transition-colors shrink-0 flex items-center gap-1"
-                    >
-                      <Save size={12} />
-                      <span>Save</span>
-                    </button>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      showToast('Header Company Logo confirmed and synced in real time across all active sessions!');
-                    }}
-                    className="w-full mt-2 py-2 px-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-[11px] flex items-center justify-center gap-1.5 transition-colors border border-emerald-200"
-                  >
-                    <CheckCircle2 size={13} className="text-emerald-600" />
-                    <span>Saved &amp; Active Across Website</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Card 2: Footer Logo */}
-              <div className="bg-white rounded-2xl border border-[#D9E2EC] p-6 shadow-xs flex flex-col justify-between relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-[#F28C18]" />
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-[10px] uppercase tracking-wider font-bold text-[#F28C18] bg-amber-50 px-2 py-0.5 rounded">
-                      Footer Dark Logo
-                    </span>
-                    <span className="text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
-                    </span>
-                  </div>
-                  <h3 className="font-manrope font-bold text-base text-[#062A5A] mb-1">
-                    Footer Brand Logo
-                  </h3>
-                  <p className="text-xs text-slate-500 mb-4">
-                    Rendered inside dark navy footer (#031C3D) with light contrast.
-                  </p>
-
-                  <div className="p-4 rounded-xl bg-[#031C3D] border border-dashed border-slate-700 flex flex-col items-center justify-center min-h-[140px] mb-4 text-center text-white">
-                    <div className="w-18 h-18 rounded-xl bg-white/10 shadow-xs border border-white/20 p-2 flex items-center justify-center mb-2">
-                      <OfficialFirmLogo source="footer" sizePx={56} />
-                    </div>
-                    <span className="text-[11px] text-slate-400 truncate max-w-xs">
-                      {settings.footerLogo.startsWith('data:') ? 'Custom Upload Data File' : settings.footerLogo}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="pt-3 border-t border-slate-100">
-                  <input
-                    ref={footerLogoRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        handleFileUpload(file, (url) => {
-                          updateFooterLogo(url);
-                          showToast('Footer Brand Logo saved and broadcast in real time!');
-                        });
-                      }
-                    }}
-                  />
-                  <button
-                    onClick={() => footerLogoRef.current?.click()}
-                    className="w-full py-2.5 px-4 rounded-xl bg-[#031C3D] hover:bg-[#02142B] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors shadow-2xs border border-white/10"
-                  >
-                    <Upload size={14} className="text-[#F28C18]" />
-                    <span>Upload New Footer Logo</span>
-                  </button>
-
-                  <div className="mt-2.5 flex gap-1.5">
-                    <input
-                      type="url"
-                      placeholder="Or paste cloud storage / CDN URL..."
-                      value={footerLogoUrlInput}
-                      onChange={(e) => setFooterLogoUrlInput(e.target.value)}
-                      className="flex-1 text-[11px] px-2.5 py-1.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#0969C7]"
-                    />
-                    <button
-                      type="button"
-                      disabled={!footerLogoUrlInput.trim()}
-                      onClick={() => {
-                        if (footerLogoUrlInput.trim()) {
-                          updateFooterLogo(footerLogoUrlInput.trim());
-                          showToast('Footer Brand Logo saved and broadcast in real time!');
-                          setFooterLogoUrlInput('');
-                        }
-                      }}
-                      className="px-3 py-1.5 bg-[#031C3D] hover:bg-[#02142B] disabled:opacity-40 text-white font-semibold text-[11px] rounded-lg transition-colors shrink-0 flex items-center gap-1 border border-white/10"
-                    >
-                      <Save size={12} />
-                      <span>Save</span>
-                    </button>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      showToast('Footer Brand Logo confirmed and synced in real time across all active sessions!');
-                    }}
-                    className="w-full mt-2 py-2 px-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-[11px] flex items-center justify-center gap-1.5 transition-colors border border-emerald-200"
-                  >
-                    <CheckCircle2 size={13} className="text-emerald-600" />
-                    <span>Saved &amp; Active Across Website</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Card 3: Browser Favicon */}
-              <div className="bg-white rounded-2xl border border-[#D9E2EC] p-6 shadow-xs flex flex-col justify-between relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-[#159447]" />
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-[10px] uppercase tracking-wider font-bold text-[#159447] bg-emerald-50 px-2 py-0.5 rounded">
-                      Browser Tab Favicon
-                    </span>
-                    <span className="text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
-                    </span>
-                  </div>
-                  <h3 className="font-manrope font-bold text-base text-[#062A5A] mb-1">
-                    Browser Tab Favicon
-                  </h3>
-                  <p className="text-xs text-slate-500 mb-4">
-                    Appears in browser tabs, bookmarks &amp; mobile shortcuts.
-                  </p>
-
-                  <div className="p-4 rounded-xl bg-[#F7F9FC] border border-dashed border-slate-300 flex flex-col items-center justify-center min-h-[140px] mb-4 text-center">
-                    <div className="w-14 h-14 rounded-xl bg-white shadow-xs border border-slate-200 p-2 flex items-center justify-center mb-2">
-                      <img src={settings.favicon || '/icai-emblem.svg'} alt="Favicon" className="w-8 h-8 object-contain" />
-                    </div>
-                    <span className="text-[11px] text-slate-400 truncate max-w-xs">
-                      {settings.favicon.startsWith('data:') ? 'Custom Upload Data File' : settings.favicon}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="pt-3 border-t border-slate-100">
-                  <input
-                    ref={faviconRef}
-                    type="file"
-                    accept="image/x-icon,image/svg+xml,image/png"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        handleFileUpload(file, (url) => {
-                          updateFavicon(url);
-                          showToast('Browser Favicon saved and broadcast in real time across tabs!');
-                        }, 256);
-                      }
-                    }}
-                  />
-                  <button
-                    onClick={() => faviconRef.current?.click()}
-                    className="w-full py-2.5 px-4 rounded-xl bg-[#159447] hover:bg-[#117638] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors shadow-2xs"
-                  >
-                    <Upload size={14} className="text-white" />
-                    <span>Upload New Favicon</span>
-                  </button>
-
-                  <div className="mt-2.5 flex gap-1.5">
-                    <input
-                      type="url"
-                      placeholder="Or paste cloud storage / CDN URL..."
-                      value={faviconUrlInput}
-                      onChange={(e) => setFaviconUrlInput(e.target.value)}
-                      className="flex-1 text-[11px] px-2.5 py-1.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#159447]"
-                    />
-                    <button
-                      type="button"
-                      disabled={!faviconUrlInput.trim()}
-                      onClick={() => {
-                        if (faviconUrlInput.trim()) {
-                          updateFavicon(faviconUrlInput.trim());
-                          showToast('Favicon saved and broadcast via Cloud URL!');
-                          setFaviconUrlInput('');
-                        }
-                      }}
-                      className="px-3 py-1.5 bg-[#159447] hover:bg-[#117638] disabled:opacity-40 text-white font-semibold text-[11px] rounded-lg transition-colors shrink-0 flex items-center gap-1"
-                    >
-                      <Save size={12} />
-                      <span>Save</span>
-                    </button>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      showToast('Browser Favicon confirmed and synced in real time across all active sessions!');
-                    }}
-                    className="w-full mt-2 py-2 px-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-[11px] flex items-center justify-center gap-1.5 transition-colors border border-emerald-200"
-                  >
-                    <CheckCircle2 size={13} className="text-emerald-600" />
-                    <span>Saved &amp; Active Across Website</span>
-                  </button>
-                </div>
-              </div>
-
+              <UniversalImageCard
+                title="Hero Visiting-Card Crest"
+                badge="Hero Badge"
+                badgeColor="purple"
+                description="Emblem rendered inside the Hero visiting-card geometric container."
+                currentUrl={settings.heroBadge}
+                defaultUrl="/icai-emblem.svg"
+                recommendedAspect="Square (1:1)"
+                dimensions="Vector SVG, PNG, or WebP"
+                darkPreviewBg={true}
+                onSave={async (url) => {
+                  await updateHeroBadge(url);
+                }}
+                onDelete={async () => {
+                  await updateHeroBadge('/icai-emblem.svg');
+                }}
+                onToast={showToast}
+              />
             </div>
           </div>
         )}
@@ -786,90 +615,116 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
                   Central Media Library &amp; Website Photos
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
-                  Manage founder portrait, office exterior/interior, hero ribbons and custom banners.
+                  Upload and manage founder portrait, office premises, and section visuals. Supports JPG, JPEG, PNG, WebP, SVG, GIF, AVIF, and ICO formats up to 10MB.
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs bg-emerald-50 text-emerald-700 font-semibold px-3 py-1.5 rounded-xl border border-emerald-200 flex items-center gap-1.5">
-                  <CheckCircle2 size={14} />
-                  Real-time broadcast enabled
-                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingMediaItem({
+                      id: `custom-media-${Date.now()}`,
+                      name: 'New Custom Media Asset',
+                      category: 'banners',
+                      description: 'Custom visual asset for firm banners or collateral.',
+                      url: '',
+                      dimensions: 'High-Res Image',
+                      recommendedAspect: '16:9 Landscape',
+                      updatedAt: 'Just added'
+                    });
+                    setMediaUrlInput('');
+                  }}
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#062A5A] hover:bg-[#031C3D] text-white font-semibold text-xs shadow-2xs transition-colors shrink-0"
+                >
+                  <Plus size={15} className="text-[#F28C18]" />
+                  <span>Add New Media Asset</span>
+                </button>
               </div>
             </div>
 
+            {/* Core Practice Visuals */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {settings.customMedia.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-white rounded-2xl border border-[#D9E2EC] p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow group"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-mono">
-                        {item.category}
-                      </span>
-                      <span className="text-[11px] text-slate-400">
-                        {item.updatedAt}
-                      </span>
-                    </div>
+              <UniversalImageCard
+                title="Founder Portrait / CA Crest"
+                badge="Leadership"
+                badgeColor="blue"
+                description="Portrait photo of CA Krishna Panjiyar featured in the Founder profile card & About page."
+                currentUrl={settings.founderPhoto}
+                defaultUrl=""
+                recommendedAspect="Square portrait (1:1 or 4:5)"
+                dimensions="JPG, PNG, WebP up to 10MB"
+                onSave={async (url) => {
+                  await updateFounderPhoto(url);
+                }}
+                onDelete={async () => {
+                  await updateFounderPhoto('');
+                }}
+                onToast={showToast}
+              />
 
-                    <div className="relative aspect-video rounded-xl bg-slate-100 border border-slate-200 overflow-hidden mb-4 flex items-center justify-center p-2">
-                      {item.url ? (
-                        <img
-                          src={item.url}
-                          alt={item.name}
-                          className="w-full h-full object-contain"
-                        />
-                      ) : (
-                        <div className="flex flex-col items-center justify-center text-slate-400 p-4 text-center">
-                          <ImageIcon size={32} className="mb-1 text-slate-300" />
-                          <span className="text-xs font-medium">Default Visual In Use</span>
-                          <span className="text-[10px] text-slate-400">Tap Replace to Upload Custom Image</span>
-                        </div>
-                      )}
-                    </div>
+              <UniversalImageCard
+                title="Andheri West Office / Reception"
+                badge="Firm Facility"
+                badgeColor="amber"
+                description="Photo of Andheri West office, conference room, or executive desk featured across the site."
+                currentUrl={settings.officePhoto}
+                defaultUrl=""
+                recommendedAspect="16:9 Landscape"
+                dimensions="JPG, PNG, WebP up to 10MB"
+                onSave={async (url) => {
+                  await updateOfficePhoto(url);
+                }}
+                onDelete={async () => {
+                  await updateOfficePhoto('');
+                }}
+                onToast={showToast}
+              />
 
-                    <h4 className="font-manrope font-bold text-sm text-[#062A5A] mb-1">
-                      {item.name}
-                    </h4>
-                    <p className="text-xs text-slate-500 mb-3 leading-relaxed">
-                      {item.description}
-                    </p>
+              <UniversalImageCard
+                title="About Section Advisory Visual"
+                badge="Section Visual"
+                badgeColor="purple"
+                description="Secondary visual background or illustration used in firm presentation cards."
+                currentUrl={settings.aboutBanner}
+                defaultUrl=""
+                recommendedAspect="16:9 or 4:3 Landscape"
+                dimensions="JPG, PNG, WebP, SVG up to 10MB"
+                onSave={async (url) => {
+                  await updateAboutBanner(url);
+                }}
+                onDelete={async () => {
+                  await updateAboutBanner('');
+                }}
+                onToast={showToast}
+              />
 
-                    <div className="text-[11px] text-slate-400 bg-slate-50 p-2 rounded-lg border border-slate-100 mb-4">
-                      <div>Aspect: <strong className="text-slate-600">{item.recommendedAspect}</strong></div>
-                      <div>Recommended: <strong className="text-slate-600">{item.dimensions}</strong></div>
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t border-slate-100 flex items-center gap-2">
-                    <button
-                      onClick={() => {
-                        setEditingMediaItem(item);
-                        setMediaUrlInput(item.url || '');
-                      }}
-                      className="flex-1 py-2 px-3 rounded-xl bg-[#EEF5FC] hover:bg-[#D9E2EC] text-[#062A5A] font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors"
-                    >
-                      <Upload size={13} className="text-[#0969C7]" />
-                      <span>Replace Photo</span>
-                    </button>
-
-                    {item.url && (
-                      <button
-                        onClick={() => {
-                          updateMediaItem(item.id, '');
-                          showToast(`${item.name} restored to default.`);
-                        }}
-                        className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                        title="Reset to default asset"
-                      >
-                        <Trash2 size={15} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
+              {/* Any additional custom media items */}
+              {settings.customMedia
+                .filter(
+                  (item) =>
+                    !['header-logo', 'footer-logo', 'website-favicon', 'hero-badge', 'founder-photo', 'office-photo', 'about-banner'].includes(item.id)
+                )
+                .map((item) => (
+                  <UniversalImageCard
+                    key={item.id}
+                    title={item.name}
+                    badge={item.category}
+                    badgeColor="slate"
+                    description={item.description}
+                    currentUrl={item.url}
+                    defaultUrl=""
+                    recommendedAspect={item.recommendedAspect || 'Any Aspect'}
+                    dimensions={item.dimensions || 'JPG, PNG, WebP, SVG'}
+                    onSave={async (url) => {
+                      await updateMediaItem(item.id, url);
+                    }}
+                    onDelete={async () => {
+                      await deleteMediaItem(item.id);
+                    }}
+                    onToast={showToast}
+                  />
+                ))}
             </div>
           </div>
         )}
@@ -961,13 +816,50 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
                   </div>
                 </div>
 
-                <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1">
+                      Banner CTA Headline
+                    </label>
+                    <input
+                      type="text"
+                      value={copyState.bannerCtaHeadline}
+                      onChange={(e) => setCopyState({ ...copyState, bannerCtaHeadline: e.target.value })}
+                      className="w-full text-xs p-3 rounded-xl border border-slate-300 focus:ring-1 focus:ring-[#0969C7]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1">
+                      Banner CTA Subheadline
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={copyState.bannerCtaSubheadline}
+                      onChange={(e) => setCopyState({ ...copyState, bannerCtaSubheadline: e.target.value })}
+                      className="w-full text-xs p-3 rounded-xl border border-slate-300 focus:ring-1 focus:ring-[#0969C7]"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-4 flex items-center justify-between gap-3 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCopyState(websiteText);
+                      showToast('Reverted copy changes back to saved state.');
+                    }}
+                    className="px-4 py-2 text-xs font-semibold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors flex items-center gap-1.5"
+                  >
+                    <RotateCcw size={13} />
+                    <span>Reset</span>
+                  </button>
+
                   <button
                     type="submit"
-                    className="px-6 py-2.5 rounded-xl bg-[#062A5A] hover:bg-[#031C3D] text-white font-semibold text-xs flex items-center gap-2 shadow-2xs transition-colors"
+                    className="px-6 py-2.5 rounded-xl bg-[#062A5A] hover:bg-[#031C3D] text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all active:scale-[0.98]"
                   >
-                    <Save size={14} />
-                    <span>Publish Copy Changes Live</span>
+                    <Save size={15} className="text-[#F28C18]" />
+                    <span>Save Changes</span>
                   </button>
                 </div>
               </div>
@@ -1432,13 +1324,42 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
                   />
                 </div>
 
-                <div className="sm:col-span-2 pt-4 flex justify-end">
+                <div className="sm:col-span-2 pt-4 flex items-center justify-between border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setContactState({
+                        name: firmDetails.name,
+                        designation: firmDetails.designation,
+                        founder: firmDetails.founder,
+                        founderTitle: firmDetails.founderTitle,
+                        tagline: firmDetails.tagline,
+                        phone1: firmDetails.phone1,
+                        phone2: firmDetails.phone2,
+                        email: firmDetails.email,
+                        line1: firmDetails.address.line1,
+                        line2: firmDetails.address.line2,
+                        city: firmDetails.address.city,
+                        state: firmDetails.address.state,
+                        pincode: firmDetails.address.pincode,
+                        workingHours: firmDetails.workingHours,
+                        mainPositioning: firmDetails.mainPositioning,
+                        supportingPositioning: firmDetails.supportingPositioning
+                      });
+                      showToast('Reverted contact changes back to saved state.');
+                    }}
+                    className="px-4 py-2 text-xs font-semibold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors flex items-center gap-1.5"
+                  >
+                    <RotateCcw size={13} />
+                    <span>Reset</span>
+                  </button>
+
                   <button
                     type="submit"
-                    className="px-6 py-2.5 rounded-xl bg-[#062A5A] hover:bg-[#031C3D] text-white font-semibold text-xs flex items-center gap-2 shadow-2xs transition-colors"
+                    className="px-6 py-2.5 rounded-xl bg-[#062A5A] hover:bg-[#031C3D] text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all active:scale-[0.98]"
                   >
-                    <Save size={14} />
-                    <span>Save Contact Details Live</span>
+                    <Save size={15} className="text-[#F28C18]" />
+                    <span>Save Changes</span>
                   </button>
                 </div>
               </div>
@@ -1633,21 +1554,38 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
             <div className="space-y-4 mb-5">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Option A: Upload File (Computer / Phone)
+                  Asset Title / Label
+                </label>
+                <input
+                  type="text"
+                  value={editingMediaItem.name}
+                  onChange={(e) => setEditingMediaItem({ ...editingMediaItem, name: e.target.value })}
+                  placeholder="e.g. Conference Hall, Executive Team Photo"
+                  className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#0969C7] bg-white mb-3"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Option A: Upload File (JPG, PNG, WebP, SVG, GIF, AVIF, ICO up to 10MB)
                 </label>
                 
                 <input
                   ref={generalMediaRef}
                   type="file"
-                  accept="image/*"
+                  accept=".jpg,.jpeg,.png,.webp,.svg,.gif,.ico,.avif,.bmp"
                   className="hidden"
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      handleFileUpload(file, (url) => {
-                        setMediaUrlInput(url);
-                        showToast(`File loaded into preview! Click "Save & Broadcast Photo" to commit.`);
-                      });
+                      try {
+                        const result = await uploadImageFile(file, 'custom_media');
+                        setMediaUrlInput(result.url);
+                        showToast(`File staged (${(result.sizeBytes / 1024).toFixed(0)} KB)! Click "Save Changes" to publish.`);
+                      } catch (err: unknown) {
+                        const msg = err instanceof Error ? err.message : 'Upload failed';
+                        showToast(`Error: ${msg}`);
+                      }
                     }
                   }}
                 />
@@ -1655,10 +1593,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
                 <button
                   type="button"
                   onClick={() => generalMediaRef.current?.click()}
-                  className="w-full py-3 border-2 border-dashed border-slate-300 hover:border-[#0969C7] hover:bg-[#EEF5FC]/50 rounded-2xl flex items-center justify-center gap-2 transition-all text-slate-700 text-xs font-semibold bg-slate-50/50"
+                  className="w-full py-3.5 border-2 border-dashed border-slate-300 hover:border-[#0969C7] hover:bg-[#EEF5FC]/50 rounded-2xl flex items-center justify-center gap-2 transition-all text-slate-700 text-xs font-semibold bg-slate-50/50"
                 >
                   <UploadCloud size={18} className="text-[#0969C7]" />
-                  <span>Select Image File (SVG, PNG, JPG, WebP)</span>
+                  <span>Choose Image File (JPG, PNG, WebP, SVG, GIF, AVIF, ICO)</span>
                 </button>
               </div>
 
@@ -1691,16 +1629,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
               
               <button
                 type="button"
-                onClick={() => {
-                  updateMediaItem(editingMediaItem.id, mediaUrlInput.trim());
-                  showToast(`${editingMediaItem.name} saved and synchronized in real time!`);
+                onClick={async () => {
+                  await updateMediaItem(editingMediaItem.id, mediaUrlInput.trim());
+                  showToast(`✓ Changes saved successfully: ${editingMediaItem.name} saved and synchronized in real time.`);
                   setEditingMediaItem(null);
                   setMediaUrlInput('');
                 }}
-                className="px-5 py-2.5 rounded-xl bg-[#062A5A] hover:bg-[#031C3D] text-white font-semibold text-xs flex items-center gap-2 shadow-sm transition-all active:scale-[0.99]"
+                className="px-5 py-2.5 rounded-xl bg-[#062A5A] hover:bg-[#031C3D] text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all active:scale-[0.98]"
               >
                 <Save size={15} className="text-[#F28C18]" />
-                <span>Save &amp; Broadcast Photo</span>
+                <span>Save Changes</span>
               </button>
             </div>
           </div>
@@ -1795,22 +1733,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
               </button>
               <button
                 type="button"
-                onClick={() => {
+                onClick={async () => {
                   if (editingService.name.trim()) {
                     if (isCreatingService) {
-                      addService(editingService);
-                      showToast(`Service "${editingService.name}" created!`);
+                      await addService(editingService);
+                      showToast(`✓ Changes saved successfully: Service "${editingService.name}" created and synchronized in real time.`);
                     } else {
-                      updateService(editingService.id, editingService);
-                      showToast(`Service "${editingService.name}" updated!`);
+                      await updateService(editingService.id, editingService);
+                      showToast(`✓ Changes saved successfully: Service "${editingService.name}" updated and broadcast across all devices.`);
                     }
                     setEditingService(null);
                   }
                 }}
-                className="px-5 py-2.5 rounded-xl bg-[#062A5A] hover:bg-[#031C3D] text-white font-semibold text-xs shadow-2xs flex items-center gap-1.5 transition-all"
+                className="px-5 py-2.5 rounded-xl bg-[#062A5A] hover:bg-[#031C3D] text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all active:scale-[0.98]"
               >
                 <Save size={14} className="text-[#F28C18]" />
-                <span>Save Practice Area Live</span>
+                <span>Save Changes</span>
               </button>
             </div>
           </div>
@@ -1915,22 +1853,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
               </button>
               <button
                 type="button"
-                onClick={() => {
+                onClick={async () => {
                   if (editingProject.title.trim()) {
                     if (isCreatingProject) {
-                      addProject(editingProject);
-                      showToast(`Project created!`);
+                      await addProject(editingProject);
+                      showToast(`✓ Changes saved successfully: Mandate "${editingProject.title}" created and synchronized in real time.`);
                     } else {
-                      updateProject(editingProject.id, editingProject);
-                      showToast(`Project updated!`);
+                      await updateProject(editingProject.id, editingProject);
+                      showToast(`✓ Changes saved successfully: Mandate "${editingProject.title}" updated and broadcast across all devices.`);
                     }
                     setEditingProject(null);
                   }
                 }}
-                className="px-5 py-2.5 rounded-xl bg-[#062A5A] hover:bg-[#031C3D] text-white font-semibold text-xs shadow-2xs flex items-center gap-1.5 transition-all"
+                className="px-5 py-2.5 rounded-xl bg-[#062A5A] hover:bg-[#031C3D] text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all active:scale-[0.98]"
               >
                 <Save size={14} className="text-[#F28C18]" />
-                <span>Save Mandate Live</span>
+                <span>Save Changes</span>
               </button>
             </div>
           </div>
@@ -2035,22 +1973,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
               </button>
               <button
                 type="button"
-                onClick={() => {
+                onClick={async () => {
                   if (editingOffice.city.trim()) {
                     if (isCreatingOffice) {
-                      addOffice(editingOffice);
-                      showToast(`Office in ${editingOffice.city} added!`);
+                      await addOffice(editingOffice);
+                      showToast(`✓ Changes saved successfully: Office in ${editingOffice.city} added and synchronized.`);
                     } else {
-                      updateOffice(editingOffice.id, editingOffice);
-                      showToast(`Office in ${editingOffice.city} updated!`);
+                      await updateOffice(editingOffice.id, editingOffice);
+                      showToast(`✓ Changes saved successfully: Office in ${editingOffice.city} updated and synchronized.`);
                     }
                     setEditingOffice(null);
                   }
                 }}
-                className="px-5 py-2.5 rounded-xl bg-[#062A5A] hover:bg-[#031C3D] text-white font-semibold text-xs shadow-2xs flex items-center gap-1.5 transition-all"
+                className="px-5 py-2.5 rounded-xl bg-[#062A5A] hover:bg-[#031C3D] text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all active:scale-[0.98]"
               >
                 <Save size={14} className="text-[#F28C18]" />
-                <span>Save Location Live</span>
+                <span>Save Changes</span>
               </button>
             </div>
           </div>
