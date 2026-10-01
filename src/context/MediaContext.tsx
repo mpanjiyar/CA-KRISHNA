@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { doc, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
 export interface ManagedMedia {
@@ -170,7 +170,9 @@ export const MediaProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return {
           ...DEFAULT_MEDIA_SETTINGS,
           ...parsed,
-          customMedia: Array.isArray(parsed.customMedia) ? parsed.customMedia : DEFAULT_MEDIA_SETTINGS.customMedia
+          customMedia: Array.isArray(parsed.customMedia) && parsed.customMedia.length > 0
+            ? parsed.customMedia
+            : DEFAULT_MEDIA_SETTINGS.customMedia
         };
       }
     } catch (e) {
@@ -183,31 +185,16 @@ export const MediaProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [cloudConnected, setCloudConnected] = useState<boolean>(true);
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
 
-  // Apply favicon to browser on mount and changes
+  // Synchronize localStorage and browser favicon whenever settings updates
   useEffect(() => {
+    try {
+      localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(settings));
+    } catch {}
+
     if (settings.favicon) {
       applyFaviconToDocument(settings.favicon);
     }
-  }, [settings.favicon]);
-
-  // Helper to persist to localStorage safely and notify tabs
-  const persistLocally = useCallback((updated: MediaSettings) => {
-    try {
-      localStorage.setItem(MEDIA_STORAGE_KEY, JSON.stringify(updated));
-    } catch {
-      // Local quota protection
-    }
-    try {
-      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-        const bc = new BroadcastChannel('panjiyar_media_sync_channel');
-        bc.postMessage({ type: 'MEDIA_UPDATE', payload: updated });
-        bc.close();
-      }
-    } catch {}
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('panjiyar_media_updated', { detail: updated }));
-    }
-  }, []);
+  }, [settings]);
 
   // Real-time synchronization across ALL devices and active users via Firestore onSnapshot
   useEffect(() => {
@@ -221,21 +208,14 @@ export const MediaProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setCloudConnected(true);
         if (snapshot.exists()) {
           const cloudData = snapshot.data() as Partial<MediaSettings>;
-          setSettings((prev) => {
-            const next: MediaSettings = {
-              ...DEFAULT_MEDIA_SETTINGS,
-              ...prev,
-              ...cloudData,
-              customMedia: Array.isArray(cloudData.customMedia) && cloudData.customMedia.length > 0
-                ? cloudData.customMedia
-                : prev.customMedia
-            };
-            persistLocally(next);
-            if (next.favicon) {
-              applyFaviconToDocument(next.favicon);
-            }
-            return next;
-          });
+          setSettings((prev) => ({
+            ...DEFAULT_MEDIA_SETTINGS,
+            ...prev,
+            ...cloudData,
+            customMedia: Array.isArray(cloudData.customMedia) && cloudData.customMedia.length > 0
+              ? cloudData.customMedia
+              : prev.customMedia
+          }));
           setLastSyncTime(new Date().toLocaleTimeString());
         }
       },
@@ -259,12 +239,7 @@ export const MediaProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             if (d && typeof d.url === 'string') {
               setSettings((prev) => {
                 if (prev[field] === d.url) return prev;
-                const next = { ...prev, [field]: d.url };
-                persistLocally(next);
-                if (field === 'favicon' && d.url) {
-                  applyFaviconToDocument(d.url);
-                }
-                return next;
+                return { ...prev, [field]: d.url };
               });
               setLastSyncTime(new Date().toLocaleTimeString());
             }
@@ -283,18 +258,14 @@ export const MediaProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     listenToSlot(FIRESTORE_DOCS.SLOT_HERO_BADGE, 'heroBadge');
     listenToSlot(FIRESTORE_DOCS.SLOT_ABOUT_BANNER, 'aboutBanner');
 
-    // 3. Cross-tab BroadcastChannel listener for local instantaneous refresh
+    // 3. Cross-tab BroadcastChannel listener for local instantaneous refresh across open tabs
     let bc: BroadcastChannel | null = null;
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         bc = new BroadcastChannel('panjiyar_media_sync_channel');
         bc.onmessage = (event) => {
           if (event.data?.type === 'MEDIA_UPDATE' && event.data?.payload) {
-            const incoming = event.data.payload;
-            setSettings(incoming);
-            if (incoming.favicon) {
-              applyFaviconToDocument(incoming.favicon);
-            }
+            setSettings(event.data.payload);
           }
         };
       }
@@ -304,7 +275,7 @@ export const MediaProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       unsubscribers.forEach((u) => u());
       bc?.close();
     };
-  }, [persistLocally]);
+  }, []);
 
   // Central persistence method writing to BOTH media_settings and individual slot
   const persistMediaChange = useCallback(
@@ -321,15 +292,19 @@ export const MediaProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         lastSavedAt: now
       };
 
-      // 1. Immediately update React state and local storage
+      // 1. Immediately update React state for instantaneous UI repaint
       setSettings(nextSettings);
-      persistLocally(nextSettings);
 
-      if (nextSettings.favicon) {
-        applyFaviconToDocument(nextSettings.favicon);
-      }
+      // 2. Broadcast to other local browser tabs
+      try {
+        if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+          const bc = new BroadcastChannel('panjiyar_media_sync_channel');
+          bc.postMessage({ type: 'MEDIA_UPDATE', payload: nextSettings });
+          bc.close();
+        }
+      } catch {}
 
-      // 2. Persist to Cloud Firestore
+      // 3. Persist to Cloud Firestore for multi-device broadcast
       try {
         const promises: Promise<unknown>[] = [];
 
@@ -353,7 +328,7 @@ export const MediaProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setIsSyncing(false);
       }
     },
-    [settings, persistLocally]
+    [settings]
   );
 
   const updateHeaderLogo = async (url: string) => {

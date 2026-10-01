@@ -61,19 +61,23 @@ export const UniversalImageCard: React.FC<UniversalImageCardProps> = ({
 
     setErrorMessage(null);
     setIsProcessing(true);
+    setIsSaving(true);
 
     try {
       const result = await uploadImageFile(file, 'branding');
       setDraftUrl(result.url);
-      setHasChanges(true);
-      const isStorage = result.source === 'firebase_storage';
-      onToast(`Image staged (${isStorage ? 'Firebase Storage' : 'Optimized Payload'}, ${(result.sizeBytes / 1024).toFixed(0)} KB). Click "Save Changes" to publish.`);
+      
+      // Persist directly to Cloud Firestore & broadcast to all devices immediately
+      await onSave(result.url);
+      setHasChanges(false);
+      onToast(`✓ Changes saved successfully: ${title} updated and synchronized across all active devices.`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to process file';
       setErrorMessage(msg);
       onToast(`Error: ${msg}`);
     } finally {
       setIsProcessing(false);
+      setIsSaving(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
