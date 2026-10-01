@@ -27,24 +27,25 @@ export const FounderSection: React.FC = () => {
             
             {/* Left Column: Visual CA Crest & Avatar Card */}
             <div className="md:col-span-4 flex flex-col items-center text-center">
-              <div className="relative mb-2.5 sm:mb-4">
-                {/* Circular Profile Frame with ICAI Colors or Uploaded Photo */}
-                <div className="w-24 h-24 xs:w-28 xs:h-28 sm:w-34 sm:h-34 rounded-full bg-gradient-to-br from-[#062A5A] to-[#0969C7] p-1 shadow-sm flex items-center justify-center overflow-hidden">
-                  <div className="w-full h-full rounded-full bg-white flex flex-col items-center justify-center p-2 text-center overflow-hidden">
+              <div className="relative mb-3 sm:mb-4">
+                {/* Circular Profile Frame with ICAI Colors or Uploaded Photo - Enlarged for prestige */}
+                <div className="w-32 h-32 xs:w-36 xs:h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 rounded-full bg-gradient-to-br from-[#062A5A] via-[#0969C7] to-[#F28C18]/60 p-1 sm:p-1.5 shadow-md flex items-center justify-center overflow-hidden">
+                  <div className={`w-full h-full rounded-full bg-white flex flex-col items-center justify-center overflow-hidden ${settings.founderPhoto && !imageError ? 'p-0' : 'p-3'}`}>
                     {settings.founderPhoto && !imageError ? (
                       <img
                         key={settings.founderPhoto}
                         src={settings.founderPhoto}
                         alt={firmDetails.founder}
-                        className="w-full h-full object-cover rounded-full"
+                        className="w-full h-full object-cover object-center rounded-full"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         onError={() => setImageError(true)}
                         loading="lazy"
                         decoding="async"
                       />
                     ) : (
                       <>
-                        <CaEmblem className="w-12 h-12 sm:w-14 sm:h-14" />
-                        <span className="text-[9px] sm:text-[10px] font-bold text-[#062A5A] uppercase tracking-wider mt-0.5">
+                        <CaEmblem className="w-16 h-16 sm:w-20 sm:h-20" />
+                        <span className="text-[10px] sm:text-[11px] font-bold text-[#062A5A] uppercase tracking-wider mt-1">
                           ICAI Member
                         </span>
                       </>
@@ -53,8 +54,8 @@ export const FounderSection: React.FC = () => {
                 </div>
 
                 {/* Verified Green Dot */}
-                <div className="absolute bottom-1 right-1 w-5 h-5 xs:w-6 xs:h-6 rounded-full bg-[#159447] text-white flex items-center justify-center border-2 border-white shadow-xs">
-                  <CheckCircle2 size={13} />
+                <div className="absolute bottom-1.5 right-1.5 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#159447] text-white flex items-center justify-center border-2 border-white shadow-xs">
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </div>
               </div>
 
