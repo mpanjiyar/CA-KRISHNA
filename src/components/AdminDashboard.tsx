@@ -1819,7 +1819,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
                     const file = e.target.files?.[0];
                     if (file) {
                       try {
-                        const result = await uploadImageFile(file, 'custom_media');
+                        const result = await uploadImageFile(file);
                         setMediaUrlInput(result.url);
                         showToast(`File staged (${(result.sizeBytes / 1024).toFixed(0)} KB)! Click "Save Changes" to publish.`);
                       } catch (err: unknown) {

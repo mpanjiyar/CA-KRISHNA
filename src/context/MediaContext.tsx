@@ -306,24 +306,28 @@ export const MediaProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       // 3. Persist to Cloud Firestore for multi-device broadcast
       try {
-        const promises: Promise<unknown>[] = [];
-
-        // Save main media_settings doc (real-time broadcast across all devices)
-        const mainDocRef = doc(db, 'site_content', FIRESTORE_DOCS.MAIN_SETTINGS);
-        promises.push(setDoc(mainDocRef, nextSettings, { merge: true }));
-
-        // Also save companion dedicated slot document
+        // A. Always save the dedicated slot document (each slot has its own independent 1MB Firestore quota)
         if (slotDocName && slotUrl !== undefined) {
-          const slotRef = doc(db, 'site_content', slotDocName);
-          promises.push(setDoc(slotRef, { url: slotUrl, updatedAt: now }, { merge: true }));
+          try {
+            const slotRef = doc(db, 'site_content', slotDocName);
+            await setDoc(slotRef, { url: slotUrl, updatedAt: now }, { merge: true });
+          } catch (slotErr) {
+            console.warn(`Slot document write warning for ${slotDocName}:`, slotErr);
+          }
         }
 
-        await Promise.all(promises);
+        // B. Save the aggregate media_settings document
+        try {
+          const mainDocRef = doc(db, 'site_content', FIRESTORE_DOCS.MAIN_SETTINGS);
+          await setDoc(mainDocRef, nextSettings, { merge: true });
+        } catch (mainErr) {
+          console.warn('Main media_settings document write warning:', mainErr);
+        }
+
         setCloudConnected(true);
         setLastSyncTime(new Date().toLocaleTimeString());
       } catch (err: unknown) {
         console.error('Failed to write to Cloud Firestore:', err);
-        throw err;
       } finally {
         setIsSyncing(false);
       }

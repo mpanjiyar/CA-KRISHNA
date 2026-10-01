@@ -88,7 +88,7 @@ export const UniversalImageCard: React.FC<UniversalImageCardProps> = ({
       setUploadProgress(45);
       setProgressStatus(`Optimizing ${file.type || 'image'} format...`);
       
-      const result: UploadResult = await uploadImageFile(file, 'branding');
+      const result: UploadResult = await uploadImageFile(file);
       
       setUploadProgress(85);
       setProgressStatus('Generating high-resolution Retina preview...');
@@ -213,6 +213,9 @@ export const UniversalImageCard: React.FC<UniversalImageCardProps> = ({
 
   const getSourceBadge = () => {
     if (!displayUrl) return null;
+    if (displayUrl.includes('googleusercontent.com') || displayUrl.includes('drive.google.com')) {
+      return <span className="text-[10px] font-mono bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-semibold">Google Drive Image</span>;
+    }
     if (displayUrl.startsWith('/uploads/')) {
       return <span className="text-[10px] font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-semibold">Local File ({displayUrl})</span>;
     }
@@ -395,33 +398,38 @@ export const UniversalImageCard: React.FC<UniversalImageCardProps> = ({
           )}
         </div>
 
-        {/* Option 2: Local Stored Path (/uploads/...) or External URL (https://...) */}
-        <div className="flex gap-1.5">
-          <div className="relative flex-1">
-            <LinkIcon size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              placeholder="/uploads/image.jpg or https://..."
-              value={pastedUrl}
-              onChange={(e) => setPastedUrl(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleApplyUrl();
-                }
-              }}
-              disabled={isProcessing || isSaving}
-              className="w-full text-[11px] pl-7 pr-2.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#0969C7]"
-            />
+        {/* Option 2: Google Drive, Cloud URL, or Local Path (/uploads/...) */}
+        <div className="space-y-1">
+          <div className="flex gap-1.5">
+            <div className="relative flex-1">
+              <LinkIcon size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Google Drive link, https://..., or /uploads/..."
+                value={pastedUrl}
+                onChange={(e) => setPastedUrl(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleApplyUrl();
+                  }
+                }}
+                disabled={isProcessing || isSaving}
+                className="w-full text-[11px] pl-7 pr-2.5 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#0969C7]"
+              />
+            </div>
+            <button
+              type="button"
+              disabled={!pastedUrl.trim() || isProcessing}
+              onClick={handleApplyUrl}
+              className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-[#062A5A] disabled:opacity-40 font-semibold text-[11px] rounded-lg transition-colors shrink-0 flex items-center gap-1"
+            >
+              <span>Preview Link</span>
+            </button>
           </div>
-          <button
-            type="button"
-            disabled={!pastedUrl.trim() || isProcessing}
-            onClick={handleApplyUrl}
-            className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-[#062A5A] disabled:opacity-40 font-semibold text-[11px] rounded-lg transition-colors shrink-0 flex items-center gap-1"
-          >
-            <span>Preview</span>
-          </button>
+          <div className="text-[10px] text-slate-400 pl-1 flex items-center justify-between">
+            <span>Supports Google Drive, Dropbox, CDN &amp; /uploads/...</span>
+          </div>
         </div>
 
         {/* Prominent Save Changes Bar */}

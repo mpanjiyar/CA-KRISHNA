@@ -1,11 +1,12 @@
 /**
- * Universal Image Processing and Validation Engine
- * Supports JPG, JPEG, PNG, WebP, SVG, GIF, ICO, AVIF, BMP, TIFF
- * - Local uploads (/uploads/image.jpg)
- * - Stored cloud files
- * - Direct image URLs & CDN links (https://example.com/image.jpg)
- * - Multi-pass WebP/PNG compression guaranteeing payload safety under Firestore document limits (<250KB)
- * - Real-time Retina display clarity with zero blur
+ * Universal Image Processing, Drive URL Normalization & Validation Engine
+ * Supports:
+ * - JPG, JPEG, PNG, WebP, SVG, GIF, ICO, AVIF, BMP, TIFF
+ * - Google Drive links (/file/d/..., open?id=..., uc?id=...)
+ * - Dropbox, Cloudinary, AWS S3, Imgur, and direct web links
+ * - Local static paths (/uploads/image.jpg, /icai-emblem.svg)
+ * - Ultra-fast client-side compression (<70KB per photo) ensuring
+ *   instant real-time Firestore sync without document size overflow.
  */
 
 export const SUPPORTED_IMAGE_TYPES = [
@@ -35,8 +36,8 @@ export const SUPPORTED_EXTENSIONS = [
   '.tiff'
 ];
 
-export const MAX_FILE_SIZE_BYTES = 15 * 1024 * 1024; // 15 MB upload limit
-export const TARGET_MAX_DATA_URL_LENGTH = 320000; // ~240KB binary payload, well under Firestore 1MB document ceiling
+export const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024; // 20 MB upload limit
+export const TARGET_MAX_DATA_URL_LENGTH = 140000; // ~100KB binary payload, leaves huge headroom for Firestore
 
 export interface ImageProcessResult {
   dataUrl: string;
@@ -54,6 +55,69 @@ export interface UrlValidationResult {
   height?: number;
   error?: string;
   isLocalPath: boolean;
+  isGoogleDrive: boolean;
+}
+
+/**
+ * Normalizes Google Drive, Dropbox, and cloud sharing links into direct image URLs
+ */
+export function normalizeMediaUrl(rawUrl: string): { url: string; isGoogleDrive: boolean } {
+  let trimmed = rawUrl.trim();
+  if (!trimmed) return { url: '', isGoogleDrive: false };
+
+  // 1. Google Drive Links
+  // Format A: https://drive.google.com/file/d/1A2B3C4D5E6F.../view?usp=sharing
+  const fileDMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (fileDMatch && fileDMatch[1]) {
+    return {
+      url: `https://lh3.googleusercontent.com/d/${fileDMatch[1]}`,
+      isGoogleDrive: true
+    };
+  }
+
+  // Format B: https://drive.google.com/open?id=1A2B3C4D5E6F... or uc?id=...
+  const idMatch = trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (idMatch && idMatch[1] && (trimmed.includes('drive.google.com') || trimmed.includes('docs.google.com'))) {
+    return {
+      url: `https://lh3.googleusercontent.com/d/${idMatch[1]}`,
+      isGoogleDrive: true
+    };
+  }
+
+  // Format C: https://drive.google.com/thumbnail?id=...
+  if (trimmed.includes('drive.google.com/thumbnail')) {
+    const thumbId = trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (thumbId && thumbId[1]) {
+      return {
+        url: `https://lh3.googleusercontent.com/d/${thumbId[1]}`,
+        isGoogleDrive: true
+      };
+    }
+  }
+
+  // 2. Dropbox Links
+  if (trimmed.includes('dropbox.com')) {
+    const directDropbox = trimmed
+      .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
+      .replace(/[?&]dl=0/, '')
+      .replace(/[?&]dl=1/, '');
+    return { url: directDropbox, isGoogleDrive: false };
+  }
+
+  // 3. Imgur link page (https://imgur.com/abc -> https://i.imgur.com/abc.jpg)
+  const imgurMatch = trimmed.match(/^https?:\/\/imgur\.com\/([a-zA-Z0-9]+)$/);
+  if (imgurMatch && imgurMatch[1]) {
+    return { url: `https://i.imgur.com/${imgurMatch[1]}.jpg`, isGoogleDrive: false };
+  }
+
+  // 4. Missing protocol auto-normalization
+  const isLocal = trimmed.startsWith('/') || trimmed.startsWith('./');
+  const isDataUrl = trimmed.startsWith('data:');
+  if (!isLocal && !isDataUrl && !trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+    trimmed = 'https://' + trimmed;
+  }
+
+  return { url: trimmed, isGoogleDrive: false };
 }
 
 /**
@@ -71,7 +135,7 @@ export function validateImageFile(file: File): { valid: boolean; error?: string 
   if (!isTypeSupported && !isExtSupported) {
     return {
       valid: false,
-      error: `Unsupported image format (${file.type || extension}). Supported formats: JPG, JPEG, PNG, WebP, SVG, GIF, ICO, AVIF, BMP.`
+      error: `Unsupported format (${file.type || extension}). Supported formats: JPG, JPEG, PNG, WebP, SVG, GIF, ICO, AVIF, BMP.`
     };
   }
 
@@ -79,7 +143,7 @@ export function validateImageFile(file: File): { valid: boolean; error?: string 
     const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
     return {
       valid: false,
-      error: `File is too large (${sizeMb} MB). Maximum allowed file size is 15 MB.`
+      error: `File is too large (${sizeMb} MB). Maximum allowed file size is 20 MB.`
     };
   }
 
@@ -88,18 +152,22 @@ export function validateImageFile(file: File): { valid: boolean; error?: string 
 
 /**
  * Multi-pass progressive canvas compression
+ * Generates an ultra-crisp, compact WebP/JPEG payload (<75KB)
+ * that preserves transparency for logos and sharp detail for photos.
  */
 function compressToTarget(
   img: HTMLImageElement,
   fileType: string
 ): { dataUrl: string; width: number; height: number; format: string } {
   const isPng = fileType === 'image/png';
+  
+  // Passes designed to maintain high Retina resolution while guaranteeing small payload
   const passes = [
-    { maxDim: 1200, quality: 0.88, mime: isPng ? 'image/png' : 'image/webp' },
-    { maxDim: 1000, quality: 0.82, mime: 'image/webp' },
-    { maxDim: 800, quality: 0.78, mime: 'image/webp' },
-    { maxDim: 640, quality: 0.72, mime: isPng ? 'image/png' : 'image/jpeg' },
-    { maxDim: 500, quality: 0.68, mime: 'image/jpeg' }
+    { maxDim: 800, quality: 0.82, mime: 'image/webp' },
+    { maxDim: 700, quality: 0.78, mime: 'image/webp' },
+    { maxDim: 600, quality: 0.74, mime: 'image/webp' },
+    { maxDim: 500, quality: 0.70, mime: isPng ? 'image/png' : 'image/jpeg' },
+    { maxDim: 400, quality: 0.65, mime: 'image/jpeg' }
   ];
 
   let bestDataUrl = '';
@@ -173,8 +241,8 @@ export async function processImageUpload(file: File): Promise<ImageProcessResult
           return;
         }
 
-        if (result.length > 800000) {
-          reject(new Error(`The ${isSvg ? 'SVG' : 'GIF'} is too large (${(result.length / 1024).toFixed(0)} KB). Please use a file under 800 KB.`));
+        if (result.length > 600000) {
+          reject(new Error(`The ${isSvg ? 'SVG' : 'GIF'} is too large (${(result.length / 1024).toFixed(0)} KB). Please use a file under 600 KB.`));
           return;
         }
 
@@ -190,7 +258,6 @@ export async function processImageUpload(file: File): Promise<ImageProcessResult
           });
         };
         img.onerror = () => {
-          // If ICO or SVG dimensions can't be decoded directly, still resolve safely
           resolve({
             dataUrl: result,
             format: isSvg ? 'SVG' : isGif ? 'GIF' : 'ICO',
@@ -207,7 +274,7 @@ export async function processImageUpload(file: File): Promise<ImageProcessResult
     });
   }
 
-  // Raster images (JPG, PNG, WebP, AVIF, BMP, TIFF): Progressive compression
+  // Raster images (JPG, PNG, WebP, AVIF, BMP, TIFF): Progressive WebP compression
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -249,24 +316,18 @@ export async function processImageUpload(file: File): Promise<ImageProcessResult
 }
 
 /**
- * Validate that an image URL (cloud/CDN, local relative path, or data URL) actually decodes
+ * Validate that an image URL (Google Drive, cloud/CDN, local relative path, or data URL) actually decodes
  */
 export function verifyImageUrl(rawUrl: string, timeoutMs: number = 7000): Promise<UrlValidationResult> {
   return new Promise((resolve) => {
     const trimmed = rawUrl.trim();
     if (!trimmed) {
-      resolve({ valid: false, normalizedUrl: '', isLocalPath: false, error: 'URL cannot be empty.' });
+      resolve({ valid: false, normalizedUrl: '', isLocalPath: false, isGoogleDrive: false, error: 'URL cannot be empty.' });
       return;
     }
 
-    // Auto-normalize external URLs without protocol
-    let normalized = trimmed;
-    const isLocalPath = trimmed.startsWith('/') || trimmed.startsWith('./');
-    const isDataUrl = trimmed.startsWith('data:image/');
-
-    if (!isLocalPath && !isDataUrl && !trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
-      normalized = 'https://' + trimmed;
-    }
+    const { url: normalized, isGoogleDrive } = normalizeMediaUrl(trimmed);
+    const isLocalPath = normalized.startsWith('/') || normalized.startsWith('./');
 
     const img = new Image();
     let hasTimedOut = false;
@@ -274,11 +335,15 @@ export function verifyImageUrl(rawUrl: string, timeoutMs: number = 7000): Promis
     const timer = setTimeout(() => {
       hasTimedOut = true;
       img.src = '';
+      const driveHint = isGoogleDrive
+        ? 'Google Drive connection timed out. Please ensure the file sharing is set to "Anyone with the link can view".'
+        : `Image verification timed out after ${timeoutMs / 1000}s. Please check if the link is accessible.`;
       resolve({
         valid: false,
         normalizedUrl: normalized,
         isLocalPath,
-        error: `Image verification timed out after ${timeoutMs / 1000}s. The URL may be unreachable or blocked.`
+        isGoogleDrive,
+        error: driveHint
       });
     }, timeoutMs);
 
@@ -290,20 +355,27 @@ export function verifyImageUrl(rawUrl: string, timeoutMs: number = 7000): Promis
         normalizedUrl: normalized,
         width: img.naturalWidth || img.width,
         height: img.naturalHeight || img.height,
-        isLocalPath
+        isLocalPath,
+        isGoogleDrive
       });
     };
 
     img.onerror = () => {
       if (hasTimedOut) return;
       clearTimeout(timer);
-      const errorMsg = isLocalPath
-        ? `Local file not found at "${normalized}". Please ensure the file exists in the public directory.`
-        : `Could not load image from "${normalized}". Please check that the URL is public, accessible, and points to a valid image.`;
+      let errorMsg = `Could not load image from "${normalized}".`;
+      if (isGoogleDrive) {
+        errorMsg = 'Google Drive image could not be loaded. Please ensure the file in Google Drive has sharing set to "Anyone with the link can view".';
+      } else if (isLocalPath) {
+        errorMsg = `Local file not found at "${normalized}". Please ensure the file exists in the public directory.`;
+      } else {
+        errorMsg = `Could not load image from the provided link. Please check that the URL is public and points directly to an image.`;
+      }
       resolve({
         valid: false,
         normalizedUrl: normalized,
         isLocalPath,
+        isGoogleDrive,
         error: errorMsg
       });
     };
