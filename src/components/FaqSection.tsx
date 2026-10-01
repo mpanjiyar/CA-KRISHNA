@@ -83,21 +83,21 @@ export const FaqSection: React.FC<FaqSectionProps> = ({ onOpenConsultation }) =>
           })}
         </div>
 
-        {/* View All FAQs and Direct Query Assistance */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
+        {/* View All FAQs and Direct Query Assistance - 2 Columns on mobile */}
+        <div className="grid grid-cols-2 sm:flex sm:flex-row items-stretch sm:items-center justify-center gap-2 sm:gap-3">
           <button
             onClick={() => setShowAllModal(true)}
-            className="w-full sm:w-auto px-5 py-3 text-xs xs:text-sm font-semibold text-[#062A5A] bg-white border border-[#D9E2EC] hover:bg-[#EEF5FC] rounded-xl transition-colors shadow-2xs min-h-[44px] flex items-center justify-center"
+            className="px-3 sm:px-5 py-2.5 sm:py-3 text-[11px] xs:text-xs sm:text-sm font-semibold text-[#062A5A] bg-white border border-[#D9E2EC] hover:bg-[#EEF5FC] rounded-xl transition-colors shadow-2xs min-h-[42px] sm:min-h-[44px] flex items-center justify-center"
           >
-            View All FAQs &amp; Statutory Guidelines
+            <span>All FAQs</span>
           </button>
 
           <a
             href={`tel:${FIRM_DETAILS.phone1}`}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 text-xs xs:text-sm font-semibold text-white bg-[#062A5A] hover:bg-[#031C3D] rounded-xl transition-colors shadow-2xs min-h-[44px]"
+            className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3 text-[11px] xs:text-xs sm:text-sm font-semibold text-white bg-[#062A5A] hover:bg-[#031C3D] rounded-xl transition-colors shadow-2xs min-h-[42px] sm:min-h-[44px]"
           >
-            <Phone size={15} className="text-[#F28C18]" />
-            <span>Speak With CA Krishna Panjiyar</span>
+            <Phone size={13} className="text-[#F28C18] shrink-0" />
+            <span className="truncate">Speak With CA</span>
           </a>
         </div>
 

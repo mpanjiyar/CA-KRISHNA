@@ -90,29 +90,21 @@ export const FounderSection: React.FC = () => {
                 {firmDetails.founder} leads <strong className="font-semibold text-[#062A5A]">{firmDetails.name}</strong> with a focus on accuracy, professional integrity, responsive service and long-term client relationships. Specializing in corporate taxation, GST litigation, and strategic bank financing, he brings direct partner oversight to every client file.
               </p>
 
-              {/* Verified Contact Buttons */}
-              <div className="flex flex-col xs:flex-row flex-wrap items-stretch sm:items-center gap-2 xs:gap-2.5">
+              {/* Verified Contact Buttons - 2 Columns on mobile */}
+              <div className="grid grid-cols-2 sm:flex sm:flex-row flex-wrap items-stretch sm:items-center gap-2 xs:gap-2.5">
                 <a
                   href={`tel:${firmDetails.phone1}`}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 xs:px-5 xs:py-3 text-xs sm:text-sm font-semibold text-white bg-[#062A5A] hover:bg-[#031C3D] active:scale-[0.98] rounded-xl transition-all shadow-xs min-h-[44px]"
+                  className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white bg-[#062A5A] hover:bg-[#031C3D] active:scale-[0.98] rounded-xl transition-all shadow-xs min-h-[40px] sm:min-h-[44px]"
                 >
-                  <Phone size={14} className="text-[#F28C18]" />
-                  <span>Call {firmDetails.phone1}</span>
-                </a>
-
-                <a
-                  href={`tel:${firmDetails.phone2}`}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 xs:px-5 xs:py-3 text-xs sm:text-sm font-semibold text-[#062A5A] bg-[#EEF5FC] hover:bg-[#D9E2EC] active:scale-[0.98] border border-[#D9E2EC] rounded-xl transition-all min-h-[44px]"
-                >
-                  <Phone size={14} className="text-[#0969C7]" />
-                  <span>Call {firmDetails.phone2}</span>
+                  <Phone size={13} className="text-[#F28C18] shrink-0" />
+                  <span className="truncate">Call Firm</span>
                 </a>
 
                 <a
                   href={`mailto:${firmDetails.email}`}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 xs:px-5 xs:py-3 text-xs sm:text-sm font-semibold text-[#172033] hover:text-[#062A5A] hover:bg-slate-100 active:scale-[0.98] border border-[#D9E2EC] rounded-xl transition-all min-h-[44px]"
+                  className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-[#172033] hover:text-[#062A5A] hover:bg-slate-100 active:scale-[0.98] border border-[#D9E2EC] rounded-xl transition-all min-h-[40px] sm:min-h-[44px]"
                 >
-                  <Mail size={14} className="text-[#159447]" />
+                  <Mail size={13} className="text-[#159447] shrink-0" />
                   <span>Email Us</span>
                 </a>
               </div>

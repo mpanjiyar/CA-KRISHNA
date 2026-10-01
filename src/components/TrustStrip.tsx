@@ -30,30 +30,30 @@ export const TrustStrip: React.FC = () => {
   ];
 
   return (
-    <section className="w-full bg-[#F7F9FC] border-b border-[#D9E2EC] py-6 sm:py-8">
-      <div className="max-w-7xl mx-auto px-3.5 xs:px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-5">
+    <section className="w-full bg-[#F7F9FC] border-b border-[#D9E2EC] py-4 sm:py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
           {trustItems.map((item, idx) => {
             const Icon = item.icon;
             return (
               <div
                 key={idx}
-                className="bg-white p-3.5 xs:p-4 sm:p-5 rounded-xl border border-[#D9E2EC] shadow-2xs flex flex-col justify-between hover:border-[#0969C7] transition-colors text-left"
+                className="bg-white p-2.5 xs:p-3 sm:p-5 rounded-xl border border-[#D9E2EC] shadow-2xs flex flex-col justify-between hover:border-[#0969C7] transition-colors text-left"
               >
-                <div className="flex items-center justify-between mb-2.5">
-                  <span className="text-[10.5px] xs:text-xs font-semibold uppercase tracking-wider text-[#667085]">
+                <div className="flex items-center justify-between mb-1.5 sm:mb-2.5">
+                  <span className="text-[9px] xs:text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#667085] truncate">
                     {item.label}
                   </span>
-                  <div className="p-1.5 rounded-md bg-[#EEF5FC] text-[#062A5A]">
-                    <Icon size={15} />
+                  <div className="p-1 sm:p-1.5 rounded-md bg-[#EEF5FC] text-[#062A5A] shrink-0">
+                    <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="font-manrope font-bold text-sm xs:text-[15px] sm:text-[17px] text-[#062A5A] tracking-tight leading-snug">
+                  <h4 className="font-manrope font-bold text-xs xs:text-sm sm:text-[17px] text-[#062A5A] tracking-tight leading-snug">
                     {item.value}
                   </h4>
-                  <p className="text-[11px] xs:text-xs text-[#667085] mt-1 leading-relaxed">
+                  <p className="text-[10px] xs:text-[11px] sm:text-xs text-[#667085] mt-0.5 sm:mt-1 leading-snug sm:leading-relaxed line-clamp-2">
                     {item.sub}
                   </p>
                 </div>

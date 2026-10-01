@@ -49,29 +49,29 @@ export const WhoWeHelp: React.FC<WhoWeHelpProps> = ({ onOpenConsultation }) => {
           </p>
         </div>
 
-        {/* 6 Segment Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        {/* 6 Segment Cards: 2 cols on mobile, 3 on lg */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4 lg:gap-5">
           {WHO_WE_HELP.map((item, idx) => (
             <div
               key={idx}
-              className="bg-white rounded-xl p-4 xs:p-5 sm:p-6 border border-[#D9E2EC] shadow-2xs flex flex-col justify-between text-left hover:border-[#0969C7] transition-colors"
+              className="bg-white rounded-xl p-3 xs:p-3.5 sm:p-6 border border-[#D9E2EC] shadow-2xs flex flex-col justify-between text-left hover:border-[#0969C7] transition-colors"
             >
               <div>
-                <div className="w-9 h-9 xs:w-10 xs:h-10 rounded-lg bg-[#EEF5FC] flex items-center justify-center mb-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-[#EEF5FC] flex items-center justify-center mb-2 sm:mb-3 shrink-0">
                   {getIcon(item.title)}
                 </div>
 
-                <h3 className="font-manrope font-bold text-base sm:text-lg text-[#062A5A] mb-1.5 tracking-tight">
+                <h3 className="font-manrope font-bold text-xs xs:text-sm sm:text-lg text-[#062A5A] mb-1 tracking-tight truncate">
                   {item.title}
                 </h3>
 
-                <p className="text-xs sm:text-sm text-[#667085] leading-relaxed">
+                <p className="text-[10px] xs:text-[11px] sm:text-sm text-[#667085] leading-snug sm:leading-relaxed line-clamp-2 sm:line-clamp-none">
                   {item.desc}
                 </p>
               </div>
 
-              <div className="mt-4 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-[#0969C7]">
-                <span>Specialized Practice</span>
+              <div className="mt-2.5 sm:mt-4 pt-2 sm:pt-2.5 border-t border-slate-100 flex items-center justify-between text-[9.5px] xs:text-xs font-semibold text-[#0969C7]">
+                <span>Practice</span>
                 <span className="text-[#F28C18]">&rarr;</span>
               </div>
             </div>

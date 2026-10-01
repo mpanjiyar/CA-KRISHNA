@@ -137,32 +137,34 @@ export const SpecializedSections: React.FC<SpecializedSectionsProps> = ({
               </button>
             </div>
 
-            {/* Right Side: 6 Tax Cards */}
-            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-left">
+            {/* Right Side: 6 Tax Cards (2 cols on mobile) */}
+            <div className="lg:col-span-7 grid grid-cols-2 gap-2 sm:gap-4 text-left">
               {[
-                { title: 'Income Tax', desc: 'ITR filing, capital gains calculations, HUF & firm returns', icon: Calculator, srvId: 'income-tax' },
-                { title: 'TDS', desc: 'Form 24Q, 26Q, 27Q filing, TRACES rectification & 16/16A generation', icon: Coins, srvId: 'tds-services' },
-                { title: 'GST', desc: 'GSTR-1, 3B, 9 & 9C returns, ITC matching & refund applications', icon: FileSpreadsheet, srvId: 'gst-services' },
-                { title: 'Tax Planning', desc: 'Legitimate tax minimization strategies for HNIs, LLPs & corporates', icon: TrendingUp, srvId: 'income-tax' },
-                { title: 'Tax Notices', desc: 'Analysis and structured evidence replies to 143(1), 148 & 142(1) notices', icon: AlertCircle, srvId: 'income-tax' },
-                { title: 'Tax Advisory', desc: 'Cross-border remittances, 15CA/CB, transfer pricing & restructuring', icon: Scale, srvId: 'income-tax' }
+                { title: 'Income Tax', desc: 'ITR filing, capital gains & returns', icon: Calculator, srvId: 'income-tax' },
+                { title: 'TDS', desc: '24Q, 26Q & Form 16 generation', icon: Coins, srvId: 'tds-services' },
+                { title: 'GST', desc: 'GSTR-1, 3B, 9 & ITC matching', icon: FileSpreadsheet, srvId: 'gst-services' },
+                { title: 'Tax Planning', desc: 'Minimization strategies for HNIs & LLPs', icon: TrendingUp, srvId: 'income-tax' },
+                { title: 'Tax Notices', desc: 'Evidence replies to 143(1) & 148 notices', icon: AlertCircle, srvId: 'income-tax' },
+                { title: 'Tax Advisory', desc: 'Remittances & 15CA/CB certifications', icon: Scale, srvId: 'income-tax' }
               ].map((item, idx) => {
                 const Icon = item.icon;
                 return (
                   <div
                     key={idx}
                     onClick={() => onSelectService(item.srvId)}
-                    className="p-3.5 xs:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-[#F28C18] hover:bg-white/10 transition-all cursor-pointer"
+                    className="p-2.5 xs:p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 hover:border-[#F28C18] hover:bg-white/10 transition-all cursor-pointer flex flex-col justify-between"
                   >
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <Icon size={17} className="text-[#F28C18]" />
-                      <h4 className="font-manrope font-bold text-sm xs:text-base text-white">
-                        {item.title}
-                      </h4>
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <Icon size={15} className="text-[#F28C18] shrink-0" />
+                        <h4 className="font-manrope font-bold text-xs xs:text-sm sm:text-base text-white truncate">
+                          {item.title}
+                        </h4>
+                      </div>
+                      <p className="text-[10px] xs:text-[11px] sm:text-xs text-slate-300 leading-snug line-clamp-2">
+                        {item.desc}
+                      </p>
                     </div>
-                    <p className="text-xs text-slate-300 leading-relaxed">
-                      {item.desc}
-                    </p>
                   </div>
                 );
               })}
@@ -187,7 +189,7 @@ export const SpecializedSections: React.FC<SpecializedSectionsProps> = ({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-7">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 lg:gap-5 mb-5 sm:mb-7">
             {[
               { title: 'Statutory Audit', desc: 'Independent verification under Companies Act 2013 ensuring true and fair view of accounts.' },
               { title: 'Tax Audit', desc: 'Mandatory Section 44AB audits, compiling Form 3CA/3CB and comprehensive Form 3CD schedules.' },
@@ -198,16 +200,16 @@ export const SpecializedSections: React.FC<SpecializedSectionsProps> = ({
             ].map((card, i) => (
               <div
                 key={i}
-                className="p-4 xs:p-5 rounded-xl bg-[#F7F9FC] border border-[#D9E2EC] text-left hover:border-[#0969C7] transition-colors flex flex-col justify-between"
+                className="p-2.5 xs:p-3 sm:p-5 rounded-xl bg-[#F7F9FC] border border-[#D9E2EC] text-left hover:border-[#0969C7] transition-colors flex flex-col justify-between"
               >
                 <div>
-                  <div className="w-7 h-7 rounded-lg bg-[#EEF5FC] text-[#062A5A] flex items-center justify-center font-bold text-xs mb-2.5 font-mono">
+                  <div className="w-6 h-6 rounded-md bg-[#EEF5FC] text-[#062A5A] flex items-center justify-center font-bold text-[10px] sm:text-xs mb-1.5 sm:mb-2.5 font-mono">
                     0{i + 1}
                   </div>
-                  <h3 className="font-manrope font-bold text-sm xs:text-base text-[#062A5A] mb-1">
+                  <h3 className="font-manrope font-bold text-xs xs:text-sm sm:text-base text-[#062A5A] mb-0.5 sm:mb-1 line-clamp-1">
                     {card.title}
                   </h3>
-                  <p className="text-xs text-[#667085] leading-relaxed">
+                  <p className="text-[10px] xs:text-[11px] sm:text-xs text-[#667085] leading-snug sm:leading-relaxed line-clamp-2 sm:line-clamp-none">
                     {card.desc}
                   </p>
                 </div>
@@ -220,7 +222,7 @@ export const SpecializedSections: React.FC<SpecializedSectionsProps> = ({
               onClick={() => onSelectService('audit-assurance')}
               className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#062A5A] hover:text-[#0969C7] transition-colors min-h-[44px]"
             >
-              <span>Explore full audit standards and documentation requirements &rarr;</span>
+              <span>Explore full audit standards &rarr;</span>
             </button>
           </div>
         </div>
@@ -242,7 +244,7 @@ export const SpecializedSections: React.FC<SpecializedSectionsProps> = ({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-7">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4 mb-5 sm:mb-7">
             {[
               { title: 'Financial Statements', desc: 'Audited balance sheets and profit & loss registers formatted for credit underwriters.' },
               { title: 'Projected Financials', desc: '5-year realistic revenue, expense and cash flow forecasting models.' },
@@ -252,18 +254,18 @@ export const SpecializedSections: React.FC<SpecializedSectionsProps> = ({
             ].map((c, i) => (
               <div
                 key={i}
-                className="p-3.5 xs:p-4 rounded-xl bg-white border border-[#D9E2EC] text-left hover:border-[#0969C7] shadow-2xs transition-colors flex flex-col justify-between"
+                className="p-2.5 xs:p-3 sm:p-4 rounded-xl bg-white border border-[#D9E2EC] text-left hover:border-[#0969C7] shadow-2xs transition-colors flex flex-col justify-between"
               >
                 <div>
-                  <div className="w-2 h-2 rounded-full bg-[#0969C7] mb-2" />
-                  <h3 className="font-manrope font-bold text-xs xs:text-sm sm:text-base text-[#062A5A] mb-1 leading-snug">
+                  <div className="w-2 h-2 rounded-full bg-[#0969C7] mb-1.5" />
+                  <h3 className="font-manrope font-bold text-xs xs:text-sm sm:text-base text-[#062A5A] mb-0.5 leading-snug line-clamp-1">
                     {c.title}
                   </h3>
-                  <p className="text-xs text-[#667085] leading-relaxed">
+                  <p className="text-[10px] xs:text-[11px] sm:text-xs text-[#667085] leading-snug line-clamp-2">
                     {c.desc}
                   </p>
                 </div>
-                <div className="mt-2.5 pt-2 border-t border-slate-100 text-[10px] font-semibold text-[#0969C7]">
+                <div className="mt-2 pt-1.5 border-t border-slate-100 text-[9.5px] xs:text-[10px] font-semibold text-[#0969C7]">
                   Bank Standard
                 </div>
               </div>

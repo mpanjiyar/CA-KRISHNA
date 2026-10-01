@@ -74,49 +74,41 @@ export const Hero: React.FC<HeroProps> = ({
               {websiteText.heroSubheadline}
             </p>
 
-            {/* CTA Buttons - Stacks cleanly on mobile, inline on sm+ */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3.5 mb-5 sm:mb-7">
+            {/* CTA Buttons - 2 Columns on mobile, inline flex on sm+ */}
+            <div className="grid grid-cols-2 sm:flex sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3.5 mb-4 sm:mb-7">
               <button
                 onClick={onOpenConsultation}
-                className="group inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 text-xs xs:text-sm sm:text-[15px] font-semibold text-white bg-[#062A5A] hover:bg-[#031C3D] active:scale-[0.98] rounded-xl shadow-xs transition-all duration-150 border-b-2 border-transparent hover:border-[#F28C18] min-h-[46px]"
+                className="group inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-6 py-2.5 sm:py-3.5 text-xs sm:text-[15px] font-semibold text-white bg-[#062A5A] hover:bg-[#031C3D] active:scale-[0.98] rounded-xl shadow-xs transition-all duration-150 border-b-2 border-transparent hover:border-[#F28C18] min-h-[42px] sm:min-h-[46px]"
               >
-                <span>Book a Consultation</span>
-                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                <span>Consultation</span>
+                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform shrink-0" />
               </button>
 
               <button
                 onClick={onExploreServices}
-                className="inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-3 sm:py-3.5 text-xs xs:text-sm sm:text-[15px] font-semibold text-[#062A5A] bg-[#EEF5FC] hover:bg-[#D9E2EC] active:scale-[0.98] rounded-xl border border-[#D9E2EC] transition-colors min-h-[46px]"
+                className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3.5 text-xs sm:text-[15px] font-semibold text-[#062A5A] bg-[#EEF5FC] hover:bg-[#D9E2EC] active:scale-[0.98] rounded-xl border border-[#D9E2EC] transition-colors min-h-[42px] sm:min-h-[46px]"
               >
-                <span>Explore Our Services</span>
+                <span>Our Services</span>
               </button>
-
-              <a
-                href={`tel:${firmDetails.phone1}`}
-                className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-[#0969C7] hover:text-[#062A5A] hover:bg-slate-50 rounded-xl transition-colors min-h-[42px]"
-              >
-                <PhoneCall size={14} className="text-[#F28C18]" />
-                <span>Call {firmDetails.phone1}</span>
-              </a>
             </div>
 
-            {/* Direct Trust Signals */}
-            <div className="pt-3 sm:pt-4 border-t border-[#D9E2EC]/70 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] xs:text-xs sm:text-[13px] text-[#667085]">
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 size={14} className="text-[#159447] shrink-0" />
-                <span>ICAI Regulation Compliant</span>
+            {/* Direct Trust Signals - 2 Columns on mobile */}
+            <div className="pt-3 sm:pt-4 border-t border-[#D9E2EC]/70 grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-1.5 sm:gap-y-2 text-[10.5px] xs:text-xs sm:text-[13px] text-[#667085]">
+              <div className="flex items-center gap-1.5 truncate">
+                <CheckCircle2 size={13} className="text-[#159447] shrink-0" />
+                <span className="truncate">ICAI Compliant</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 size={14} className="text-[#159447] shrink-0" />
-                <span>Direct Partner Oversight</span>
+              <div className="flex items-center gap-1.5 truncate">
+                <CheckCircle2 size={13} className="text-[#159447] shrink-0" />
+                <span className="truncate">Partner Oversight</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 size={14} className="text-[#159447] shrink-0" />
-                <span>Andheri (W), Mumbai</span>
+              <div className="flex items-center gap-1.5 truncate">
+                <CheckCircle2 size={13} className="text-[#159447] shrink-0" />
+                <span className="truncate">Andheri (W), Mumbai</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 size={14} className="text-[#0969C7] shrink-0" />
-                <span>PAN India Remote Desk</span>
+              <div className="flex items-center gap-1.5 truncate">
+                <CheckCircle2 size={13} className="text-[#0969C7] shrink-0" />
+                <span className="truncate">PAN India Virtual</span>
               </div>
             </div>
 
@@ -124,20 +116,20 @@ export const Hero: React.FC<HeroProps> = ({
 
           {/* Right Column: CA India Logo Treatment with Visiting Card Geometry */}
           <div className="lg:col-span-5 flex flex-col items-center justify-center w-full max-w-full animate-fade-slide-up" style={{ animationDelay: '100ms' }}>
-            {/* Visiting Card Visual Container */}
-            <div className="relative w-full max-w-[400px] bg-gradient-to-br from-[#062A5A] via-[#031C3D] to-[#062A5A] rounded-2xl shadow-xl overflow-hidden p-4 xs:p-5 sm:p-7 text-white border border-[#0969C7]/30 card-hover-lift">
+            {/* Visiting Card Visual Container - Compact on Mobile */}
+            <div className="relative w-full max-w-[340px] xs:max-w-[380px] sm:max-w-[400px] bg-gradient-to-br from-[#062A5A] via-[#031C3D] to-[#062A5A] rounded-2xl shadow-xl overflow-hidden p-3.5 xs:p-5 sm:p-7 text-white border border-[#0969C7]/30 card-hover-lift">
               
               {/* Card Geometric Lines and Curves */}
-              <div className="absolute top-0 right-0 w-44 h-44 bg-gradient-to-bl from-[#0969C7]/30 to-transparent rounded-bl-full pointer-events-none" />
-              <div className="absolute -bottom-8 -left-8 w-32 h-32 border-4 border-[#F28C18]/20 rounded-full pointer-events-none" />
+              <div className="absolute top-0 right-0 w-36 sm:w-44 h-36 sm:h-44 bg-gradient-to-bl from-[#0969C7]/30 to-transparent rounded-bl-full pointer-events-none" />
+              <div className="absolute -bottom-8 -left-8 w-28 sm:w-32 h-28 sm:h-32 border-4 border-[#F28C18]/20 rounded-full pointer-events-none" />
               
               {/* Gold / Orange Accent Ribbon */}
               <div className="absolute top-0 left-5 sm:left-7 w-16 sm:w-20 h-1.5 bg-[#F28C18]" />
 
               {/* Main Card Content */}
-              <div className="relative z-10 flex flex-col items-center text-center pt-2">
+              <div className="relative z-10 flex flex-col items-center text-center pt-1.5 sm:pt-2">
                 {/* Official Firm Crest / Hero Badge */}
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/10 backdrop-blur-xs p-2 border border-white/20 shadow-md flex items-center justify-center mb-2.5 overflow-hidden">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-white/10 backdrop-blur-xs p-1.5 sm:p-2 border border-white/20 shadow-md flex items-center justify-center mb-2 sm:mb-2.5 overflow-hidden">
                   <img
                     key={settings.heroBadge || settings.headerLogo || '/icai-emblem.svg'}
                     src={settings.heroBadge || settings.headerLogo || '/icai-emblem.svg'}
@@ -153,42 +145,42 @@ export const Hero: React.FC<HeroProps> = ({
                 </div>
 
                 {/* Firm Name */}
-                <h3 className="font-brand text-lg xs:text-xl sm:text-2xl font-bold tracking-tight text-white mb-0.5">
+                <h3 className="font-brand text-base xs:text-lg sm:text-2xl font-bold tracking-tight text-white mb-0.5">
                   {firmDetails.name}
                 </h3>
-                <p className="text-[11px] xs:text-xs sm:text-sm text-[#EEF5FC] font-medium tracking-widest uppercase mb-2.5 sm:mb-3">
+                <p className="text-[10px] xs:text-[11px] sm:text-sm text-[#EEF5FC] font-medium tracking-widest uppercase mb-2 sm:mb-3">
                   {firmDetails.designation}
                 </p>
 
                 {/* Card Hairline Divider */}
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-[#D9E2EC]/30 to-transparent my-2" />
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-[#D9E2EC]/30 to-transparent my-1.5 sm:my-2" />
 
                 {/* Founder Title Badge */}
-                <div className="flex items-center gap-1.5 xs:gap-2 mb-2.5 sm:mb-3 flex-wrap justify-center text-xs sm:text-sm">
+                <div className="flex items-center gap-1.5 xs:gap-2 mb-2 sm:mb-3 flex-wrap justify-center text-xs sm:text-sm">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#159447] shrink-0" />
                   <span className="font-semibold text-white tracking-wide">
                     {firmDetails.founder}
                   </span>
-                  <span className="text-[11px] xs:text-xs text-slate-300">
+                  <span className="text-[10px] xs:text-[11px] sm:text-xs text-slate-300">
                     &middot; {firmDetails.founderTitle}
                   </span>
                 </div>
 
                 {/* Visiting Card Front Tagline Pill */}
-                <div className="bg-[#031C3D]/90 px-3 py-1.5 xs:py-2 rounded-lg border border-[#0969C7]/40 w-full">
-                  <p className="font-manrope text-[11px] xs:text-xs sm:text-sm font-bold tracking-wider uppercase text-[#F28C18]">
+                <div className="bg-[#031C3D]/90 px-2.5 py-1 xs:py-1.5 sm:py-2 rounded-lg border border-[#0969C7]/40 w-full">
+                  <p className="font-manrope text-[10px] xs:text-xs sm:text-sm font-bold tracking-wider uppercase text-[#F28C18]">
                     {firmDetails.tagline}
                   </p>
                 </div>
 
                 {/* Office Address on Card */}
-                <p className="text-[10px] xs:text-[11px] text-slate-300 mt-2.5 sm:mt-3 leading-relaxed font-light">
+                <p className="text-[9.5px] xs:text-[10px] sm:text-[11px] text-slate-300 mt-2 sm:mt-3 leading-relaxed font-light">
                   {firmDetails.address.line1}, {firmDetails.address.line2}
                 </p>
               </div>
 
               {/* Secure Certificate Tag */}
-              <div className="mt-3.5 sm:mt-4 pt-2.5 border-t border-white/10 flex items-center justify-between text-[10px] xs:text-[11px] text-slate-300">
+              <div className="mt-2.5 sm:mt-4 pt-2 sm:pt-2.5 border-t border-white/10 flex items-center justify-between text-[9.5px] xs:text-[10px] sm:text-[11px] text-slate-300">
                 <span className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#159447]" />
                   Verified ICAI Practice

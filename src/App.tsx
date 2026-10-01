@@ -35,28 +35,76 @@ import { AdminRoute } from './components/AdminRoute';
 import { PageRoute } from './types';
 import { CORE_SERVICES, FIRM_DETAILS } from './data/firmData';
 
+function parsePathToRoute(pathname: string): { route: PageRoute; serviceId?: string } {
+  const cleanPath = pathname.toLowerCase().replace(/\/$/, '') || '/';
+  if (cleanPath === '/admin' || cleanPath.startsWith('/admin/')) {
+    return { route: 'admin' };
+  }
+  if (cleanPath === '/about') {
+    return { route: 'about' };
+  }
+  if (cleanPath === '/services') {
+    return { route: 'services' };
+  }
+  if (cleanPath.startsWith('/services/')) {
+    const parts = cleanPath.split('/');
+    return { route: 'service-detail', serviceId: parts[2] || 'income-tax' };
+  }
+  if (cleanPath === '/industries') {
+    return { route: 'industries' };
+  }
+  if (cleanPath === '/portal' || cleanPath === '/vault') {
+    return { route: 'portal' };
+  }
+  if (cleanPath === '/contact') {
+    return { route: 'contact' };
+  }
+  if (cleanPath === '/location-andheri' || cleanPath === '/andheri') {
+    return { route: 'location-andheri' };
+  }
+  return { route: 'home' };
+}
+
+function getPathForRoute(route: PageRoute, serviceId?: string): string {
+  switch (route) {
+    case 'admin': return '/admin';
+    case 'about': return '/about';
+    case 'services': return '/services';
+    case 'service-detail': return `/services/${serviceId || 'income-tax'}`;
+    case 'industries': return '/industries';
+    case 'portal': return '/portal';
+    case 'contact': return '/contact';
+    case 'location-andheri': return '/location-andheri';
+    case 'home':
+    default: return '/';
+  }
+}
+
 export default function App() {
   const [currentRoute, setCurrentRoute] = useState<PageRoute>(() => {
     if (typeof window !== 'undefined') {
-      const path = window.location.pathname.toLowerCase();
-      if (path === '/admin' || path.startsWith('/admin/')) {
-        return 'admin';
-      }
+      return parsePathToRoute(window.location.pathname).route;
     }
     return 'home';
   });
-  const [selectedServiceId, setSelectedServiceId] = useState<string>('income-tax');
+  const [selectedServiceId, setSelectedServiceId] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return parsePathToRoute(window.location.pathname).serviceId || 'income-tax';
+    }
+    return 'income-tax';
+  });
   const [consultationModalOpen, setConsultationModalOpen] = useState(false);
   const [consultationDefaultService, setConsultationDefaultService] = useState('Income Tax Services');
 
-  // Handle URL synchronizing for /admin and popstate (browser back/forward)
+  // Handle URL synchronizing and browser popstate back/forward navigation
   useEffect(() => {
     const handlePopState = () => {
-      const path = window.location.pathname.toLowerCase();
-      if (path === '/admin' || path.startsWith('/admin/')) {
-        setCurrentRoute('admin');
-      } else {
-        setCurrentRoute('home');
+      if (typeof window !== 'undefined') {
+        const { route, serviceId } = parsePathToRoute(window.location.pathname);
+        setCurrentRoute(route);
+        if (serviceId) {
+          setSelectedServiceId(serviceId);
+        }
       }
     };
 
@@ -64,15 +112,9 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Scroll to top upon route change and update URL history if appropriate
+  // Scroll to top upon route change
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (typeof window !== 'undefined') {
-      const targetPath = currentRoute === 'admin' ? '/admin' : '/';
-      if (window.location.pathname !== targetPath && (currentRoute === 'admin' || window.location.pathname === '/admin')) {
-        window.history.pushState({}, '', targetPath);
-      }
-    }
   }, [currentRoute, selectedServiceId]);
 
   const handleNavigate = (route: PageRoute, serviceId?: string) => {
@@ -81,6 +123,13 @@ export default function App() {
       setCurrentRoute('service-detail');
     } else {
       setCurrentRoute(route);
+    }
+
+    if (typeof window !== 'undefined') {
+      const targetPath = getPathForRoute(serviceId ? 'service-detail' : route, serviceId);
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState({}, '', targetPath);
+      }
     }
   };
 

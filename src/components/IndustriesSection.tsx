@@ -69,8 +69,8 @@ export const IndustriesSection: React.FC<IndustriesSectionProps> = ({ onOpenCons
           </p>
         </div>
 
-        {/* 10 Industry Cards: 1 col on xs, 2 on sm, 3 on md, 5 on lg */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+        {/* 10 Industry Cards: 2 cols on mobile, 3 on md, 5 on lg */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 xs:gap-2.5 sm:gap-4">
           {INDUSTRIES_SERVED.map((ind, idx) => {
             const isSelected = selectedIndustry === ind.name;
             return (
@@ -86,29 +86,29 @@ export const IndustriesSection: React.FC<IndustriesSectionProps> = ({ onOpenCons
                     setSelectedIndustry(isSelected ? null : ind.name);
                   }
                 }}
-                className={`p-3.5 xs:p-4 sm:p-5 rounded-xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between focus-visible:outline-2 focus-visible:outline-[#0969C7] min-h-[150px] ${
+                className={`p-2.5 xs:p-3 sm:p-5 rounded-xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between focus-visible:outline-2 focus-visible:outline-[#0969C7] min-h-[110px] xs:min-h-[125px] sm:min-h-[150px] ${
                   isSelected
                     ? 'bg-[#EEF5FC] border-[#0969C7] shadow-xs ring-1 ring-[#0969C7]'
                     : 'bg-white border-[#D9E2EC] hover:border-[#0969C7]/50 hover:bg-[#F7F9FC]'
                 }`}
               >
                 <div>
-                  <div className="w-9 h-9 xs:w-10 xs:h-10 rounded-lg bg-[#EEF5FC] flex items-center justify-center mb-2.5">
+                  <div className="w-7 h-7 xs:w-8 xs:h-8 sm:w-10 sm:h-10 rounded-lg bg-[#EEF5FC] flex items-center justify-center mb-1.5 sm:mb-2.5 shrink-0">
                     {getIndustryIcon(ind.name)}
                   </div>
 
-                  <h3 className="font-manrope font-bold text-sm xs:text-base text-[#062A5A] mb-1 leading-snug">
+                  <h3 className="font-manrope font-bold text-xs xs:text-sm sm:text-base text-[#062A5A] mb-0.5 sm:mb-1 leading-snug line-clamp-1 sm:line-clamp-none">
                     {ind.name}
                   </h3>
 
-                  <p className="text-xs text-[#667085] leading-relaxed line-clamp-2">
+                  <p className="text-[10px] xs:text-[11px] sm:text-xs text-[#667085] leading-snug sm:leading-relaxed line-clamp-2">
                     {ind.desc}
                   </p>
                 </div>
 
-                <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-medium text-[#0969C7]">
-                  <span>{isSelected ? 'Selected' : 'View Advisory'}</span>
-                  <ArrowRight size={12} className={isSelected ? 'rotate-90 transition-transform' : ''} />
+                <div className="mt-2 sm:mt-3 pt-1.5 sm:pt-2 border-t border-slate-100 flex items-center justify-between text-[9.5px] xs:text-[10.5px] sm:text-[11px] font-medium text-[#0969C7]">
+                  <span>{isSelected ? 'Selected' : 'Advisory'}</span>
+                  <ArrowRight size={11} className={isSelected ? 'rotate-90 transition-transform' : ''} />
                 </div>
               </div>
             );
