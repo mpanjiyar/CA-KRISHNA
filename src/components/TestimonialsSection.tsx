@@ -4,12 +4,12 @@ import {
   MessageSquarePlus, 
   CheckCircle2, 
   ShieldCheck, 
-  ChevronLeft, 
-  ChevronRight, 
   X, 
   Sparkles, 
   Trash2,
-  Quote
+  Quote,
+  Pause,
+  Play
 } from 'lucide-react';
 import { useFirmData, ReviewItem } from '../context/FirmDataContext';
 import { useAdminAuth } from '../context/AdminAuthContext';
@@ -18,9 +18,8 @@ export const TestimonialsSection: React.FC = () => {
   const { reviews, addReview, deleteReview } = useFirmData();
   const { isAuthenticated } = useAdminAuth();
 
-  const [activeIdx, setActiveIdx] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isAutoPlay, setIsAutoPlay] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -52,25 +51,6 @@ export const TestimonialsSection: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Auto-slide carousel gently
-  useEffect(() => {
-    if (!isAutoPlay || reviews.length <= 1) return;
-    const interval = setInterval(() => {
-      setActiveIdx((prev) => (prev + 1) % reviews.length);
-    }, 6000);
-    return () => clearInterval(interval);
-  }, [isAutoPlay, reviews.length]);
-
-  const handleNext = () => {
-    setIsAutoPlay(false);
-    setActiveIdx((prev) => (prev + 1) % (reviews.length || 1));
-  };
-
-  const handlePrev = () => {
-    setIsAutoPlay(false);
-    setActiveIdx((prev) => (prev - 1 + reviews.length) % (reviews.length || 1));
-  };
-
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!authorName.trim() || !reviewContent.trim()) return;
@@ -99,7 +79,6 @@ export const TestimonialsSection: React.FC = () => {
       setAuthorCompany('');
       setReviewContent('');
       setRating(5);
-      setActiveIdx(0);
     }, 1800);
   };
 
@@ -107,6 +86,14 @@ export const TestimonialsSection: React.FC = () => {
   const avgRating = (
     reviews.reduce((acc, curr) => acc + curr.rating, 0) / (reviews.length || 1)
   ).toFixed(1);
+
+  // Prepare infinite looping array: duplicate reviews so the horizontal loop is 100% seamless
+  // Ensure at least 8 items on track for wide viewports
+  const loopMultiplier = reviews.length < 4 ? 4 : 2;
+  const loopList: ReviewItem[] = [];
+  for (let m = 0; m < loopMultiplier; m++) {
+    loopList.push(...reviews);
+  }
 
   return (
     <section 
@@ -119,10 +106,10 @@ export const TestimonialsSection: React.FC = () => {
       <div className="absolute top-0 right-1/4 w-80 h-80 bg-[#0969C7]/5 rounded-full blur-3xl pointer-events-none animate-pulse duration-[8000ms]" />
       <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[#F28C18]/5 rounded-full blur-3xl pointer-events-none animate-pulse duration-[10000ms]" />
 
-      <div className="max-w-6xl mx-auto px-3.5 sm:px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-3.5 sm:px-6 relative z-10 mb-6 sm:mb-8">
         
         {/* Modern Header Bar with Requested Supporting Tagline */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-7 pb-5 border-b border-slate-200/80">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200/80">
           <div className="flex items-start gap-3.5">
             <div className="w-10 h-10 rounded-2xl bg-[#062A5A] text-white flex items-center justify-center shrink-0 shadow-md shadow-[#062A5A]/10 mt-0.5 group-hover:scale-105 transition-transform">
               <Star className="w-5 h-5 text-[#F28C18] fill-[#F28C18]" />
@@ -148,13 +135,13 @@ export const TestimonialsSection: React.FC = () => {
               </p>
 
               <p className="text-[11.5px] text-slate-500 mt-0.5 hidden xs:block">
-                Authentic testimonials from corporate directors, business founders &amp; professionals across India.
+                Continuous stream of verified feedback from founders, executives &amp; corporate clients across India.
               </p>
             </div>
           </div>
 
           {/* Right Action Area: Live Rating Pill & Write a Review Button */}
-          <div className="flex items-center gap-2.5 self-start sm:self-center shrink-0">
+          <div className="flex items-center gap-2 sm:gap-2.5 self-start sm:self-center shrink-0 flex-wrap">
             {/* Soft Glowing Trust Rating Card */}
             <div className="relative group/glow">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-400/20 to-[#0969C7]/20 rounded-xl blur-xs opacity-70 group-hover/glow:opacity-100 transition-opacity duration-300" />
@@ -167,9 +154,20 @@ export const TestimonialsSection: React.FC = () => {
               </div>
             </div>
 
+            {/* Play/Pause Button */}
+            <button
+              type="button"
+              onClick={() => setIsPaused(!isPaused)}
+              title={isPaused ? 'Resume continuous slide' : 'Pause review animation'}
+              className="p-2 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-[#062A5A] hover:bg-slate-50 shadow-2xs transition-colors flex items-center justify-center min-h-[36px] min-w-[36px]"
+              aria-label={isPaused ? 'Resume auto-scrolling' : 'Pause auto-scrolling'}
+            >
+              {isPaused ? <Play size={14} className="text-[#159447] fill-[#159447]" /> : <Pause size={14} />}
+            </button>
+
             <button
               onClick={() => setIsModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-[#062A5A] bg-white border border-[#D9E2EC] hover:bg-[#EEF5FC] hover:border-[#0969C7] hover:text-[#0969C7] rounded-xl shadow-2xs transition-all duration-200 hover:-translate-y-0.5 active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-[#062A5A] bg-white border border-[#D9E2EC] hover:bg-[#EEF5FC] hover:border-[#0969C7] hover:text-[#0969C7] rounded-xl shadow-2xs transition-all duration-200 hover:-translate-y-0.5 active:scale-95 min-h-[36px]"
             >
               <MessageSquarePlus className="w-3.5 h-3.5 text-[#0969C7]" />
               <span>Write a Review</span>
@@ -177,155 +175,117 @@ export const TestimonialsSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Reviews Grid / Carousel Container with Staggered Entrance & Soft Hover Lift */}
-        <div className="relative">
-          {reviews.length === 0 ? (
-            <div className="py-12 text-center bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-xs">
-              No client reviews published yet. Be the first to share your experience!
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-              {reviews.map((r, idx) => {
-                const isMobileActive = idx === activeIdx;
-                // Calculate position relative to active on desktop to ensure smooth rotation
-                const staggerDelay = `${(idx % 3) * 120}ms`;
+      </div>
 
-                return (
-                  <div
-                    key={r.id}
-                    style={{
-                      transitionDelay: isVisible ? staggerDelay : '0ms',
-                      transform: isVisible ? 'translateY(0)' : 'translateY(16px)',
-                      opacity: isVisible ? 1 : 0
-                    }}
-                    className={`bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs hover:shadow-lg hover:border-[#0969C7]/40 hover:-translate-y-1.5 transition-all duration-300 ease-out flex flex-col justify-between group relative overflow-hidden ${
-                      isMobileActive ? 'block' : 'hidden md:flex'
-                    }`}
-                  >
-                    {/* Top Right Subtle Watermark Quote */}
-                    <Quote className="absolute top-4 right-4 w-7 h-7 text-slate-100 group-hover:text-[#0969C7]/10 transition-colors pointer-events-none" />
+      {/* Infinite Horizontal Carousel Container with Left/Right Smooth Gradient Masks */}
+      <div 
+        className="relative w-full overflow-hidden marquee-track py-2"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        onTouchStart={() => setIsPaused(true)}
+        onTouchEnd={() => setIsPaused(false)}
+      >
+        {/* Left Gradient Fade Mask */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-8 sm:w-20 md:w-32 bg-gradient-to-r from-[#F7F9FC] via-[#F7F9FC]/90 to-transparent z-20" />
+        
+        {/* Right Gradient Fade Mask */}
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-8 sm:w-20 md:w-32 bg-gradient-to-l from-[#F7F9FC] via-[#F7F9FC]/90 to-transparent z-20" />
 
-                    <div className="relative z-10">
-                      {/* Top Rating with Animated Star Reveal */}
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-1">
-                          {[...Array(5)].map((_, i) => {
-                            const isFilled = i < r.rating;
-                            return (
-                              <span
-                                key={i}
-                                className="inline-block transition-transform duration-300 ease-out"
-                                style={{
-                                  transitionDelay: isVisible ? `${(idx % 3) * 100 + i * 40}ms` : '0ms',
-                                  transform: isVisible ? 'scale(1)' : 'scale(0.3)'
-                                }}
-                              >
-                                <Star
-                                  className={`w-4 h-4 transition-colors ${
-                                    isFilled
-                                      ? 'text-amber-400 fill-amber-400 drop-shadow-[0_1px_2px_rgba(245,158,11,0.25)]'
-                                      : 'text-slate-200 fill-slate-200'
-                                  }`}
-                                />
-                              </span>
-                            );
-                          })}
-                        </div>
+        {reviews.length === 0 ? (
+          <div className="max-w-md mx-auto py-12 text-center bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-xs">
+            No client reviews published yet. Be the first to share your experience!
+          </div>
+        ) : (
+          /* Infinite Moving Continuous Track */
+          <div 
+            className={`animate-infinite-scroll flex gap-3.5 sm:gap-5 w-max ${
+              isPaused ? 'marquee-paused' : ''
+            }`}
+          >
+            {loopList.map((r, idx) => (
+              <div
+                key={`${r.id}-${idx}`}
+                className="w-[260px] xs:w-[300px] sm:w-[350px] md:w-[380px] shrink-0 bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-lg hover:border-[#0969C7]/40 hover:-translate-y-1.5 transition-all duration-300 ease-out flex flex-col justify-between group relative overflow-hidden select-none cursor-grab active:cursor-grabbing text-left"
+              >
+                {/* Subtle Quote Watermark Accent */}
+                <Quote className="absolute top-3.5 right-3.5 w-6 h-6 sm:w-7 sm:h-7 text-slate-100 group-hover:text-[#0969C7]/15 transition-colors pointer-events-none" />
 
-                        <div className="flex items-center gap-1.5">
-                          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 group-hover:bg-emerald-100/70 transition-colors">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                            Verified Engagement
-                          </span>
-
-                          {/* Instant Admin Delete Button */}
-                          {isAuthenticated && (
-                            <button
-                              type="button"
-                              onClick={async () => {
-                                if (window.confirm(`Delete review from "${r.name}" (${r.company})?`)) {
-                                  await deleteReview(r.id);
-                                }
-                              }}
-                              className="p-1 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                              title="Admin: Delete this review"
-                            >
-                              <Trash2 size={13} />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Review Content */}
-                      <p className="text-xs sm:text-[13px] text-slate-700 leading-relaxed font-normal line-clamp-3 mb-4 group-hover:text-slate-900 transition-colors">
-                        &ldquo;{r.content}&rdquo;
-                      </p>
+                <div className="relative z-10">
+                  {/* Rating Stars & Verified Badge */}
+                  <div className="flex items-center justify-between mb-2.5 sm:mb-3">
+                    <div className="flex items-center gap-0.5 sm:gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-3.5 h-3.5 transition-colors ${
+                            i < r.rating
+                              ? 'text-amber-400 fill-amber-400 drop-shadow-[0_1px_2px_rgba(245,158,11,0.25)]'
+                              : 'text-slate-200 fill-slate-200'
+                          }`}
+                        />
+                      ))}
                     </div>
 
-                    {/* Author Meta Footer */}
-                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs relative z-10">
-                      <div className="min-w-0 pr-2">
-                        <h4 className="font-semibold text-slate-900 truncate text-xs group-hover:text-[#062A5A] transition-colors">
-                          {r.name}
-                        </h4>
-                        <p className="text-[11px] text-slate-500 truncate mt-0.5">
-                          {r.role} &bull; <span className="font-medium text-slate-600">{r.company}</span>
-                        </p>
-                      </div>
-                      <span className="shrink-0 text-[10px] text-slate-500 font-mono bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100 group-hover:border-slate-200 transition-colors">
-                        {r.location}
+                    <div className="flex items-center gap-1.5">
+                      <span className="inline-flex items-center gap-1 text-[9.5px] sm:text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 group-hover:bg-emerald-100/70 transition-colors">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                        Verified
                       </span>
+
+                      {/* Instant Admin Delete Button */}
+                      {isAuthenticated && (
+                        <button
+                          type="button"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            if (window.confirm(`Delete review from "${r.name}" (${r.company})?`)) {
+                              await deleteReview(r.id);
+                            }
+                          }}
+                          className="p-1 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                          title="Admin: Delete this review"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      )}
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          )}
 
-          {/* Navigation Arrows & Dot Indicators */}
-          {reviews.length > 1 && (
-            <div className="flex items-center justify-between mt-5 px-1">
-              {/* Dots with Smooth Expansion */}
-              <div className="flex items-center gap-1.5">
-                {reviews.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => {
-                      setIsAutoPlay(false);
-                      setActiveIdx(i);
-                    }}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                      i === activeIdx
-                        ? 'w-6 bg-[#062A5A] shadow-xs'
-                        : 'w-2 bg-slate-300 hover:bg-slate-400 hover:w-3'
-                    }`}
-                    aria-label={`Go to slide ${i + 1}`}
-                  />
-                ))}
+                  {/* Review Text */}
+                  <p className="text-[11.5px] sm:text-[13px] text-slate-700 leading-snug sm:leading-relaxed font-normal line-clamp-3 mb-3 sm:mb-4 group-hover:text-slate-900 transition-colors">
+                    &ldquo;{r.content}&rdquo;
+                  </p>
+                </div>
+
+                {/* Author Meta Footer */}
+                <div className="pt-2.5 sm:pt-3 border-t border-slate-100 flex items-center justify-between text-xs relative z-10">
+                  <div className="min-w-0 pr-2">
+                    <h4 className="font-semibold text-slate-900 truncate text-[11px] sm:text-xs group-hover:text-[#062A5A] transition-colors">
+                      {r.name}
+                    </h4>
+                    <p className="text-[10px] sm:text-[11px] text-slate-500 truncate mt-0.5">
+                      {r.role} &bull; <span className="font-medium text-slate-600">{r.company}</span>
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-[9.5px] sm:text-[10px] text-slate-500 font-mono bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100 group-hover:border-slate-200 transition-colors">
+                    {r.location}
+                  </span>
+                </div>
               </div>
+            ))}
+          </div>
+        )}
+      </div>
 
-              {/* Prev / Next Buttons with Tactile Hover */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handlePrev}
-                  className="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-[#062A5A] hover:bg-[#EEF5FC] hover:border-[#0969C7]/40 flex items-center justify-center transition-all shadow-2xs hover:scale-105 active:scale-90"
-                  aria-label="Previous review"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={handleNext}
-                  className="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-[#062A5A] hover:bg-[#EEF5FC] hover:border-[#0969C7]/40 flex items-center justify-center transition-all shadow-2xs hover:scale-105 active:scale-90"
-                  aria-label="Next review"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
-
-        </div>
-
+      {/* Subtle Hint Bar under carousel */}
+      <div className="max-w-7xl mx-auto px-4 mt-3 flex items-center justify-between text-[11px] text-slate-400">
+        <span className="hidden xs:inline-flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#159447] animate-pulse" />
+          Continuous infinite loop &middot; Hover or tap to pause
+        </span>
+        <span className="text-[10.5px] xs:text-[11px] text-slate-400/90 ml-auto">
+          Reviews are verified under ICAI engagement guidelines
+        </span>
       </div>
 
       {/* Interactive "Write a Review" Modal */}
@@ -353,7 +313,7 @@ export const TestimonialsSection: React.FC = () => {
                   Thank You for Your Feedback!
                 </h4>
                 <p className="text-xs text-slate-500 max-w-xs mx-auto">
-                  Your review and rating have been synchronized live to our verified client reviews section.
+                  Your review has been added to our live verified customer loop.
                 </p>
               </div>
             ) : (
