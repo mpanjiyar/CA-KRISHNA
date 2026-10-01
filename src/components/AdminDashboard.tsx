@@ -1659,7 +1659,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#062A5A] to-[#0969C7] p-1 shadow-sm flex items-center justify-center overflow-hidden">
                   <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
                     {settings.founderPhoto ? (
-                      <img src={settings.founderPhoto} alt="Founder" className="w-full h-full object-cover" />
+                      <img 
+                        src={settings.founderPhoto} 
+                        alt="Founder" 
+                        className="w-full h-full object-cover" 
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
                     ) : (
                       <OfficialFirmLogo sizePx={38} />
                     )}
