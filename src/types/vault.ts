@@ -71,17 +71,38 @@ export interface VaultProject {
   description: string;
 }
 
+export interface VaultFolder {
+  id: string; // e.g. "FLD-DOCS", "FLD-INV", etc.
+  name: string; // e.g. "Documents & Certificates"
+  slug: string;
+  clientId: string; // "all" for global firm-wide folders, or specific client ID e.g. "USR-CL-101"
+  description?: string;
+  color?: string; // e.g. "blue", "emerald", "amber", "purple", "rose", "cyan"
+  icon?: string; // "Folder" | "FileText" | "FileSpreadsheet" | "Image" | "Video" | "Shield" | "Briefcase"
+  createdAt: string;
+  createdBy: string;
+  isSystem?: boolean;
+  permissions?: {
+    canView: boolean;
+    canUpload: boolean;
+    canDownload: boolean;
+    canEdit: boolean;
+    canDelete: boolean;
+  };
+}
+
 export interface VaultFileItem {
   id: string;
   title: string;
   fileName: string;
-  fileType: 'document' | 'photo' | 'video' | 'invoice' | 'report' | 'contract';
+  fileType: 'document' | 'photo' | 'video' | 'invoice' | 'report' | 'contract' | 'spreadsheet' | 'archive';
   fileSize: string;
   clientId: string;
   clientName: string;
   projectId?: string;
   projectName?: string;
-  folder: 'Documents' | 'Photos' | 'Videos' | 'Invoices' | 'Reports' | 'Contracts';
+  folderId?: string; // References VaultFolder.id
+  folder: string; // Folder name for display & categorization
   uploadDate: string;
   uploadedBy: string;
   sha256Hash: string;
@@ -97,6 +118,7 @@ export interface VaultFileItem {
     canMove: boolean;
   };
   fileUrl?: string;
+  previewContent?: string;
 }
 
 export interface VaultInvitation {

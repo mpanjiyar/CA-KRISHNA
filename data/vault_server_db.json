@@ -1,0 +1,1201 @@
+{
+  "users": [
+    {
+      "id": "USR-ADM-001",
+      "fullName": "CA Krishna Panjiyar",
+      "company": "PANJIYAR KRISHNA & CO.",
+      "email": "cakrishanpanjiyar@gmail.com",
+      "phone": "+91 6000310815",
+      "username": "admin.krishna",
+      "passwordHash": "8b2855beb4087fbf141aa88b22705e42:a9041babab53caccebf203e1100e53799009168158c3b782e4e85691946346f5419cb891f314831867afa78a89cb311924fedf8c1348f864f51afed4cd711dd6",
+      "accountType": "super_admin",
+      "role": "Managing Partner & Founder",
+      "status": "Active",
+      "assignedProjects": [
+        "PRJ-MUM-01",
+        "PRJ-MUM-02",
+        "PRJ-MUM-03",
+        "PRJ-MUM-04"
+      ],
+      "assignedClientIds": [
+        "USR-CL-101",
+        "USR-CL-102",
+        "USR-CL-103"
+      ],
+      "notes": "Managing Partner with root encryption authority.",
+      "createdAt": "2025-01-15T00:00:00.000Z",
+      "lastLogin": "2026-10-02T12:07:36.654Z",
+      "forcePasswordChange": false,
+      "loginDisabled": false,
+      "twoFactorEnabled": false,
+      "sectionAccess": [
+        "Dashboard",
+        "My Profile",
+        "Projects",
+        "Documents",
+        "Files",
+        "Invoices",
+        "Reports",
+        "Messages",
+        "Settings"
+      ],
+      "permissions": {
+        "Client Vault": {
+          "view": true,
+          "create": true,
+          "edit": true,
+          "delete": true,
+          "upload": true,
+          "download": true,
+          "share": true
+        },
+        "Files": {
+          "view": true,
+          "create": true,
+          "edit": true,
+          "delete": true,
+          "upload": true,
+          "download": true,
+          "share": true
+        },
+        "Projects": {
+          "view": true,
+          "create": true,
+          "edit": true,
+          "delete": true,
+          "upload": true,
+          "download": true,
+          "share": true
+        },
+        "Documents": {
+          "view": true,
+          "create": true,
+          "edit": true,
+          "delete": true,
+          "upload": true,
+          "download": true,
+          "share": true
+        },
+        "Profile": {
+          "view": true,
+          "create": true,
+          "edit": true,
+          "delete": true,
+          "upload": true,
+          "download": true,
+          "share": true
+        }
+      }
+    },
+    {
+      "id": "USR-STF-201",
+      "fullName": "CA Sneha Mehta",
+      "company": "PANJIYAR KRISHNA & CO.",
+      "email": "sneha.mehta@panjiyarca.in",
+      "phone": "+91 9820144981",
+      "username": "sneha.ca",
+      "passwordHash": "ba2e8eb13113ce99fea6c8a9fd61e0e9:3800ff87c14cdc23b0e788d04ca633eba0de3550e637dcafc5a38b53595f82e387676234452514d39eb1ad851ef5f355dafa7bb5c3ba8117b0377845a2067d84",
+      "accountType": "staff",
+      "role": "Senior Audit Manager",
+      "status": "Active",
+      "assignedProjects": [
+        "PRJ-MUM-01",
+        "PRJ-MUM-03"
+      ],
+      "assignedClientIds": [
+        "USR-CL-101",
+        "USR-CL-103"
+      ],
+      "notes": "Senior Audit Manager managing corporate client mandates.",
+      "createdAt": "2025-04-10T00:00:00.000Z",
+      "lastLogin": "2026-10-02T11:43:16.329Z",
+      "forcePasswordChange": false,
+      "loginDisabled": false,
+      "twoFactorEnabled": false,
+      "sectionAccess": [
+        "Dashboard",
+        "My Profile",
+        "Projects",
+        "Documents",
+        "Files",
+        "Invoices",
+        "Reports"
+      ],
+      "permissions": {
+        "Client Vault": {
+          "view": true,
+          "create": true,
+          "edit": true,
+          "delete": false,
+          "upload": true,
+          "download": true,
+          "share": true
+        },
+        "Files": {
+          "view": true,
+          "create": true,
+          "edit": true,
+          "delete": false,
+          "upload": true,
+          "download": true,
+          "share": true
+        },
+        "Projects": {
+          "view": true,
+          "create": true,
+          "edit": true,
+          "delete": false,
+          "upload": true,
+          "download": true,
+          "share": true
+        },
+        "Documents": {
+          "view": true,
+          "create": true,
+          "edit": true,
+          "delete": false,
+          "upload": true,
+          "download": true,
+          "share": true
+        },
+        "Profile": {
+          "view": true,
+          "create": true,
+          "edit": true,
+          "delete": false,
+          "upload": true,
+          "download": true,
+          "share": true
+        }
+      }
+    },
+    {
+      "id": "USR-CL-101",
+      "fullName": "Rajesh Singhal",
+      "company": "Apex Precision Engineering Ltd",
+      "email": "rajesh@apexprecision.co.in",
+      "phone": "+91 9821034455",
+      "username": "apex.singhal",
+      "passwordHash": "a55875f4d8d81322958bfb59cdb5a2dc:acd9982e32e94ae69556abc48d0bf8ae124acfc174be9b9862e0e8cc5553800f5ffd05217bb420fb0823b967157c8883e575dcb1bc615e7a92c8f5663d0a4fc6",
+      "accountType": "client",
+      "role": "Managing Director",
+      "status": "Active",
+      "assignedProjects": [
+        "PRJ-MUM-01"
+      ],
+      "notes": "Automotive components client with isolated secure vault.",
+      "createdAt": "2025-02-14T00:00:00.000Z",
+      "lastLogin": "2026-10-02T10:29:07.359Z",
+      "forcePasswordChange": false,
+      "loginDisabled": false,
+      "twoFactorEnabled": false,
+      "sectionAccess": [
+        "Dashboard",
+        "My Profile",
+        "Projects",
+        "Documents",
+        "Files",
+        "Invoices",
+        "Reports"
+      ],
+      "permissions": {
+        "Client Vault": {
+          "view": true,
+          "create": false,
+          "edit": false,
+          "delete": false,
+          "upload": true,
+          "download": true,
+          "share": false
+        },
+        "Files": {
+          "view": true,
+          "create": false,
+          "edit": false,
+          "delete": false,
+          "upload": true,
+          "download": true,
+          "share": false
+        },
+        "Projects": {
+          "view": true,
+          "create": false,
+          "edit": false,
+          "delete": false,
+          "upload": false,
+          "download": true,
+          "share": false
+        },
+        "Documents": {
+          "view": true,
+          "create": false,
+          "edit": false,
+          "delete": false,
+          "upload": true,
+          "download": true,
+          "share": false
+        },
+        "Profile": {
+          "view": true,
+          "create": false,
+          "edit": true,
+          "delete": false,
+          "upload": true,
+          "download": false,
+          "share": false
+        }
+      }
+    },
+    {
+      "id": "USR-CL-102",
+      "fullName": "Dr. Anita Kulkarni",
+      "company": "Nexus BioPharma Solutions",
+      "email": "anita.k@nexusbiopharma.com",
+      "phone": "+91 9930219876",
+      "username": "nexus.anita",
+      "passwordHash": "76a3d1fefb7c9cae304991a94f93f75c:342933ab7b74ad20a4e787486cd904fc3c1039e74ddc22b86b0a995b1bc795f7404d6d02eaa4330a4009e63bd12f41defa056e20f9557e61c2399cc143e105a6",
+      "accountType": "client",
+      "role": "Founder & CEO",
+      "status": "Active",
+      "assignedProjects": [
+        "PRJ-MUM-02"
+      ],
+      "notes": "Pharma client with dedicated compliance archive.",
+      "createdAt": "2025-05-18T00:00:00.000Z",
+      "lastLogin": "2026-10-02T08:28:48.733Z",
+      "forcePasswordChange": false,
+      "loginDisabled": false,
+      "twoFactorEnabled": false,
+      "sectionAccess": [
+        "Dashboard",
+        "My Profile",
+        "Projects",
+        "Documents",
+        "Files",
+        "Invoices"
+      ],
+      "permissions": {
+        "Client Vault": {
+          "view": true,
+          "create": false,
+          "edit": false,
+          "delete": false,
+          "upload": true,
+          "download": true,
+          "share": false
+        },
+        "Files": {
+          "view": true,
+          "create": false,
+          "edit": false,
+          "delete": false,
+          "upload": true,
+          "download": true,
+          "share": false
+        },
+        "Projects": {
+          "view": true,
+          "create": false,
+          "edit": false,
+          "delete": false,
+          "upload": false,
+          "download": true,
+          "share": false
+        },
+        "Documents": {
+          "view": true,
+          "create": false,
+          "edit": false,
+          "delete": false,
+          "upload": true,
+          "download": true,
+          "share": false
+        },
+        "Profile": {
+          "view": true,
+          "create": false,
+          "edit": true,
+          "delete": false,
+          "upload": true,
+          "download": false,
+          "share": false
+        }
+      }
+    }
+  ],
+  "sessions": [
+    {
+      "id": "SES-1790941539886-893",
+      "token": "b82af0675980139127f770c6ea1afda983e92d30281f4dcfc8f2a28f3b116dfe",
+      "userId": "USR-ADM-001",
+      "username": "admin.krishna",
+      "fullName": "CA Krishna Panjiyar",
+      "accountType": "super_admin",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)",
+      "ipAddress": "2405:201:a808:800b:f951:291e:a8d2:310b",
+      "createdAt": "2026-10-02T11:45:39.886Z",
+      "lastActiveAt": "2026-10-02T11:45:39.886Z",
+      "expiresAt": "2026-10-02T12:45:39.886Z"
+    },
+    {
+      "id": "SES-1790942609076-398",
+      "token": "eb6962b7d86ed4dc49c264d24844a431329521560c28f86700a557f2142c2d2c",
+      "userId": "USR-ADM-001",
+      "username": "admin.krishna",
+      "fullName": "CA Krishna Panjiyar",
+      "accountType": "super_admin",
+      "device": "curl/7.88.1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-02T12:03:29.076Z",
+      "lastActiveAt": "2026-10-02T12:04:17.630Z",
+      "expiresAt": "2026-10-02T13:03:29.076Z"
+    },
+    {
+      "id": "SES-1790942856654-648",
+      "token": "385f52cbe72e976e57fc38012ba09075bae0b3f7f63cbb242ded01d999c03289",
+      "userId": "USR-ADM-001",
+      "username": "admin.krishna",
+      "fullName": "CA Krishna Panjiyar",
+      "accountType": "super_admin",
+      "device": "curl/7.88.1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-02T12:07:36.654Z",
+      "lastActiveAt": "2026-10-02T12:08:36.595Z",
+      "expiresAt": "2026-10-02T13:07:36.654Z"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "LOG-1790942916596-143",
+      "timestamp": "2026-10-02T12:08:36.596Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "FILE_MOVED",
+      "category": "File",
+      "status": "Success",
+      "details": "File 'Audit_Report_Apex_FY25_Signed.pdf' moved from 'Audit & Tax Reports' to 'Documents & Certificates' by CA Krishna Panjiyar.",
+      "ipAddress": "127.0.0.1"
+    },
+    {
+      "id": "LOG-1790942912463-881",
+      "timestamp": "2026-10-02T12:08:32.463Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "FILE_MOVED",
+      "category": "File",
+      "status": "Success",
+      "details": "File 'Audit_Report_Apex_FY25_Signed.pdf' moved from 'Documents & Certificates' to 'Audit & Tax Reports' by CA Krishna Panjiyar.",
+      "ipAddress": "127.0.0.1"
+    },
+    {
+      "id": "LOG-1790942878982-229",
+      "timestamp": "2026-10-02T12:07:58.982Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "FOLDER_DELETED",
+      "category": "File",
+      "status": "Warning",
+      "details": "Folder 'Compliance Filings 2026' (FLD-MUQX59SO) deleted. 0 files moved safely to 'Documents & Certificates'.",
+      "ipAddress": "127.0.0.1"
+    },
+    {
+      "id": "LOG-1790942874072-182",
+      "timestamp": "2026-10-02T12:07:54.073Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "FOLDER_CREATED",
+      "category": "File",
+      "status": "Success",
+      "details": "Folder 'Compliance Filings 2026' created by CA Krishna Panjiyar (Scope: all).",
+      "ipAddress": "127.0.0.1"
+    },
+    {
+      "id": "LOG-1790942856655-482",
+      "timestamp": "2026-10-02T12:07:36.655Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "category": "Auth",
+      "status": "Success",
+      "details": "Successful login by 'CA Krishna Panjiyar' (SUPER_ADMIN) from 127.0.0.1. Session issued.",
+      "ipAddress": "127.0.0.1",
+      "device": "curl/7.88.1"
+    },
+    {
+      "id": "LOG-1790942657631-17",
+      "timestamp": "2026-10-02T12:04:17.631Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "FILE_MOVED",
+      "category": "File",
+      "status": "Success",
+      "details": "File 'Form_3CD_Tax_Audit_Statement_FY25.pdf' moved from 'Documents & Certificates' to 'Audit & Tax Reports' by CA Krishna Panjiyar.",
+      "ipAddress": "127.0.0.1"
+    },
+    {
+      "id": "LOG-1790942652761-285",
+      "timestamp": "2026-10-02T12:04:12.761Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "FOLDER_DELETED",
+      "category": "File",
+      "status": "Warning",
+      "details": "Folder 'Statutory Tax Filings 2026' (FLD-MUQX07N0) deleted. 1 files moved safely to 'Documents & Certificates'.",
+      "ipAddress": "127.0.0.1"
+    },
+    {
+      "id": "LOG-1790942647522-46",
+      "timestamp": "2026-10-02T12:04:07.522Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "FILE_MOVED",
+      "category": "File",
+      "status": "Success",
+      "details": "File 'Form_3CD_Tax_Audit_Statement_FY25.pdf' moved from 'Audit & Tax Reports' to 'Statutory Tax Filings 2026' by CA Krishna Panjiyar.",
+      "ipAddress": "127.0.0.1"
+    },
+    {
+      "id": "LOG-1790942637997-201",
+      "timestamp": "2026-10-02T12:03:57.997Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "FOLDER_CREATED",
+      "category": "File",
+      "status": "Success",
+      "details": "Folder 'Statutory Tax Filings 2026' created by CA Krishna Panjiyar (Scope: all).",
+      "ipAddress": "127.0.0.1"
+    },
+    {
+      "id": "LOG-1790942630399-869",
+      "timestamp": "2026-10-02T12:03:50.399Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "FILE_DOWNLOADED",
+      "category": "File",
+      "status": "Success",
+      "details": "File 'Audit_Report_Apex_FY25_Signed.pdf' (FIL-1001) downloaded. SHA256 integrity verified: e3b0c44298fc1c14...",
+      "ipAddress": "127.0.0.1"
+    },
+    {
+      "id": "LOG-1790942609077-220",
+      "timestamp": "2026-10-02T12:03:29.077Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "category": "Auth",
+      "status": "Success",
+      "details": "Successful login by 'CA Krishna Panjiyar' (SUPER_ADMIN) from 127.0.0.1. Session issued.",
+      "ipAddress": "127.0.0.1",
+      "device": "curl/7.88.1"
+    },
+    {
+      "id": "LOG-1790941539886-213",
+      "timestamp": "2026-10-02T11:45:39.886Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "category": "Auth",
+      "status": "Success",
+      "details": "Successful login by 'CA Krishna Panjiyar' (SUPER_ADMIN) from 2405:201:a808:800b:f951:291e:a8d2:310b. Session issued.",
+      "ipAddress": "2405:201:a808:800b:f951:291e:a8d2:310b",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36"
+    },
+    {
+      "id": "LOG-1790941465060-254",
+      "timestamp": "2026-10-02T11:44:25.060Z",
+      "user": "sneha.ca",
+      "userRole": "Senior Audit Manager",
+      "action": "AUTH_LOGOUT",
+      "category": "Auth",
+      "status": "Success",
+      "details": "User 'sneha.ca' logged out successfully. Session terminated.",
+      "ipAddress": "2405:201:a808:800b:f951:291e:a8d2:310b"
+    },
+    {
+      "id": "LOG-1790941396330-417",
+      "timestamp": "2026-10-02T11:43:16.330Z",
+      "user": "sneha.ca",
+      "userRole": "Senior Audit Manager",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "category": "Auth",
+      "status": "Success",
+      "details": "Successful login by 'CA Sneha Mehta' (STAFF) from 2405:201:a808:800b:f951:291e:a8d2:310b. Session issued.",
+      "ipAddress": "2405:201:a808:800b:f951:291e:a8d2:310b",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36"
+    },
+    {
+      "id": "LOG-1790941367985-373",
+      "timestamp": "2026-10-02T11:42:47.985Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "AUTH_LOGOUT",
+      "category": "Auth",
+      "status": "Success",
+      "details": "User 'admin.krishna' logged out successfully. Session terminated.",
+      "ipAddress": "2405:201:a808:800b:f951:291e:a8d2:310b"
+    },
+    {
+      "id": "LOG-1790941273999-550",
+      "timestamp": "2026-10-02T11:41:13.999Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "category": "Auth",
+      "status": "Success",
+      "details": "Successful login by 'CA Krishna Panjiyar' (SUPER_ADMIN) from 2405:201:a808:800b:f951:291e:a8d2:310b. Session issued.",
+      "ipAddress": "2405:201:a808:800b:f951:291e:a8d2:310b",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36"
+    },
+    {
+      "id": "LOG-1790941265031-30",
+      "timestamp": "2026-10-02T11:41:05.031Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "AUTH_LOGOUT",
+      "category": "Auth",
+      "status": "Success",
+      "details": "User 'admin.krishna' logged out successfully. Session terminated.",
+      "ipAddress": "2405:201:a808:800b:f951:291e:a8d2:310b"
+    },
+    {
+      "id": "LOG-1790941167478-977",
+      "timestamp": "2026-10-02T11:39:27.478Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "AUTH_LOGOUT",
+      "category": "Auth",
+      "status": "Success",
+      "details": "User 'admin.krishna' logged out successfully. Session terminated.",
+      "ipAddress": "127.0.0.1"
+    },
+    {
+      "id": "LOG-1790941167454-699",
+      "timestamp": "2026-10-02T11:39:27.454Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "category": "Auth",
+      "status": "Success",
+      "details": "Successful login by 'CA Krishna Panjiyar' (SUPER_ADMIN) from 127.0.0.1. Session issued.",
+      "ipAddress": "127.0.0.1",
+      "device": "node"
+    },
+    {
+      "id": "LOG-1790940319468-774",
+      "timestamp": "2026-10-02T11:25:19.468Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "SESSION_REVOKED",
+      "category": "Security",
+      "status": "Success",
+      "details": "Session SES-1790936931856-964 (User: admin.krishna, IP: 127.0.0.1) was revoked.",
+      "ipAddress": "2405:201:a808:800b:f951:291e:a8d2:310b"
+    },
+    {
+      "id": "LOG-1790940316187-471",
+      "timestamp": "2026-10-02T11:25:16.187Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "SESSION_REVOKED",
+      "category": "Security",
+      "status": "Success",
+      "details": "Session SES-1790939323904-178 (User: admin.krishna, IP: 127.0.0.1) was revoked.",
+      "ipAddress": "2405:201:a808:800b:f951:291e:a8d2:310b"
+    },
+    {
+      "id": "LOG-1790940307771-29",
+      "timestamp": "2026-10-02T11:25:07.771Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "SESSION_REVOKED",
+      "category": "Security",
+      "status": "Success",
+      "details": "Session SES-1790936947359-511 (User: apex.singhal, IP: 127.0.0.1) was revoked.",
+      "ipAddress": "2405:201:a808:800b:f951:291e:a8d2:310b"
+    },
+    {
+      "id": "LOG-1790939323905-18",
+      "timestamp": "2026-10-02T11:08:43.905Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "category": "Auth",
+      "status": "Success",
+      "details": "Successful login by 'CA Krishna Panjiyar' (SUPER_ADMIN) from 127.0.0.1. Session issued.",
+      "ipAddress": "127.0.0.1",
+      "device": "node"
+    },
+    {
+      "id": "LOG-1790939036155-424",
+      "timestamp": "2026-10-02T11:03:56.155Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "category": "Auth",
+      "status": "Success",
+      "details": "Successful login by 'CA Krishna Panjiyar' (SUPER_ADMIN) from 2405:201:a808:800b:f951:291e:a8d2:310b. Session issued.",
+      "ipAddress": "2405:201:a808:800b:f951:291e:a8d2:310b",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36"
+    },
+    {
+      "id": "LOG-1790936958612-284",
+      "timestamp": "2026-10-02T10:29:18.612Z",
+      "user": "test.user",
+      "userRole": "Unknown",
+      "action": "AUTH_LOCKOUT_REJECTED",
+      "category": "Auth",
+      "status": "Denied",
+      "details": "Rejected login attempt on locked account 'test.user'. 895s remaining.",
+      "ipAddress": "127.0.0.1",
+      "device": "node"
+    },
+    {
+      "id": "LOG-1790936953374-320",
+      "timestamp": "2026-10-02T10:29:13.374Z",
+      "user": "test.user",
+      "userRole": "Unknown",
+      "action": "AUTH_FAILED_USER_NOT_FOUND",
+      "category": "Auth",
+      "status": "Denied",
+      "details": "Failed login attempt for non-existent username/email 'test.user'. Attempt 5.",
+      "ipAddress": "127.0.0.1",
+      "device": "node"
+    },
+    {
+      "id": "LOG-1790936953353-225",
+      "timestamp": "2026-10-02T10:29:13.353Z",
+      "user": "test.user",
+      "userRole": "Unknown",
+      "action": "AUTH_FAILED_USER_NOT_FOUND",
+      "category": "Auth",
+      "status": "Denied",
+      "details": "Failed login attempt for non-existent username/email 'test.user'. Attempt 4.",
+      "ipAddress": "127.0.0.1",
+      "device": "node"
+    },
+    {
+      "id": "LOG-1790936953337-878",
+      "timestamp": "2026-10-02T10:29:13.337Z",
+      "user": "test.user",
+      "userRole": "Unknown",
+      "action": "AUTH_FAILED_USER_NOT_FOUND",
+      "category": "Auth",
+      "status": "Denied",
+      "details": "Failed login attempt for non-existent username/email 'test.user'. Attempt 3.",
+      "ipAddress": "127.0.0.1",
+      "device": "node"
+    },
+    {
+      "id": "LOG-1790936953331-169",
+      "timestamp": "2026-10-02T10:29:13.331Z",
+      "user": "test.user",
+      "userRole": "Unknown",
+      "action": "AUTH_FAILED_USER_NOT_FOUND",
+      "category": "Auth",
+      "status": "Denied",
+      "details": "Failed login attempt for non-existent username/email 'test.user'. Attempt 2.",
+      "ipAddress": "127.0.0.1",
+      "device": "node"
+    },
+    {
+      "id": "LOG-1790936953313-74",
+      "timestamp": "2026-10-02T10:29:13.313Z",
+      "user": "test.user",
+      "userRole": "Unknown",
+      "action": "AUTH_FAILED_USER_NOT_FOUND",
+      "category": "Auth",
+      "status": "Denied",
+      "details": "Failed login attempt for non-existent username/email 'test.user'. Attempt 1.",
+      "ipAddress": "127.0.0.1",
+      "device": "node"
+    },
+    {
+      "id": "LOG-1790936947359-550",
+      "timestamp": "2026-10-02T10:29:07.359Z",
+      "user": "apex.singhal",
+      "userRole": "Managing Director",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "category": "Auth",
+      "status": "Success",
+      "details": "Successful login by 'Rajesh Singhal' (CLIENT) from 127.0.0.1. Session issued.",
+      "ipAddress": "127.0.0.1",
+      "device": "node"
+    },
+    {
+      "id": "LOG-1790936931856-970",
+      "timestamp": "2026-10-02T10:28:51.856Z",
+      "user": "admin.krishna",
+      "userRole": "Managing Partner & Founder",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "category": "Auth",
+      "status": "Success",
+      "details": "Successful login by 'CA Krishna Panjiyar' (SUPER_ADMIN) from 127.0.0.1. Session issued.",
+      "ipAddress": "127.0.0.1",
+      "device": "curl/7.88.1"
+    },
+    {
+      "id": "LOG-INIT-01",
+      "timestamp": "2026-10-02T10:28:48.733Z",
+      "user": "System Provisioner",
+      "userRole": "Security Kernel",
+      "action": "VAULT_INITIALIZED",
+      "category": "Security",
+      "status": "Success",
+      "details": "Server cryptographic engine initialized with salted PBKDF2 hashing and session management.",
+      "ipAddress": "127.0.0.1"
+    }
+  ],
+  "folders": [
+    {
+      "id": "FLD-DOCS",
+      "name": "Documents & Certificates",
+      "slug": "documents",
+      "clientId": "all",
+      "description": "Statutory audit reports, CA certified balance sheets, and formal tax declarations.",
+      "color": "blue",
+      "icon": "FileText",
+      "createdAt": "2026-01-01",
+      "createdBy": "CA Krishna Panjiyar",
+      "isSystem": true,
+      "permissions": {
+        "canView": true,
+        "canUpload": true,
+        "canDownload": true,
+        "canEdit": true,
+        "canDelete": false
+      }
+    },
+    {
+      "id": "FLD-REPORTS",
+      "name": "Audit & Tax Reports",
+      "slug": "reports",
+      "clientId": "all",
+      "description": "Detailed Form 3CD schedules, transfer pricing dossiers, and GSTR-9C certifications.",
+      "color": "emerald",
+      "icon": "FileSpreadsheet",
+      "createdAt": "2026-01-01",
+      "createdBy": "CA Krishna Panjiyar",
+      "isSystem": true,
+      "permissions": {
+        "canView": true,
+        "canUpload": true,
+        "canDownload": true,
+        "canEdit": true,
+        "canDelete": false
+      }
+    },
+    {
+      "id": "FLD-INVOICES",
+      "name": "Invoices & Financing",
+      "slug": "invoices",
+      "clientId": "all",
+      "description": "Bank CMA working capital dossiers, term loan appraisals, and commercial invoices.",
+      "color": "amber",
+      "icon": "FileSpreadsheet",
+      "createdAt": "2026-01-01",
+      "createdBy": "CA Krishna Panjiyar",
+      "isSystem": true,
+      "permissions": {
+        "canView": true,
+        "canUpload": true,
+        "canDownload": true,
+        "canEdit": true,
+        "canDelete": false
+      }
+    },
+    {
+      "id": "FLD-PHOTOS",
+      "name": "Inspection & Site Photos",
+      "slug": "photos",
+      "clientId": "all",
+      "description": "Physical inventory verification, plant inspection visuals, and registered office geotagged photos.",
+      "color": "purple",
+      "icon": "Image",
+      "createdAt": "2026-01-01",
+      "createdBy": "CA Krishna Panjiyar",
+      "isSystem": true,
+      "permissions": {
+        "canView": true,
+        "canUpload": true,
+        "canDownload": true,
+        "canEdit": true,
+        "canDelete": false
+      }
+    },
+    {
+      "id": "FLD-VIDEOS",
+      "name": "Meeting & Audit Recordings",
+      "slug": "videos",
+      "clientId": "all",
+      "description": "Board audit committee briefings, ROC compliance discussions, and video depositions.",
+      "color": "indigo",
+      "icon": "Video",
+      "createdAt": "2026-01-01",
+      "createdBy": "CA Krishna Panjiyar",
+      "isSystem": true,
+      "permissions": {
+        "canView": true,
+        "canUpload": true,
+        "canDownload": true,
+        "canEdit": true,
+        "canDelete": false
+      }
+    },
+    {
+      "id": "FLD-CONTRACTS",
+      "name": "Agreements & NDAs",
+      "slug": "contracts",
+      "clientId": "all",
+      "description": "Confidential corporate agreements, partner NDAs, and engagement engagement letters.",
+      "color": "cyan",
+      "icon": "Folder",
+      "createdAt": "2026-01-01",
+      "createdBy": "CA Krishna Panjiyar",
+      "isSystem": true,
+      "permissions": {
+        "canView": true,
+        "canUpload": true,
+        "canDownload": true,
+        "canEdit": true,
+        "canDelete": false
+      }
+    },
+    {
+      "id": "FLD-APX-TAX",
+      "name": "FY 2025-26 Tax Workpapers",
+      "slug": "apex-tax-workpapers",
+      "clientId": "USR-CL-101",
+      "description": "Exclusive working files for Apex Precision Engineering Ltd tax audit engagement.",
+      "color": "blue",
+      "icon": "Shield",
+      "createdAt": "2026-04-10",
+      "createdBy": "CA Krishna Panjiyar",
+      "isSystem": false,
+      "permissions": {
+        "canView": true,
+        "canUpload": true,
+        "canDownload": true,
+        "canEdit": true,
+        "canDelete": true
+      }
+    },
+    {
+      "id": "FLD-NEX-GST",
+      "name": "GST Reconciliation Archive",
+      "slug": "nexus-gst-archive",
+      "clientId": "USR-CL-102",
+      "description": "Exclusive monthly GSTR-2B vs ERP reconciliation worksheets for Nexus BioPharma.",
+      "color": "emerald",
+      "icon": "Briefcase",
+      "createdAt": "2026-05-20",
+      "createdBy": "CA Sneha Mehta",
+      "isSystem": false,
+      "permissions": {
+        "canView": true,
+        "canUpload": true,
+        "canDownload": true,
+        "canEdit": true,
+        "canDelete": true
+      }
+    }
+  ],
+  "projects": [
+    {
+      "id": "PRJ-MUM-01",
+      "title": "Statutory & Tax Audit FY 2025-26",
+      "clientName": "Apex Precision Engineering Ltd",
+      "clientId": "USR-CL-101",
+      "category": "Statutory Audit",
+      "assignedStaffIds": [
+        "USR-STF-201"
+      ],
+      "status": "Active",
+      "dueDate": "2026-10-31",
+      "createdDate": "2026-04-01",
+      "description": "Comprehensive 3CD audit report, fixed asset physical verification, and internal control assurance."
+    },
+    {
+      "id": "PRJ-MUM-02",
+      "title": "GSTR-9 & 9C Annual Reconciliation",
+      "clientName": "Nexus BioPharma Solutions",
+      "clientId": "USR-CL-102",
+      "category": "Indirect Taxation",
+      "assignedStaffIds": [
+        "USR-STF-201"
+      ],
+      "status": "Under Review",
+      "dueDate": "2026-12-31",
+      "createdDate": "2026-05-15",
+      "description": "Reconciliation of GSTR-2B vs Books, reverse charge mechanism audit, and export refund filings."
+    },
+    {
+      "id": "PRJ-MUM-03",
+      "title": "Bank Loan CMA Project Financing (₹14.5 Cr)",
+      "clientName": "Bluecrest Logistics & Cold Storage",
+      "clientId": "USR-CL-103",
+      "category": "Project Financing",
+      "assignedStaffIds": [
+        "USR-STF-201"
+      ],
+      "status": "Active",
+      "dueDate": "2026-11-15",
+      "createdDate": "2026-03-10",
+      "description": "Full DSCR modeling, bank consortium presentation, and working capital credit appraisal dossier."
+    },
+    {
+      "id": "PRJ-MUM-04",
+      "title": "Cross-Border SaaS Export 15CA/15CB Compliance",
+      "clientName": "Vertex FinTech Pvt Ltd",
+      "clientId": "USR-CL-104",
+      "category": "International Tax",
+      "assignedStaffIds": [
+        "USR-STF-201"
+      ],
+      "status": "Active",
+      "dueDate": "2026-09-15",
+      "createdDate": "2026-07-01",
+      "description": "DTAA withholding tax evaluation and chartered certification for foreign software outward remittances."
+    }
+  ],
+  "files": [
+    {
+      "id": "FIL-1001",
+      "title": "Signed Statutory Audit Report FY24-25",
+      "fileName": "Audit_Report_Apex_FY25_Signed.pdf",
+      "fileType": "document",
+      "fileSize": "4.8 MB",
+      "clientId": "USR-CL-101",
+      "clientName": "Apex Precision Engineering Ltd",
+      "projectId": "PRJ-MUM-01",
+      "projectName": "Statutory & Tax Audit FY 2025-26",
+      "folderId": "FLD-DOCS",
+      "folder": "Documents & Certificates",
+      "uploadDate": "2026-08-15",
+      "uploadedBy": "CA Krishna Panjiyar",
+      "sha256Hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "encryptionStandard": "AES-256 (GCM)",
+      "previewContent": "PANJIYAR KRISHNA & CO.\nCHARTERED ACCOUNTANTS\nFirm Regn No: 035129N | Peer Reviewed Unit\n\nINDEPENDENT AUDITOR'S REPORT\nTo the Members of Apex Precision Engineering Ltd\n\n1. Opinion\nWe have audited the accompanying standalone financial statements of Apex Precision Engineering Ltd, which comprise the Balance Sheet as at March 31, 2025, and the Statement of Profit and Loss and Statement of Cash Flows for the year then ended.",
+      "permissions": {
+        "canView": true,
+        "canUpload": false,
+        "canDownload": true,
+        "canEdit": false,
+        "canDelete": false,
+        "canShare": true,
+        "canRename": true,
+        "canMove": true
+      }
+    },
+    {
+      "id": "FIL-1002",
+      "title": "Form 3CD Tax Audit Statement",
+      "fileName": "Form_3CD_Tax_Audit_Statement_FY25.pdf",
+      "fileType": "report",
+      "fileSize": "2.1 MB",
+      "clientId": "USR-CL-101",
+      "clientName": "Apex Precision Engineering Ltd",
+      "projectId": "PRJ-MUM-01",
+      "projectName": "Statutory & Tax Audit FY 2025-26",
+      "folderId": "FLD-REPORTS",
+      "folder": "Audit & Tax Reports",
+      "uploadDate": "2026-08-18",
+      "uploadedBy": "CA Sneha Mehta",
+      "sha256Hash": "a7c93e4b11f32890cdfa457788102aef649bc33198de7422bcde1029471abef1",
+      "encryptionStandard": "AES-256 (GCM)",
+      "previewContent": "FORM NO. 3CD [See rule 6G(2)]\nTax Audit Statement under section 44AB of the Income-tax Act, 1961.\nAssessee: Apex Precision Engineering Ltd | PAN: AAACA1234F\nClauses 13 to 44: Audited without qualification. Depreciation schedule conforms with Appendix I.",
+      "permissions": {
+        "canView": true,
+        "canUpload": false,
+        "canDownload": true,
+        "canEdit": false,
+        "canDelete": false,
+        "canShare": false,
+        "canRename": true,
+        "canMove": true
+      }
+    },
+    {
+      "id": "FIL-1003",
+      "title": "GSTR-9C Annual Certification Dossier",
+      "fileName": "Nexus_GSTR_9C_Reconciliation_Certified.pdf",
+      "fileType": "report",
+      "fileSize": "3.6 MB",
+      "clientId": "USR-CL-102",
+      "clientName": "Nexus BioPharma Solutions",
+      "projectId": "PRJ-MUM-02",
+      "projectName": "GSTR-9 & 9C Annual Reconciliation",
+      "folderId": "FLD-REPORTS",
+      "folder": "Audit & Tax Reports",
+      "uploadDate": "2026-09-02",
+      "uploadedBy": "CA Sneha Mehta",
+      "sha256Hash": "98d5a1e2f8c7b3990412e8bcde219a55743b1239cdfe80447192aabbccddeeff",
+      "encryptionStandard": "AES-256 (GCM)",
+      "previewContent": "FORM GSTR-9C [See rule 80(3)]\nGSTIN: 27AABCN8890K1ZP | Nexus BioPharma Solutions Pvt Ltd\nGross Turnover reconciled: ₹48,22,50,000/-\nInput Tax Credit fully reconciled with GSTR-2B. No adverse discrepancy noted.",
+      "permissions": {
+        "canView": true,
+        "canUpload": false,
+        "canDownload": true,
+        "canEdit": false,
+        "canDelete": false,
+        "canShare": true,
+        "canRename": true,
+        "canMove": true
+      }
+    },
+    {
+      "id": "FIL-1004",
+      "title": "Bank CMA Model & 7-Year Cash Flows",
+      "fileName": "Bluecrest_CMA_WorkingCapital_14Cr.xlsx",
+      "fileType": "spreadsheet",
+      "fileSize": "8.4 MB",
+      "clientId": "USR-CL-103",
+      "clientName": "Bluecrest Logistics & Cold Storage",
+      "projectId": "PRJ-MUM-03",
+      "projectName": "Bank Loan CMA Project Financing",
+      "folderId": "FLD-INVOICES",
+      "folder": "Invoices & Financing",
+      "uploadDate": "2026-06-25",
+      "uploadedBy": "CA Krishna Panjiyar",
+      "sha256Hash": "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
+      "encryptionStandard": "AES-256 (GCM)",
+      "previewContent": "BANK CONSORTIUM CREDIT APPRAISAL DOSSIER\nBorrower: Bluecrest Logistics & Cold Storage Ltd\nFacility: ₹14.50 Crore Working Capital & Cold Chain Expansion\nDSCR: 2.14x (Average over 7 years) | Fixed Asset Coverage: 1.85x",
+      "permissions": {
+        "canView": true,
+        "canUpload": false,
+        "canDownload": true,
+        "canEdit": false,
+        "canDelete": false,
+        "canShare": false,
+        "canRename": true,
+        "canMove": true
+      }
+    },
+    {
+      "id": "FIL-1005",
+      "title": "Form 15CB CA Undertaking Certificate",
+      "fileName": "Vertex_15CB_Remittance_USD_450k.pdf",
+      "fileType": "document",
+      "fileSize": "1.4 MB",
+      "clientId": "USR-CL-104",
+      "clientName": "Vertex FinTech Pvt Ltd",
+      "projectId": "PRJ-MUM-04",
+      "projectName": "Cross-Border SaaS Export 15CA/15CB Compliance",
+      "folderId": "FLD-DOCS",
+      "folder": "Documents & Certificates",
+      "uploadDate": "2026-09-10",
+      "uploadedBy": "CA Sneha Mehta",
+      "sha256Hash": "4f5e6d7c8b9a0123456789abcdef0123456789abcdef0123456789abcdef0123",
+      "encryptionStandard": "AES-256 (GCM)",
+      "previewContent": "CERTIFICATE UNDER SECTION 195(6) OF THE INCOME-TAX ACT, 1961\nRemitter: Vertex FinTech Pvt Ltd | Beneficiary: Cloud Infrastructure Inc (USA)\nAmount: USD 450,000 (INR ₹3,78,00,000) | Withholding Tax: 0% under India-US DTAA Art 7.",
+      "permissions": {
+        "canView": true,
+        "canUpload": false,
+        "canDownload": true,
+        "canEdit": false,
+        "canDelete": false,
+        "canShare": true,
+        "canRename": true,
+        "canMove": true
+      }
+    },
+    {
+      "id": "FIL-1006",
+      "title": "Andheri West Office Facility Inspection Photo",
+      "fileName": "Facility_Audit_Apex_Plant.jpg",
+      "fileType": "photo",
+      "fileSize": "3.2 MB",
+      "clientId": "USR-CL-101",
+      "clientName": "Apex Precision Engineering Ltd",
+      "projectId": "PRJ-MUM-01",
+      "projectName": "Statutory & Tax Audit FY 2025-26",
+      "folderId": "FLD-PHOTOS",
+      "folder": "Inspection & Site Photos",
+      "uploadDate": "2026-07-20",
+      "uploadedBy": "Rajesh Singhal",
+      "sha256Hash": "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567",
+      "encryptionStandard": "AES-256 (GCM)",
+      "previewContent": "[GEOTAGGED INSPECTION IMAGE]\nTimestamp: 2026-07-20T14:32:10 IST\nCoordinates: 19.1136° N, 72.8697° E (MIDC Industrial Area, Andheri West, Mumbai)\nVerification Item: CNC Multi-Axis Milling Unit (Asset ID: CNC-MUM-09)",
+      "permissions": {
+        "canView": true,
+        "canUpload": true,
+        "canDownload": true,
+        "canEdit": false,
+        "canDelete": false,
+        "canShare": false,
+        "canRename": true,
+        "canMove": true
+      }
+    },
+    {
+      "id": "FIL-1007",
+      "title": "Tax Audit Workpapers & Ledger Reconciliation",
+      "fileName": "Apex_Tax_Audit_Workpapers_2026.xlsx",
+      "fileType": "spreadsheet",
+      "fileSize": "5.1 MB",
+      "clientId": "USR-CL-101",
+      "clientName": "Apex Precision Engineering Ltd",
+      "projectId": "PRJ-MUM-01",
+      "projectName": "Statutory & Tax Audit FY 2025-26",
+      "folderId": "FLD-APX-TAX",
+      "folder": "FY 2025-26 Tax Workpapers",
+      "uploadDate": "2026-08-10",
+      "uploadedBy": "CA Krishna Panjiyar",
+      "sha256Hash": "5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f",
+      "encryptionStandard": "AES-256 (GCM)",
+      "previewContent": "APEX PRECISION ENGINEERING LTD - AUDIT WORKPAPERS\nGeneral ledger cross-verification, Section 43B statutory dues reconciliation, and TDS remittance challans check.",
+      "permissions": {
+        "canView": true,
+        "canUpload": true,
+        "canDownload": true,
+        "canEdit": true,
+        "canDelete": true,
+        "canShare": false,
+        "canRename": true,
+        "canMove": true
+      }
+    },
+    {
+      "id": "FIL-1008",
+      "title": "GSTR-2B Inward Credit Variance Sheet",
+      "fileName": "Nexus_GSTR2B_Variance_Worksheet.xlsx",
+      "fileType": "spreadsheet",
+      "fileSize": "3.9 MB",
+      "clientId": "USR-CL-102",
+      "clientName": "Nexus BioPharma Solutions",
+      "projectId": "PRJ-MUM-02",
+      "projectName": "GSTR-9 & 9C Annual Reconciliation",
+      "folderId": "FLD-NEX-GST",
+      "folder": "GST Reconciliation Archive",
+      "uploadDate": "2026-08-28",
+      "uploadedBy": "CA Sneha Mehta",
+      "sha256Hash": "9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d",
+      "encryptionStandard": "AES-256 (GCM)",
+      "previewContent": "GSTR-2B vs PURCHASE REGISTER RECONCILIATION\nIdentified mismatched vendor invoices: 0. Unclaimed eligible credit: ₹4,12,000 carried forward to subsequent return.",
+      "permissions": {
+        "canView": true,
+        "canUpload": true,
+        "canDownload": true,
+        "canEdit": true,
+        "canDelete": true,
+        "canShare": false,
+        "canRename": true,
+        "canMove": true
+      }
+    }
+  ],
+  "failedLogins": {
+    "test.user": {
+      "count": 5,
+      "lockedUntil": 1790937853374
+    }
+  },
+  "securityConfig": {
+    "sessionTimeoutMinutes": 60,
+    "maxFailedLoginsBeforeLock": 5,
+    "enforceTwoFactor": false,
+    "enforcePasswordComplexity": true,
+    "passwordExpiryDays": 90,
+    "ipWhitelistEnabled": false,
+    "notifyOnNewLogin": true
+  }
+}

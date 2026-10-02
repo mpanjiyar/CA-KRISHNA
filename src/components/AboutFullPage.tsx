@@ -68,19 +68,19 @@ export const AboutFullPage: React.FC<AboutFullPageProps> = ({
         <section className="mb-10 sm:mb-14 p-6 sm:p-8 rounded-2xl bg-[#F7F9FC] border border-[#D9E2EC]">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 items-center">
             <div className="md:col-span-4 flex flex-col items-center text-center">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white border border-[#D9E2EC] shadow-sm mb-3 flex items-center justify-center overflow-hidden p-1">
+              <div className="w-32 h-32 xs:w-36 xs:h-36 sm:w-40 sm:h-40 md:w-44 md:h-44 rounded-full bg-white border-2 border-[#D9E2EC] shadow-md mb-3 flex items-center justify-center overflow-hidden p-1.5 transition-all">
                 {settings.founderPhoto && !imageError ? (
                   <img
                     key={settings.founderPhoto}
                     src={settings.founderPhoto}
                     alt={firmDetails.founder}
-                    className="w-full h-full object-cover rounded-full"
+                    className="w-full h-full object-cover object-center rounded-full shadow-inner"
                     onError={() => setImageError(true)}
                     loading="lazy"
                     decoding="async"
                   />
                 ) : (
-                  <CaEmblem sizePx={72} />
+                  <CaEmblem sizePx={96} />
                 )}
               </div>
               <h3 className="font-brand font-bold text-base sm:text-lg text-[#062A5A]">
