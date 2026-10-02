@@ -1,12 +1,4 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import {
-  findVaultAccount,
-  verifyPasswordClient,
-  generateSessionToken,
-  getFailedAttempts,
-  recordFailedAttempt,
-  clearFailedAttempts
-} from '../utils/vaultAuthEngine';
 
 export interface VaultAuthUser {
   id: string;
@@ -97,15 +89,9 @@ export const VaultAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [sessionRemainingSeconds, setSessionRemainingSeconds] = useState<number>(0);
 
   const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const isLoggingOutRef = useRef<boolean>(false);
 
   // Validate session on load or token change
   const validateSession = useCallback(async (sessionToken: string) => {
-    if (isLoggingOutRef.current || !sessionToken) {
-      setIsLoading(false);
-      return false;
-    }
-
     try {
       const res = await fetch('/api/vault/auth/me', {
         headers: {
@@ -113,51 +99,14 @@ export const VaultAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
       });
 
-      const contentType = res.headers.get('content-type') || '';
-
-      // If server responded with valid JSON
-      if (res.ok && contentType.includes('application/json')) {
-        const data = await res.json();
-        
-        // Double check that user hasn't logged out while request was in-flight
-        if (isLoggingOutRef.current || !localStorage.getItem(VAULT_TOKEN_KEY)) {
-          setUser(null);
-          setToken(null);
-          setExpiresAt(null);
-          return false;
-        }
-
-        setUser(data.user);
-        setExpiresAt(data.session.expiresAt);
-        try {
-          localStorage.setItem('panjiyar_vault_current_user', JSON.stringify(data.user));
-          localStorage.setItem('panjiyar_vault_expires_at', data.session.expiresAt);
-        } catch {
-          // ignore
-        }
-        return true;
+      if (!res.ok) {
+        throw new Error('Session invalid or expired');
       }
 
-      // If server explicitly returned 401 or 403 in JSON: session was revoked
-      if (!res.ok && contentType.includes('application/json')) {
-        throw new Error('Session revoked or invalid');
-      }
-
-      // If server returned non-JSON (e.g. Vercel SPA rewrite returning HTML index.html, 404, or 502):
-      // Safely preserve valid session from localStorage if not expired
-      const savedUser = localStorage.getItem('panjiyar_vault_current_user');
-      const savedExpiry = localStorage.getItem('panjiyar_vault_expires_at');
-      if (savedUser && savedExpiry) {
-        const remainingMs = new Date(savedExpiry).getTime() - Date.now();
-        if (remainingMs > 0) {
-          const parsed = JSON.parse(savedUser);
-          setUser(parsed);
-          setExpiresAt(savedExpiry);
-          return true;
-        }
-      }
-
-      throw new Error('Session invalid or expired');
+      const data = await res.json();
+      setUser(data.user);
+      setExpiresAt(data.session.expiresAt);
+      return true;
     } catch {
       // Clear token on failure
       setToken(null);
@@ -165,9 +114,6 @@ export const VaultAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setExpiresAt(null);
       try {
         localStorage.removeItem(VAULT_TOKEN_KEY);
-        sessionStorage.removeItem(VAULT_TOKEN_KEY);
-        localStorage.removeItem('panjiyar_vault_current_user');
-        localStorage.removeItem('panjiyar_vault_expires_at');
       } catch {
         // ignore
       }
@@ -178,7 +124,7 @@ export const VaultAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, []);
 
   useEffect(() => {
-    if (token && !isLoggingOutRef.current) {
+    if (token) {
       validateSession(token);
     } else {
       setIsLoading(false);
@@ -204,9 +150,6 @@ export const VaultAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setExpiresAt(null);
         try {
           localStorage.removeItem(VAULT_TOKEN_KEY);
-          sessionStorage.removeItem(VAULT_TOKEN_KEY);
-          localStorage.removeItem('panjiyar_vault_current_user');
-          localStorage.removeItem('panjiyar_vault_expires_at');
         } catch {
           // ignore
         }
@@ -220,182 +163,73 @@ export const VaultAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     };
   }, [expiresAt, user]);
 
-  // Client-side authentication fallback with identical PBKDF2 hashing
-  const performClientSideLogin = async (username: string, password: string) => {
-    const cleanUser = username.trim().toLowerCase();
-
-    // 1. Check Lockout
-    const failedRecord = getFailedAttempts(cleanUser);
-    if (failedRecord.lockedUntil && failedRecord.lockedUntil > Date.now()) {
-      const remainingSeconds = Math.ceil((failedRecord.lockedUntil - Date.now()) / 1000);
-      return {
-        success: false,
-        error: `Account is temporarily locked due to multiple failed attempts. Please try again in ${Math.ceil(remainingSeconds / 60)} minute(s).`,
-        locked: true,
-        remainingSeconds
-      };
-    }
-
-    // 2. Find account record
-    const account = findVaultAccount(cleanUser);
-    if (!account) {
-      const failInfo = recordFailedAttempt(cleanUser);
-      return {
-        success: false,
-        error: 'Invalid username or password.',
-        attemptsLeft: Math.max(0, 5 - failInfo.count),
-        locked: failInfo.locked,
-        remainingSeconds: failInfo.remainingSeconds
-      };
-    }
-
-    // 3. Check account status
-    if (account.user.status !== 'Active' || account.user.loginDisabled) {
-      return {
-        success: false,
-        error: `Account is ${account.user.status === 'Suspended' ? 'suspended' : 'deactivated'}. Please contact CA Krishna Panjiyar administrator.`
-      };
-    }
-
-    // 4. Verify password with Web Crypto PBKDF2 (SHA-512, 100,000 iterations)
-    const isPasswordValid = await verifyPasswordClient(password, account.passwordHash);
-    if (!isPasswordValid) {
-      const failInfo = recordFailedAttempt(cleanUser);
-      return {
-        success: false,
-        error: 'Invalid username or password.',
-        attemptsLeft: Math.max(0, 5 - failInfo.count),
-        locked: failInfo.locked,
-        remainingSeconds: failInfo.remainingSeconds
-      };
-    }
-
-    // 5. Success! Clear failed attempts
-    clearFailedAttempts(cleanUser);
-
-    // Issue cryptographic token and 60-minute session
-    const newToken = generateSessionToken();
-    const timeoutMs = 60 * 60 * 1000;
-    const sessionExpiresAt = new Date(Date.now() + timeoutMs).toISOString();
-
-    const verifiedUser: VaultAuthUser = {
-      ...account.user,
-      lastLogin: new Date().toISOString()
-    };
-
-    isLoggingOutRef.current = false;
-    setToken(newToken);
-    setUser(verifiedUser);
-    setExpiresAt(sessionExpiresAt);
-
-    try {
-      localStorage.setItem(VAULT_TOKEN_KEY, newToken);
-      sessionStorage.setItem(VAULT_TOKEN_KEY, newToken);
-      localStorage.setItem('panjiyar_vault_current_user', JSON.stringify(verifiedUser));
-      localStorage.setItem('panjiyar_vault_expires_at', sessionExpiresAt);
-    } catch {
-      // ignore
-    }
-
-    return { success: true };
-  };
-
   const login = async (username: string, password: string, twoFactorCode?: string, tempToken?: string) => {
-    isLoggingOutRef.current = false;
-    const cleanUser = username.trim();
-    const cleanPass = password;
-
-    if (!cleanUser || !cleanPass) {
-      return { success: false, error: 'Please enter both your username and password.' };
-    }
-
     try {
       const res = await fetch('/api/vault/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: cleanUser, password: cleanPass, twoFactorCode, tempToken })
+        body: JSON.stringify({ username, password, twoFactorCode, tempToken })
       });
 
-      const contentType = res.headers.get('content-type') || '';
+      const data = await res.json();
 
-      // If server responded with JSON
-      if (contentType.includes('application/json')) {
-        const data = await res.json();
-
-        if (!res.ok) {
-          return {
-            success: false,
-            error: data.error || 'Authentication failed',
-            attemptsLeft: data.attemptsLeft,
-            locked: data.locked,
-            remainingSeconds: data.remainingSeconds
-          };
-        }
-
-        if (data.require2FA) {
-          return {
-            success: true,
-            require2FA: true,
-            tempToken: data.tempToken,
-            maskedEmail: data.maskedEmail,
-            demoOtp: data.demoOtp
-          };
-        }
-
-        // Successful server-side login
-        isLoggingOutRef.current = false;
-        setToken(data.token);
-        setUser(data.user);
-        setExpiresAt(data.expiresAt);
-        try {
-          localStorage.setItem(VAULT_TOKEN_KEY, data.token);
-          sessionStorage.setItem(VAULT_TOKEN_KEY, data.token);
-          localStorage.setItem('panjiyar_vault_current_user', JSON.stringify(data.user));
-          localStorage.setItem('panjiyar_vault_expires_at', data.expiresAt);
-        } catch {
-          // ignore
-        }
-
-        return { success: true };
+      if (!res.ok) {
+        return {
+          success: false,
+          error: data.error || 'Authentication failed',
+          attemptsLeft: data.attemptsLeft,
+          locked: data.locked,
+          remainingSeconds: data.remainingSeconds
+        };
       }
 
-      // If server returned non-JSON (e.g. Vercel SPA rewrite returned HTML index.html, 404, or 500)
-      return await performClientSideLogin(cleanUser, cleanPass);
+      if (data.require2FA) {
+        return {
+          success: true,
+          require2FA: true,
+          tempToken: data.tempToken,
+          maskedEmail: data.maskedEmail,
+          demoOtp: data.demoOtp
+        };
+      }
+
+      // Successful login
+      setToken(data.token);
+      setUser(data.user);
+      setExpiresAt(data.expiresAt);
+      try {
+        localStorage.setItem(VAULT_TOKEN_KEY, data.token);
+      } catch {
+        // ignore
+      }
+
+      return { success: true };
     } catch {
-      // In case of network error, seamlessly verify with client PBKDF2 engine
-      return await performClientSideLogin(cleanUser, cleanPass);
+      return { success: false, error: 'Network error communicating with authentication server.' };
     }
   };
 
   const logout = async () => {
-    isLoggingOutRef.current = true;
-    const currentToken = token;
-    
-    // Immediately clear all in-memory auth state
-    setToken(null);
-    setUser(null);
-    setExpiresAt(null);
-    setSessionRemainingSeconds(0);
-    setIsLoading(false);
-
-    try {
-      localStorage.removeItem(VAULT_TOKEN_KEY);
-      sessionStorage.removeItem(VAULT_TOKEN_KEY);
-    } catch {
-      // ignore
-    }
-
-    if (currentToken) {
+    if (token) {
       try {
         await fetch('/api/vault/auth/logout', {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${currentToken}`
+            Authorization: `Bearer ${token}`
           }
         });
       } catch {
         // Ignore network errors on logout
       }
+    }
+
+    setToken(null);
+    setUser(null);
+    setExpiresAt(null);
+    try {
+      localStorage.removeItem(VAULT_TOKEN_KEY);
+    } catch {
+      // ignore
     }
   };
 

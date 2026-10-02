@@ -24,7 +24,6 @@ export const VaultSecuritySettings: React.FC<VaultSecuritySettingsProps> = ({ on
 
   const [formState, setFormState] = useState<VaultSecurityConfig>(() => ({ ...securityConfig }));
   const [hasChanges, setHasChanges] = useState(false);
-  const [isConfirmRevokeOpen, setIsConfirmRevokeOpen] = useState(false);
 
   const handleToggle = (key: keyof VaultSecurityConfig) => {
     setFormState((prev) => {
@@ -55,18 +54,23 @@ export const VaultSecuritySettings: React.FC<VaultSecuritySettingsProps> = ({ on
     onSuccessToast('Reset security configuration to saved values.');
   };
 
-  const handleExecuteLogoutAllFirmSessions = () => {
-    users.forEach((u) => {
-      updateUser(u.id, { activeSessionsCount: 0 });
-    });
-    addAuditLog(
-      'Firm-Wide Device Session Purge',
-      'Security',
-      'All active portal device tokens invalidated by Super Admin.',
-      'Warning'
-    );
-    setIsConfirmRevokeOpen(false);
-    onSuccessToast('All client and staff devices have been signed out.');
+  const handleLogoutAllFirmSessions = () => {
+    if (
+      window.confirm(
+        'Are you sure you want to terminate all active sessions across all client and staff accounts? All users will need to re-authenticate.'
+      )
+    ) {
+      users.forEach((u) => {
+        updateUser(u.id, { activeSessionsCount: 0 });
+      });
+      addAuditLog(
+        'Firm-Wide Device Session Purge',
+        'Security',
+        'All active portal device tokens invalidated by Super Admin.',
+        'Warning'
+      );
+      onSuccessToast('All client and staff devices have been signed out.');
+    }
   };
 
   return (
@@ -224,56 +228,13 @@ export const VaultSecuritySettings: React.FC<VaultSecuritySettingsProps> = ({ on
 
         <button
           type="button"
-          onClick={() => setIsConfirmRevokeOpen(true)}
-          className="px-5 py-2.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors shrink-0 flex items-center gap-2 cursor-pointer"
+          onClick={handleLogoutAllFirmSessions}
+          className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors shrink-0 flex items-center gap-2"
         >
           <LogOut size={14} />
           <span>Logout All Devices</span>
         </button>
       </div>
-
-      {/* Confirmation Modal for Firm-Wide Session Revocation */}
-      {isConfirmRevokeOpen && (
-        <div 
-          onClick={() => setIsConfirmRevokeOpen(false)}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in"
-        >
-          <div 
-            onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-md w-full p-6 text-left relative animate-in zoom-in-95"
-          >
-            <div className="w-12 h-12 rounded-2xl bg-red-50 border border-red-200 text-red-600 flex items-center justify-center mb-3">
-              <AlertTriangle size={24} />
-            </div>
-
-            <h3 className="font-manrope font-bold text-lg text-slate-900">
-              Revoke All Firm Portal Sessions?
-            </h3>
-
-            <p className="text-xs text-slate-600 mt-1 mb-5 leading-relaxed">
-              This will instantly terminate all active sessions across all client and staff accounts. All currently signed-in users will need to re-authenticate with their credentials.
-            </p>
-
-            <div className="flex items-center justify-end gap-2.5">
-              <button
-                type="button"
-                onClick={() => setIsConfirmRevokeOpen(false)}
-                className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleExecuteLogoutAllFirmSessions}
-                className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                <LogOut size={13} />
-                <span>Terminate All Sessions</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Prominent Save / Reset Bar */}
       <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">

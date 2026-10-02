@@ -40,6 +40,8 @@ export interface VaultUser {
   email: string;
   phone: string;
   username: string;
+  passwordHash?: string; // Cryptographic salt+SHA-256 digest (never stored in plain text)
+  passwordSalt?: string; // Secure random cryptographic salt
   passwordMasked?: string;
   accountType: VaultAccountType;
   role: string;
@@ -53,9 +55,28 @@ export interface VaultUser {
   forcePasswordChange: boolean;
   loginDisabled: boolean;
   twoFactorEnabled: boolean;
+  twoFactorSecret?: string;
+  failedLoginAttempts?: number;
+  lockedUntil?: string | null;
   permissions: UserPermissions;
   sectionAccess: VaultSectionName[];
   activeSessionsCount: number;
+}
+
+export interface VaultSession {
+  token: string;
+  userId: string;
+  username: string;
+  accountType: VaultAccountType;
+  role: string;
+  fullName: string;
+  company: string;
+  email: string;
+  device: string;
+  loginTime: string;
+  lastActivityTime: number; // timestamp in ms
+  expiresAt: number; // timestamp in ms
+  twoFactorVerified: boolean;
 }
 
 export interface VaultProject {
@@ -71,38 +92,17 @@ export interface VaultProject {
   description: string;
 }
 
-export interface VaultFolder {
-  id: string; // e.g. "FLD-DOCS", "FLD-INV", etc.
-  name: string; // e.g. "Documents & Certificates"
-  slug: string;
-  clientId: string; // "all" for global firm-wide folders, or specific client ID e.g. "USR-CL-101"
-  description?: string;
-  color?: string; // e.g. "blue", "emerald", "amber", "purple", "rose", "cyan"
-  icon?: string; // "Folder" | "FileText" | "FileSpreadsheet" | "Image" | "Video" | "Shield" | "Briefcase"
-  createdAt: string;
-  createdBy: string;
-  isSystem?: boolean;
-  permissions?: {
-    canView: boolean;
-    canUpload: boolean;
-    canDownload: boolean;
-    canEdit: boolean;
-    canDelete: boolean;
-  };
-}
-
 export interface VaultFileItem {
   id: string;
   title: string;
   fileName: string;
-  fileType: 'document' | 'photo' | 'video' | 'invoice' | 'report' | 'contract' | 'spreadsheet' | 'archive';
+  fileType: 'document' | 'photo' | 'video' | 'invoice' | 'report' | 'contract';
   fileSize: string;
   clientId: string;
   clientName: string;
   projectId?: string;
   projectName?: string;
-  folderId?: string; // References VaultFolder.id
-  folder: string; // Folder name for display & categorization
+  folder: 'Documents' | 'Photos' | 'Videos' | 'Invoices' | 'Reports' | 'Contracts';
   uploadDate: string;
   uploadedBy: string;
   sha256Hash: string;
@@ -118,7 +118,6 @@ export interface VaultFileItem {
     canMove: boolean;
   };
   fileUrl?: string;
-  previewContent?: string;
 }
 
 export interface VaultInvitation {

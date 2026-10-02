@@ -1,35 +1,29 @@
 import React from 'react';
 import {
-  Briefcase,
-  FileText,
-  Image as ImageIcon,
-  Video,
-  FileSpreadsheet,
-  MessageSquare,
-  Bell,
-  Download,
-  Shield,
-  ShieldCheck,
-  Building,
   Users,
   UserCheck,
+  UserPlus,
+  Shield,
+  ShieldCheck,
+  FileText,
   Clock,
-  ArrowRight,
   Send,
-  Activity,
   AlertTriangle,
-  Lock,
+  Activity,
   Plus,
+  ArrowRight,
   Sliders,
   CheckCircle2,
-  FolderLock,
+  Lock,
+  Building,
+  Key,
   Folder,
-  Cpu,
-  Layers
+  Briefcase,
+  Download
 } from 'lucide-react';
 import { useVault } from '../../context/VaultContext';
 import { useVaultAuth } from '../../context/VaultAuthContext';
-import { VaultAccountType, VaultSectionName } from '../../types/vault';
+import { VaultAccountType } from '../../types/vault';
 
 interface ClientVaultDashboardProps {
   onNavigateSubTab: (tab: string) => void;
@@ -41,374 +35,386 @@ export const ClientVaultDashboard: React.FC<ClientVaultDashboardProps> = ({
   onOpenCreate
 }) => {
   const { user: authUser } = useVaultAuth();
-  const { users, files, projects, folders, invitations, auditLogs } = useVault();
+  const { users, files, projects, invitations, auditLogs } = useVault();
 
   const isClient = authUser?.accountType === 'client';
   const isStaff = authUser?.accountType === 'staff';
   const isSuperAdmin = authUser?.accountType === 'super_admin';
 
-  // Check section access permissions
-  const hasAccessTo = (section: VaultSectionName): boolean => {
-    if (isSuperAdmin) return true;
-    if (!authUser?.sectionAccess) return true;
-    return authUser.sectionAccess.includes(section);
-  };
-
   // Client-specific filtered items
   const clientFiles = files.filter((f) => f.clientId === authUser?.id);
   const clientProjects = projects.filter((p) => p.clientId === authUser?.id);
-  const clientFolders = folders.filter((f) => f.clientId === 'all' || f.clientId === authUser?.id);
 
   // Administrative metric counts
   const totalClients = users.filter((u) => u.accountType === 'client').length;
   const activeClients = users.filter((u) => u.accountType === 'client' && u.status === 'Active').length;
+  const inactiveClients = users.filter((u) => u.accountType === 'client' && (u.status === 'Inactive' || u.status === 'Suspended')).length;
   const totalStaff = users.filter((u) => u.accountType === 'staff' || u.accountType === 'super_admin').length;
+  const totalActiveUsers = users.filter((u) => u.status === 'Active').length;
   const pendingInvitations = invitations.filter((i) => i.status === 'Pending').length;
+  const expiredAccounts = users.filter((u) => u.status === 'Expired').length;
   const recentActivityCount = auditLogs.length;
 
-  // The 8 Core Futuristic Vault Cards
-  const coreVaultCards: {
-    id: string;
-    section: VaultSectionName;
-    title: string;
-    subtitle: string;
-    icon: React.ReactNode;
-    count: string | number;
-    targetTab: string;
-    gradient: string;
-    iconBg: string;
-  }[] = [
-    {
-      id: 'projects',
-      section: 'Projects',
-      title: 'My Projects',
-      subtitle: 'Statutory audits & financing mandates',
-      icon: <Briefcase className="w-5 h-5 text-amber-500" />,
-      count: isClient ? clientProjects.length : projects.length,
-      targetTab: 'projects',
-      gradient: 'from-amber-500/10 via-amber-500/5 to-transparent',
-      iconBg: 'bg-amber-50 border-amber-200/80 text-amber-700'
-    },
-    {
-      id: 'documents',
-      section: 'Documents',
-      title: 'Documents',
-      subtitle: 'Form 3CD, tax filings & signed certificates',
-      icon: <FileText className="w-5 h-5 text-blue-600" />,
-      count: (isClient ? clientFiles : files).filter(f => f.folder?.toLowerCase().includes('document') || f.folderId === 'FLD-DOCS' || f.fileType === 'document').length,
-      targetTab: 'documents',
-      gradient: 'from-blue-500/10 via-blue-500/5 to-transparent',
-      iconBg: 'bg-blue-50 border-blue-200/80 text-blue-700'
-    },
-    {
-      id: 'photos',
-      section: 'Photos',
-      title: 'Photos & Media',
-      subtitle: 'Physical asset & verification gallery',
-      icon: <ImageIcon className="w-5 h-5 text-emerald-600" />,
-      count: (isClient ? clientFiles : files).filter(f => f.folder?.toLowerCase().includes('photo') || f.folderId === 'FLD-PHOTOS' || f.fileType === 'photo').length,
-      targetTab: 'photos',
-      gradient: 'from-emerald-500/10 via-emerald-500/5 to-transparent',
-      iconBg: 'bg-emerald-50 border-emerald-200/80 text-emerald-700'
-    },
-    {
-      id: 'videos',
-      section: 'Videos',
-      title: 'Videos & Audits',
-      subtitle: 'Recorded board reviews & inspections',
-      icon: <Video className="w-5 h-5 text-indigo-600" />,
-      count: (isClient ? clientFiles : files).filter(f => f.folder?.toLowerCase().includes('video') || f.folderId === 'FLD-VIDEOS' || f.fileType === 'video').length,
-      targetTab: 'videos',
-      gradient: 'from-indigo-500/10 via-indigo-500/5 to-transparent',
-      iconBg: 'bg-indigo-50 border-indigo-200/80 text-indigo-700'
-    },
-    {
-      id: 'reports',
-      section: 'Reports',
-      title: 'Reports & Ledgers',
-      subtitle: 'GSTR-3B computations & P&L audits',
-      icon: <FileSpreadsheet className="w-5 h-5 text-teal-600" />,
-      count: (isClient ? clientFiles : files).filter(f => f.folder?.toLowerCase().includes('report') || f.folderId === 'FLD-REPORTS' || f.fileType === 'report' || f.fileType === 'spreadsheet').length,
-      targetTab: 'reports',
-      gradient: 'from-teal-500/10 via-teal-500/5 to-transparent',
-      iconBg: 'bg-teal-50 border-teal-200/80 text-teal-700'
-    },
-    {
-      id: 'messages',
-      section: 'Messages',
-      title: 'Messages',
-      subtitle: 'End-to-end encrypted advisory channel',
-      icon: <MessageSquare className="w-5 h-5 text-sky-600" />,
-      count: 'Live E2E',
-      targetTab: 'messages',
-      gradient: 'from-sky-500/10 via-sky-500/5 to-transparent',
-      iconBg: 'bg-sky-50 border-sky-200/80 text-sky-700'
-    },
-    {
-      id: 'notifications',
-      section: 'Notifications',
-      title: 'Notifications',
-      subtitle: 'Real-time vault events & due dates',
-      icon: <Bell className="w-5 h-5 text-purple-600" />,
-      count: auditLogs.length > 0 ? `${auditLogs.length} Events` : 'Active',
-      targetTab: 'notifications',
-      gradient: 'from-purple-500/10 via-purple-500/5 to-transparent',
-      iconBg: 'bg-purple-50 border-purple-200/80 text-purple-700'
-    },
-    {
-      id: 'downloads',
-      section: 'Downloads',
-      title: 'Downloads',
-      subtitle: 'Encrypted export bundles & offline files',
-      icon: <Download className="w-5 h-5 text-slate-700" />,
-      count: `${(isClient ? clientFiles : files).length} Files`,
-      targetTab: 'files',
-      gradient: 'from-slate-500/10 via-slate-500/5 to-transparent',
-      iconBg: 'bg-slate-100 border-slate-200 text-slate-700'
-    }
-  ];
+  const recentLogs = auditLogs.slice(0, 5);
 
-  // Only display cards the user has permission to access
-  const authorizedCards = coreVaultCards.filter((card) => hasAccessTo(card.section));
+  // ========================================================
+  // VIEW A: CLIENT PERSPECTIVE (Rajesh Singhal / Apex Precision)
+  // ========================================================
+  if (isClient) {
+    return (
+      <div className="space-y-6 text-left">
+        {/* Welcome Client Banner */}
+        <div className="bg-gradient-to-r from-[#062A5A] via-[#031C3D] to-[#062A5A] rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-md border border-[#0969C7]/30">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-[#0969C7]/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 right-20 w-40 h-40 bg-[#F28C18]/10 rounded-full blur-2xl pointer-events-none" />
 
-  return (
-    <div className="space-y-6 text-left">
-      
-      {/* 1. Futuristic Glassmorphic Welcome Banner */}
-      <div className="relative rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-[#061833] via-[#082247] to-[#040D1D] text-white border border-blue-500/25 shadow-xl overflow-hidden">
-        
-        {/* Subtle animated ambient light glow */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#0969C7]/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-1/4 w-52 h-52 bg-[#F28C18]/15 rounded-full blur-2xl pointer-events-none" />
-        <div 
-          className="absolute inset-0 opacity-10 pointer-events-none"
-          style={{
-            backgroundImage: `radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1px)`,
-            backgroundSize: '24px 24px'
-          }}
-        />
-
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="max-w-2xl">
-            
-            {/* Status Chip */}
-            <div className="inline-flex items-center gap-2 mb-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-white text-[11px] font-semibold border border-white/15">
-              <ShieldCheck size={13} className="text-[#38BDF8]" />
-              <span>
-                {isSuperAdmin ? 'Master Enterprise Control Center' : isStaff ? 'Senior Audit Staff Workspace' : 'Isolated Corporate Client Vault'}
-              </span>
-              <span className="text-white/40">&bull;</span>
-              <span className="text-emerald-400 font-mono text-[10px]">AES-256 Verified</span>
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 mb-2 px-2.5 py-1 rounded-full bg-white/10 text-white text-[11px] font-semibold border border-white/15">
+                <Shield size={12} className="text-[#F28C18]" />
+                <span>Isolated Corporate Client Vault</span>
+              </div>
+              <h1 className="font-manrope font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
+                Welcome, {authUser?.fullName}
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed">
+                Direct statutory audit, GST filings, and confidential documentation workspace for{' '}
+                <strong className="text-white">{authUser?.company}</strong>.
+              </p>
             </div>
 
-            <h1 className="font-manrope font-extrabold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
-              Welcome, {authUser?.fullName || 'User'}
-            </h1>
-            
-            <p className="text-xs sm:text-sm text-slate-300 mt-1.5 leading-relaxed">
-              {isClient ? (
-                <>
-                  Private digital repository for <strong className="text-white">{authUser?.company}</strong>. All data is segregated under zero-knowledge access perimeter.
-                </>
-              ) : isStaff ? (
-                <>
-                  Practice engagement workspace. Access assigned corporate mandates, review workpapers, and verify client statutory filings.
-                </>
-              ) : (
-                <>
-                  Centralized command console for multi-tenant client vaults, granular permissions matrices, and cryptographic audit monitoring.
-                </>
-              )}
-            </p>
-          </div>
-
-          {/* Quick Primary Actions */}
-          <div className="flex flex-wrap sm:flex-nowrap gap-2.5 shrink-0">
-            {isSuperAdmin && (
-              <>
-                <button
-                  type="button"
-                  onClick={() => onOpenCreate('client')}
-                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#F28C18] to-[#d67910] text-[#062A5A] font-bold text-xs flex items-center gap-1.5 shadow-md hover:brightness-105 transition-all"
-                >
-                  <Plus size={14} />
-                  <span>+ Add Client</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => onOpenCreate('staff')}
-                  className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs flex items-center gap-1.5 border border-white/20 backdrop-blur-md transition-colors"
-                >
-                  <Plus size={14} />
-                  <span>+ Add Staff</span>
-                </button>
-              </>
-            )}
-
-            {isClient && (
+            <div className="flex flex-wrap gap-2.5 shrink-0">
               <button
                 type="button"
                 onClick={() => onNavigateSubTab('files')}
-                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#0969C7] to-[#159447] text-white font-bold text-xs flex items-center gap-1.5 shadow-md hover:brightness-110 transition-all"
+                className="px-4 py-2.5 rounded-xl bg-[#F28C18] hover:bg-[#d67910] text-[#062A5A] font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all"
               >
-                <FolderLock size={14} />
-                <span>Open Document Vault</span>
+                <Folder size={14} />
+                <span>My Vault Documents ({clientFiles.length})</span>
               </button>
-            )}
+
+              <button
+                type="button"
+                onClick={() => onNavigateSubTab('projects')}
+                className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs flex items-center gap-1.5 border border-white/20 transition-colors"
+              >
+                <Briefcase size={14} />
+                <span>Active Mandates ({clientProjects.length})</span>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* 2. Admin Quick Metrics Row (Super Admin & Staff) */}
-      {!isClient && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
+        {/* Client Summary Metrics */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div
-            onClick={() => onNavigateSubTab('clients')}
-            className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-[#0969C7] transition-all cursor-pointer group"
+            onClick={() => onNavigateSubTab('files')}
+            className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-md hover:border-[#0969C7] transition-all cursor-pointer"
           >
-            <div className="flex items-center justify-between text-slate-400 mb-1">
-              <span className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500">Corporate Clients</span>
-              <Building size={16} className="text-[#062A5A] group-hover:scale-110 transition-transform" />
+            <div className="flex items-center justify-between text-slate-400 mb-2">
+              <Folder size={18} className="text-[#0969C7]" />
+              <span className="text-[10px] uppercase font-bold text-slate-400">Vault Files</span>
             </div>
-            <div className="font-manrope font-extrabold text-2xl text-[#062A5A]">{totalClients}</div>
-            <p className="text-[11px] text-emerald-600 font-medium mt-0.5">{activeClients} Active &bull; 0 Breaches</p>
-          </div>
-
-          <div
-            onClick={() => onNavigateSubTab(isSuperAdmin ? 'staff' : 'dashboard')}
-            className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-[#0969C7] transition-all cursor-pointer group"
-          >
-            <div className="flex items-center justify-between text-slate-400 mb-1">
-              <span className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500">Practice Staff</span>
-              <Users size={16} className="text-[#0969C7] group-hover:scale-110 transition-transform" />
+            <div className="font-manrope font-extrabold text-2xl sm:text-3xl text-[#062A5A]">
+              {clientFiles.length}
             </div>
-            <div className="font-manrope font-extrabold text-2xl text-[#0969C7]">{totalStaff}</div>
-            <p className="text-[11px] text-slate-500 font-medium mt-0.5">Assigned CA Managers</p>
+            <p className="text-[11px] text-slate-500 mt-0.5">Encrypted Documents &amp; Reports</p>
           </div>
 
           <div
             onClick={() => onNavigateSubTab('projects')}
-            className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-[#0969C7] transition-all cursor-pointer group"
+            className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-md hover:border-[#0969C7] transition-all cursor-pointer"
           >
-            <div className="flex items-center justify-between text-slate-400 mb-1">
-              <span className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500">Active Mandates</span>
-              <Briefcase size={16} className="text-[#F28C18] group-hover:scale-110 transition-transform" />
+            <div className="flex items-center justify-between text-slate-400 mb-2">
+              <Briefcase size={18} className="text-[#F28C18]" />
+              <span className="text-[10px] uppercase font-bold text-slate-400">Mandates</span>
             </div>
-            <div className="font-manrope font-extrabold text-2xl text-[#062A5A]">{projects.length}</div>
-            <p className="text-[11px] text-slate-500 font-medium mt-0.5">Audits &amp; Reconciliations</p>
+            <div className="font-manrope font-extrabold text-2xl sm:text-3xl text-[#062A5A]">
+              {clientProjects.length}
+            </div>
+            <p className="text-[11px] text-slate-500 mt-0.5">Assigned CA Audits &amp; Filings</p>
           </div>
 
-          <div
-            onClick={() => onNavigateSubTab('files')}
-            className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-[#0969C7] transition-all cursor-pointer group"
-          >
-            <div className="flex items-center justify-between text-slate-400 mb-1">
-              <span className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500">Vault Folders</span>
-              <Folder size={16} className="text-[#0969C7] group-hover:scale-110 transition-transform" />
+          <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs">
+            <div className="flex items-center justify-between text-slate-400 mb-2">
+              <ShieldCheck size={18} className="text-emerald-600" />
+              <span className="text-[10px] uppercase font-bold text-slate-400">Compliance</span>
             </div>
-            <div className="font-manrope font-extrabold text-2xl text-[#062A5A]">{folders.length}</div>
-            <p className="text-[11px] text-slate-500 font-medium mt-0.5">Custom &amp; System Folders</p>
+            <div className="font-manrope font-extrabold text-2xl sm:text-3xl text-emerald-700">
+              100%
+            </div>
+            <p className="text-[11px] text-slate-500 mt-0.5">Statutory Filings Up to Date</p>
           </div>
 
-          <div
-            onClick={() => onNavigateSubTab('files')}
-            className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-[#0969C7] transition-all cursor-pointer group"
-          >
-            <div className="flex items-center justify-between text-slate-400 mb-1">
-              <span className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500">Encrypted Files</span>
-              <FileText size={16} className="text-emerald-600 group-hover:scale-110 transition-transform" />
+          <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs">
+            <div className="flex items-center justify-between text-slate-400 mb-2">
+              <Lock size={18} className="text-[#062A5A]" />
+              <span className="text-[10px] uppercase font-bold text-slate-400">Security</span>
             </div>
-            <div className="font-manrope font-extrabold text-2xl text-emerald-700">{files.length}</div>
-            <p className="text-[11px] text-slate-500 font-medium mt-0.5">Verified SHA-256 Digests</p>
-          </div>
-
-          <div
-            onClick={() => onNavigateSubTab('activity')}
-            className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-[#0969C7] transition-all cursor-pointer group"
-          >
-            <div className="flex items-center justify-between text-slate-400 mb-1">
-              <span className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500">Security Events</span>
-              <Activity size={16} className="text-purple-600 group-hover:scale-110 transition-transform" />
+            <div className="font-manrope font-bold text-lg sm:text-xl text-[#062A5A]">
+              AES-256
             </div>
-            <div className="font-manrope font-extrabold text-2xl text-purple-700">{recentActivityCount}</div>
-            <p className="text-[11px] text-slate-500 font-medium mt-0.5">Real-Time Audit Trail</p>
+            <p className="text-[11px] text-slate-500 mt-0.5">GCM End-to-End Cryptography</p>
           </div>
         </div>
-      )}
 
-      {/* 3. Section Title */}
-      <div className="flex items-center justify-between pt-2">
-        <div>
-          <h2 className="font-manrope font-bold text-lg sm:text-xl text-[#062A5A]">
-            {isClient ? 'My Secure Vault Workspace' : 'Client Vault Sections'}
-          </h2>
-          <p className="text-xs text-slate-500">
-            Select a verified portal module to view segregated data, manage uploads, or review compliance status.
-          </p>
+        {/* 2-Column: My Active Projects & Recent Files */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Active Mandates */}
+          <div className="lg:col-span-7 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div>
+                <h3 className="font-manrope font-bold text-base text-[#062A5A]">
+                  Active Statutory Engagements
+                </h3>
+                <p className="text-xs text-slate-400">
+                  Audit and compliance deadlines managed by CA Krishna Panjiyar &amp; Co.
+                </p>
+              </div>
+              <button
+                onClick={() => onNavigateSubTab('projects')}
+                className="text-[#0969C7] font-semibold text-xs hover:underline flex items-center gap-1"
+              >
+                <span>View All</span>
+                <ArrowRight size={13} />
+              </button>
+            </div>
+
+            {clientProjects.length === 0 ? (
+              <div className="p-8 text-center text-slate-400 text-xs">
+                No active projects recorded for your account.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {clientProjects.map((p) => (
+                  <div
+                    key={p.id}
+                    className="p-4 rounded-2xl border border-slate-200/90 hover:border-[#0969C7]/50 bg-slate-50/60 transition-all flex items-center justify-between gap-4"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-xs text-[#062A5A]">{p.title}</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                          {p.category}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-1 line-clamp-1">{p.description}</p>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <span className="text-[10px] text-slate-400 block font-mono">Due Date</span>
+                      <span className="text-xs font-bold text-slate-800">{p.dueDate}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Recent Confidential Files */}
+          <div className="lg:col-span-5 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div>
+                <h3 className="font-manrope font-bold text-base text-[#062A5A]">
+                  Recent Vault Files
+                </h3>
+                <p className="text-xs text-slate-400">
+                  Confidential reports and verified tax filings.
+                </p>
+              </div>
+              <button
+                onClick={() => onNavigateSubTab('files')}
+                className="text-[#0969C7] font-semibold text-xs hover:underline flex items-center gap-1"
+              >
+                <span>Browse All</span>
+                <ArrowRight size={13} />
+              </button>
+            </div>
+
+            {clientFiles.length === 0 ? (
+              <div className="p-8 text-center text-slate-400 text-xs">
+                No files uploaded yet in your vault.
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {clientFiles.slice(0, 5).map((f) => (
+                  <div
+                    key={f.id}
+                    className="p-3 rounded-xl border border-slate-200/80 bg-white hover:bg-slate-50 transition-colors flex items-center justify-between gap-2 text-xs"
+                  >
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 font-bold text-slate-800 truncate">
+                        <FileText size={14} className="text-[#0969C7] shrink-0" />
+                        <span className="truncate">{f.title}</span>
+                      </div>
+                      <p className="text-[10.5px] text-slate-400 font-mono mt-0.5 truncate">
+                        {f.fileName} &bull; {f.fileSize}
+                      </p>
+                    </div>
+
+                    <span className="shrink-0 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                      Verified
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
+      </div>
+    );
+  }
 
-        <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 font-mono">
-          <Cpu size={14} className="text-[#0969C7]" />
-          <span>Role: {authUser?.role || authUser?.accountType}</span>
+  // ========================================================
+  // VIEW B: ADMINISTRATIVE & STAFF PERSPECTIVE
+  // ========================================================
+  return (
+    <div className="space-y-6 text-left">
+      {/* Welcome Banner */}
+      <div className="bg-gradient-to-r from-[#062A5A] via-[#031C3D] to-[#062A5A] rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-md border border-[#0969C7]/30">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-[#0969C7]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-20 w-40 h-40 bg-[#F28C18]/10 rounded-full blur-2xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 mb-2 px-2.5 py-1 rounded-full bg-white/10 text-white text-[11px] font-semibold border border-white/15">
+              <Shield size={12} className="text-[#F28C18]" />
+              <span>Multi-Tenant Vault Control Center</span>
+            </div>
+            <h1 className="font-manrope font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
+              {isSuperAdmin ? 'Master Vault Dashboard' : 'Staff Auditor Workspace'}
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed">
+              Secure administrative hub to provision isolated client vaults, manage staff delegation, govern permissions matrices, and audit document integrity.
+            </p>
+          </div>
+
+          {/* Quick Primary Actions Stack */}
+          {isSuperAdmin && (
+            <div className="flex flex-wrap sm:flex-nowrap gap-2.5 shrink-0">
+              <button
+                type="button"
+                onClick={() => onOpenCreate('client')}
+                className="px-4 py-2.5 rounded-xl bg-[#F28C18] hover:bg-[#d67910] text-[#062A5A] font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all"
+              >
+                <Plus size={14} />
+                <span>+ Add Client</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onOpenCreate('staff')}
+                className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs flex items-center gap-1.5 border border-white/20 transition-colors"
+              >
+                <Plus size={14} />
+                <span>+ Add Staff</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* 4. The 8 Futuristic Glass-Style Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {authorizedCards.map((card) => (
+      {/* 8 Summary Metric Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4">
+        {[
+          { label: 'Total Clients', value: totalClients, tab: 'clients', color: 'text-[#062A5A]', icon: <Building size={16} /> },
+          { label: 'Active Clients', value: activeClients, tab: 'clients', color: 'text-emerald-700', icon: <CheckCircle2 size={16} /> },
+          { label: 'Inactive Clients', value: inactiveClients, tab: 'clients', color: 'text-amber-700', icon: <AlertTriangle size={16} /> },
+          { label: 'Total Staff', value: totalStaff, tab: isSuperAdmin ? 'staff' : 'dashboard', color: 'text-[#0969C7]', icon: <Users size={16} /> },
+          { label: 'Active Users', value: totalActiveUsers, tab: 'clients', color: 'text-emerald-700', icon: <UserCheck size={16} /> },
+          { label: 'Pending Invites', value: pendingInvitations, tab: isSuperAdmin ? 'invitations' : 'dashboard', color: 'text-[#F28C18]', icon: <Send size={16} /> },
+          { label: 'Expired Accts', value: expiredAccounts, tab: 'clients', color: 'text-slate-500', icon: <Clock size={16} /> },
+          { label: 'Audit Records', value: recentActivityCount, tab: 'activity', color: 'text-purple-700', icon: <Activity size={16} /> }
+        ].map((stat, idx) => (
           <div
-            key={card.id}
-            onClick={() => onNavigateSubTab(card.targetTab)}
-            className="relative bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs hover:shadow-lg hover:border-[#0969C7]/60 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group overflow-hidden flex flex-col justify-between min-h-[160px]"
+            key={idx}
+            onClick={() => onNavigateSubTab(stat.tab)}
+            className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-md hover:border-[#0969C7] transition-all cursor-pointer group flex flex-col justify-between"
           >
-            {/* Top Subtle Gradient Glow on Hover */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`} />
-
-            <div>
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <div className={`p-2.5 rounded-xl border ${card.iconBg} shadow-2xs group-hover:scale-105 transition-transform`}>
-                  {card.icon}
-                </div>
-
-                <span className="font-manrope font-extrabold text-sm sm:text-base text-slate-800 font-mono bg-slate-50 px-2 py-0.5 rounded-lg border border-slate-200">
-                  {card.count}
-                </span>
-              </div>
-
-              <h3 className="font-manrope font-bold text-base text-[#062A5A] group-hover:text-[#0969C7] transition-colors">
-                {card.title}
-              </h3>
-              
-              <p className="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">
-                {card.subtitle}
-              </p>
+            <div className="flex items-center justify-between text-slate-400 mb-2">
+              <span className="p-1 rounded bg-slate-50 group-hover:bg-[#EEF5FC] transition-colors">{stat.icon}</span>
             </div>
-
-            <div className="pt-4 border-t border-slate-100 mt-2 flex items-center justify-between text-xs font-bold text-[#0969C7]">
-              <span>Access Module</span>
-              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+            <div>
+              <div className={`font-manrope font-extrabold text-xl sm:text-2xl ${stat.color}`}>
+                {stat.value}
+              </div>
+              <div className="text-[10.5px] font-semibold text-slate-500 truncate mt-0.5">
+                {stat.label}
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* 5. Two-Column Live Overview: Projects & Recent Files */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start pt-2">
-        
-        {/* Left Column: Active Mandates */}
-        <div className="lg:col-span-7 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/90 shadow-xs space-y-4">
+      {/* Quick Actions Action Bar (Admin Only) */}
+      {isSuperAdmin && (
+        <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
+          <span className="font-bold text-slate-700 uppercase tracking-wider text-[11px]">
+            Quick Administrative Actions:
+          </span>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onOpenCreate('client')}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#EEF5FC] text-[#062A5A] font-semibold text-xs flex items-center gap-1.5 transition-colors"
+            >
+              <Plus size={13} className="text-[#0969C7]" />
+              <span>+ Add Client</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onOpenCreate('staff')}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#EEF5FC] text-[#062A5A] font-semibold text-xs flex items-center gap-1.5 transition-colors"
+            >
+              <Plus size={13} className="text-[#0969C7]" />
+              <span>+ Add Staff</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onNavigateSubTab('permissions')}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#EEF5FC] text-[#062A5A] font-semibold text-xs flex items-center gap-1.5 transition-colors"
+            >
+              <Sliders size={13} className="text-[#F28C18]" />
+              <span>Manage Permissions</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onNavigateSubTab('invitations')}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#EEF5FC] text-[#062A5A] font-semibold text-xs flex items-center gap-1.5 transition-colors"
+            >
+              <Send size={13} className="text-emerald-600" />
+              <span>Pending Invitations ({pendingInvitations})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onNavigateSubTab('activity')}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-[#EEF5FC] text-[#062A5A] font-semibold text-xs flex items-center gap-1.5 transition-colors"
+            >
+              <Activity size={13} className="text-purple-600" />
+              <span>Security Logs</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 2-Column Overview: Active Mandates & Real-Time Security Audit */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column: Active Client Projects (lg:col-span-7) */}
+        <div className="lg:col-span-7 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <div>
-              <h3 className="font-manrope font-bold text-base text-[#062A5A] flex items-center gap-2">
-                <Briefcase size={16} className="text-[#0969C7]" />
-                <span>{isClient ? 'My Active Mandates' : 'Assigned Client Mandates'}</span>
+              <h3 className="font-manrope font-bold text-base text-[#062A5A]">
+                Isolated Client Projects &amp; Mandates
               </h3>
               <p className="text-xs text-slate-400">
-                Statutory audit engagements and statutory return deadlines.
+                Current active engagements under direct CA assurance.
               </p>
             </div>
-            
             <button
               onClick={() => onNavigateSubTab('projects')}
               className="text-[#0969C7] font-semibold text-xs hover:underline flex items-center gap-1"
@@ -418,93 +424,95 @@ export const ClientVaultDashboard: React.FC<ClientVaultDashboardProps> = ({
             </button>
           </div>
 
-          {((isClient ? clientProjects : projects).length === 0) ? (
-            <div className="p-8 text-center text-slate-400 text-xs">
-              No active mandates assigned to your profile.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {(isClient ? clientProjects : projects).slice(0, 4).map((p) => (
-                <div
-                  key={p.id}
-                  className="p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 hover:border-[#0969C7]/50 bg-slate-50/60 hover:bg-white transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
-                >
-                  <div className="min-w-0 space-y-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-slate-900 truncate">{p.title}</span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                        {p.category}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-500 truncate">
-                      Client: <strong>{p.clientName}</strong> &bull; Assigned: {p.assignedStaffIds.join(', ')}
-                    </p>
+          <div className="space-y-3">
+            {projects.slice(0, 4).map((project) => (
+              <div
+                key={project.id}
+                className="p-4 rounded-2xl border border-slate-200/90 hover:border-[#0969C7]/50 bg-slate-50/60 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-[#062A5A]">{project.title}</span>
+                    <span
+                      className={`text-[9.5px] font-bold px-2 py-0.5 rounded-full border ${
+                        project.status === 'Active'
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                          : project.status === 'Completed'
+                          ? 'bg-blue-50 text-blue-800 border-blue-200'
+                          : 'bg-amber-50 text-amber-800 border-amber-200'
+                      }`}
+                    >
+                      {project.status}
+                    </span>
                   </div>
-
-                  <div className="text-right shrink-0">
-                    <span className="text-[10px] text-slate-400 block font-mono">Due Date</span>
-                    <span className="font-bold text-slate-800 text-xs">{p.dueDate}</span>
+                  <div className="text-slate-500 flex items-center gap-2">
+                    <span>{project.clientName}</span>
+                    <span>&bull;</span>
+                    <span className="text-slate-400">{project.category}</span>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+
+                <div className="text-right shrink-0">
+                  <span className="text-[10px] text-slate-400 block font-mono">Statutory Due</span>
+                  <span className="font-bold text-slate-800">{project.dueDate}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Right Column: Confidential Files Preview */}
-        <div className="lg:col-span-5 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/90 shadow-xs space-y-4">
+        {/* Right Column: Real-Time Audit Log Feed (lg:col-span-5) */}
+        <div className="lg:col-span-5 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <div>
-              <h3 className="font-manrope font-bold text-base text-[#062A5A] flex items-center gap-2">
-                <FileText size={16} className="text-emerald-600" />
-                <span>Recent Confidential Files</span>
+              <h3 className="font-manrope font-bold text-base text-[#062A5A]">
+                Recent Security Audit Logs
               </h3>
               <p className="text-xs text-slate-400">
-                Encrypted reports with verifiable cryptographic hash.
+                Cryptographic authentication and permission events.
               </p>
             </div>
-
             <button
-              onClick={() => onNavigateSubTab('files')}
+              onClick={() => onNavigateSubTab('activity')}
               className="text-[#0969C7] font-semibold text-xs hover:underline flex items-center gap-1"
             >
-              <span>Browse All</span>
+              <span>Audit Center</span>
               <ArrowRight size={13} />
             </button>
           </div>
 
-          {((isClient ? clientFiles : files).length === 0) ? (
-            <div className="p-8 text-center text-slate-400 text-xs">
-              No files currently stored in this vault.
-            </div>
-          ) : (
-            <div className="space-y-2.5">
-              {(isClient ? clientFiles : files).slice(0, 4).map((f) => (
-                <div
-                  key={f.id}
-                  className="p-3 rounded-xl border border-slate-200/80 bg-slate-50/60 hover:bg-white transition-colors flex items-center justify-between gap-3 text-xs"
-                >
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5 font-bold text-slate-800 truncate">
-                      <FileText size={14} className="text-[#0969C7] shrink-0" />
-                      <span className="truncate">{f.title}</span>
-                    </div>
-                    <p className="text-[10.5px] text-slate-400 font-mono mt-0.5 truncate">
-                      {f.fileName} &bull; {f.fileSize}
-                    </p>
-                  </div>
-
-                  <span className="shrink-0 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-mono">
-                    AES-256
+          <div className="space-y-3">
+            {recentLogs.map((log) => (
+              <div
+                key={log.id}
+                className="p-3 rounded-2xl border border-slate-100 bg-slate-50/70 hover:bg-slate-50 transition-colors text-xs space-y-1"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#062A5A] truncate">{log.action}</span>
+                  <span
+                    className={`text-[9.5px] font-bold px-1.5 py-0.2 rounded-md ${
+                      log.status === 'Success'
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : log.status === 'Warning'
+                        ? 'bg-amber-100 text-amber-800'
+                        : 'bg-rose-100 text-rose-800'
+                    }`}
+                  >
+                    {log.status}
                   </span>
                 </div>
-              ))}
-            </div>
-          )}
+                <p className="text-slate-600 text-[11px] leading-tight line-clamp-2">
+                  {log.details}
+                </p>
+                <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 font-mono">
+                  <span>{log.user} ({log.userRole})</span>
+                  <span>{log.timestamp}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-
       </div>
-
     </div>
   );
 };

@@ -9,15 +9,13 @@ import {
   ShieldCheck, 
   MapPin, 
   Sparkles, 
-  Briefcase,
-  LogOut
+  Briefcase
 } from 'lucide-react';
 import { FIRM_DETAILS } from '../data/firmData';
 import { BrandHeaderLockup } from './CaLogo';
 import { WhatsAppOfficialIcon } from './FloatingContactPanel';
 import { PageRoute } from '../types';
 import { useFirmData } from '../context/FirmDataContext';
-import { useVaultAuth } from '../context/VaultAuthContext';
 
 interface HeaderProps {
   currentRoute: PageRoute;
@@ -31,7 +29,6 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenConsultation
 }) => {
   const { firmDetails, services } = useFirmData();
-  const { user: vaultAuthUser, logout: vaultLogout } = useVaultAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [servicesMenuOpen, setServicesMenuOpen] = useState(false);
   const [mobileServicesExpanded, setMobileServicesExpanded] = useState(false);
@@ -312,38 +309,18 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             {/* Client Vault */}
-            <div className="flex items-center gap-0.5">
-              <button
-                onClick={() => handleNav('portal')}
-                aria-current={currentRoute === 'portal' ? 'page' : undefined}
-                className={`py-1.5 px-3 flex items-center gap-1.5 rounded-lg transition-all min-h-[38px] whitespace-nowrap ${
-                  currentRoute === 'portal' 
-                    ? 'text-[#062A5A] font-bold bg-[#EEF5FC] shadow-2xs' 
-                    : 'text-[#172033] hover:text-[#0969C7] hover:bg-slate-50'
-                }`}
-              >
-                <ShieldCheck size={14} className="text-[#159447]" />
-                <span>Client Vault</span>
-                {vaultAuthUser && (
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse ml-0.5" title={`Authenticated as ${vaultAuthUser.fullName}`} />
-                )}
-              </button>
-
-              {vaultAuthUser && (
-                <button
-                  type="button"
-                  onClick={async () => {
-                    await vaultLogout();
-                    handleNav('portal');
-                  }}
-                  className="p-1.5 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                  title="Sign out of Client Vault session"
-                  aria-label="Sign out of Client Vault"
-                >
-                  <LogOut size={13} />
-                </button>
-              )}
-            </div>
+            <button
+              onClick={() => handleNav('portal')}
+              aria-current={currentRoute === 'portal' ? 'page' : undefined}
+              className={`py-1.5 px-3 flex items-center gap-1.5 rounded-lg transition-all min-h-[38px] whitespace-nowrap ${
+                currentRoute === 'portal' 
+                  ? 'text-[#062A5A] font-bold bg-[#EEF5FC] shadow-2xs' 
+                  : 'text-[#172033] hover:text-[#0969C7] hover:bg-slate-50'
+              }`}
+            >
+              <ShieldCheck size={14} className="text-[#159447]" />
+              <span>Client Vault</span>
+            </button>
 
             {/* Contact */}
             <button
@@ -522,47 +499,20 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
 
                 {/* Client Vault */}
-                <div className="rounded-xl overflow-hidden border border-slate-200/80 bg-slate-50/50">
-                  <button
-                    onClick={() => handleNav('portal')}
-                    className={`w-full text-left py-2.5 px-3.5 flex items-center justify-between min-h-[44px] transition-colors ${
-                      currentRoute === 'portal' 
-                        ? 'bg-[#EEF5FC] text-[#062A5A] font-bold border-l-4 border-[#0969C7]' 
-                        : 'hover:bg-slate-50 text-slate-800'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <ShieldCheck size={15} className="text-[#159447]" />
-                      <span>Client Vault</span>
-                      {vaultAuthUser && (
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      )}
-                    </div>
-                    <span className="text-[10px] bg-[#159447]/10 text-[#159447] px-2 py-0.5 rounded font-medium">
-                      {vaultAuthUser ? 'Active Session' : 'AES-256'}
-                    </span>
-                  </button>
-
-                  {vaultAuthUser && (
-                    <div className="px-3.5 py-2 bg-rose-50/80 border-t border-rose-100 flex items-center justify-between">
-                      <span className="text-[11px] text-slate-600 truncate max-w-[170px] font-medium">
-                        {vaultAuthUser.fullName}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          setMobileMenuOpen(false);
-                          await vaultLogout();
-                          handleNav('portal');
-                        }}
-                        className="text-[11px] font-bold text-rose-600 hover:text-rose-700 flex items-center gap-1 cursor-pointer"
-                      >
-                        <LogOut size={12} />
-                        <span>Sign Out</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <button
+                  onClick={() => handleNav('portal')}
+                  className={`text-left py-2.5 px-3.5 rounded-xl flex items-center justify-between min-h-[44px] transition-colors ${
+                    currentRoute === 'portal' 
+                      ? 'bg-[#EEF5FC] text-[#062A5A] font-bold border-l-4 border-[#0969C7] shadow-2xs' 
+                      : 'hover:bg-slate-50 text-slate-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck size={15} className="text-[#159447]" />
+                    <span>Client Vault</span>
+                  </div>
+                  <span className="text-[10px] bg-[#159447]/10 text-[#159447] px-2 py-0.5 rounded font-medium">AES-256</span>
+                </button>
 
                 {/* Contact */}
                 <button

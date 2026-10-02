@@ -47,22 +47,16 @@ import { VaultAuditLogView } from './VaultAuditLogView';
 import { VaultSecuritySettings } from './VaultSecuritySettings';
 import { CreateAccountModal } from './CreateAccountModal';
 import { UserProfileDrawer } from './UserProfileDrawer';
-import { VaultLogin } from './VaultLogin';
 
 type VaultSubTab =
   | 'dashboard'
-  | 'users'
-  | 'staff'
   | 'clients'
+  | 'staff'
   | 'permissions'
   | 'projects'
   | 'files'
   | 'documents'
-  | 'reports'
-  | 'invoices'
   | 'gallery'
-  | 'photos'
-  | 'videos'
   | 'messages'
   | 'notifications'
   | 'invitations'
@@ -74,14 +68,9 @@ export const ClientVaultContainer: React.FC = () => {
   const { user: authUser, logout, sessionRemainingSeconds, changePassword, fetchSessions, revokeSession } = useVaultAuth();
   const { users, files, projects, invitations, auditLogs } = useVault();
 
-  // Guard: Zero-access without successful authentication
-  if (!authUser) {
-    return <VaultLogin />;
-  }
-
-  const isSuperAdmin = authUser.accountType === 'super_admin';
-  const isStaff = authUser.accountType === 'staff';
-  const isClient = authUser.accountType === 'client';
+  const isSuperAdmin = authUser?.accountType === 'super_admin';
+  const isStaff = authUser?.accountType === 'staff';
+  const isClient = authUser?.accountType === 'client';
 
   const [activeSubTab, setActiveSubTab] = useState<VaultSubTab>('dashboard');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -97,8 +86,6 @@ export const ClientVaultContainer: React.FC = () => {
   // Security modals for current user
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isDevicesModalOpen, setIsDevicesModalOpen] = useState(false);
-  const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
-  const [isSigningOut, setIsSigningOut] = useState(false);
   const [sessionsList, setSessionsList] = useState<ActiveSessionItem[]>([]);
   const [isLoadingSessions, setIsLoadingSessions] = useState(false);
 
@@ -173,20 +160,6 @@ export const ClientVaultContainer: React.FC = () => {
     showToast('✓ Password updated securely with salted PBKDF2 hash.');
   };
 
-  const handleConfirmSignOut = async () => {
-    setIsSigningOut(true);
-    try {
-      await logout();
-      showToast('Signed out of Client Vault session successfully.');
-    } catch (e) {
-      console.error('Logout error:', e);
-    } finally {
-      setIsSigningOut(false);
-      setIsSignOutModalOpen(false);
-      setIsMobileSidebarOpen(false);
-    }
-  };
-
   // Build role-tailored navigation items
   const allNavItems: {
     id: VaultSubTab;
@@ -198,25 +171,9 @@ export const ClientVaultContainer: React.FC = () => {
   }[] = [
     {
       id: 'dashboard',
-      label: isClient ? 'My Overview' : 'Client Vault Overview',
+      label: isClient ? 'My Overview' : 'Dashboard',
       icon: <LayoutDashboard size={15} />,
       allowedRoles: ['super_admin', 'staff', 'client']
-    },
-    {
-      id: 'users',
-      label: 'Users',
-      icon: <Users size={15} />,
-      badge: users.length,
-      badgeColor: 'bg-indigo-100 text-indigo-800',
-      allowedRoles: ['super_admin']
-    },
-    {
-      id: 'staff',
-      label: 'Staff',
-      icon: <UserCheck size={15} />,
-      badge: users.filter((u) => u.accountType === 'staff' || u.accountType === 'super_admin').length,
-      badgeColor: 'bg-blue-100 text-blue-800',
-      allowedRoles: ['super_admin']
     },
     {
       id: 'clients',
@@ -227,6 +184,14 @@ export const ClientVaultContainer: React.FC = () => {
       allowedRoles: ['super_admin', 'staff']
     },
     {
+      id: 'staff',
+      label: 'Staff Management',
+      icon: <UserCheck size={15} />,
+      badge: users.filter((u) => u.accountType === 'staff' || u.accountType === 'super_admin').length,
+      badgeColor: 'bg-blue-100 text-blue-800',
+      allowedRoles: ['super_admin']
+    },
+    {
       id: 'permissions',
       label: 'Roles & Permissions',
       icon: <Shield size={15} />,
@@ -234,40 +199,68 @@ export const ClientVaultContainer: React.FC = () => {
     },
     {
       id: 'projects',
-      label: isClient ? 'My Projects' : 'Projects',
+      label: isClient ? 'My Mandates' : 'Projects',
       icon: <Briefcase size={15} />,
-      badge: (isClient ? projects.filter(p => p.clientId === authUser?.id) : projects).length,
+      badge: projects.length,
       badgeColor: 'bg-amber-100 text-amber-800',
       allowedRoles: ['super_admin', 'staff', 'client']
     },
     {
       id: 'files',
-      label: isClient ? 'My Files' : 'Files',
+      label: isClient ? 'My Vault Documents' : 'Files & Filings',
       icon: <Folder size={15} />,
-      badge: (isClient ? files.filter(f => f.clientId === authUser?.id) : files).length,
+      badge: files.length,
       allowedRoles: ['super_admin', 'staff', 'client']
     },
     {
       id: 'documents',
-      label: 'Documents',
+      label: 'Statutory Reports',
       icon: <FileText size={15} />,
-      allowedRoles: ['super_admin', 'staff', 'client']
+      allowedRoles: ['super_admin', 'staff']
+    },
+    {
+      id: 'gallery',
+      label: 'Media Archive',
+      icon: <ImageIcon size={15} />,
+      allowedRoles: ['super_admin']
+    },
+    {
+      id: 'messages',
+      label: 'Encrypted Messages',
+      icon: <MessageSquare size={15} />,
+      badge: 'Live',
+      badgeColor: 'bg-emerald-500 text-white',
+      allowedRoles: ['super_admin', 'staff']
+    },
+    {
+      id: 'notifications',
+      label: 'Notifications',
+      icon: <Bell size={15} />,
+      allowedRoles: ['super_admin', 'staff']
+    },
+    {
+      id: 'invitations',
+      label: 'Access Invitations',
+      icon: <Send size={15} />,
+      badge: invitations.filter((i) => i.status === 'Pending').length,
+      badgeColor: 'bg-amber-500 text-white',
+      allowedRoles: ['super_admin']
     },
     {
       id: 'activity',
-      label: 'Activity Log',
+      label: 'Security & Audit Logs',
       icon: <Activity size={15} />,
       allowedRoles: ['super_admin', 'staff']
     },
     {
       id: 'security',
-      label: isClient ? 'My Security' : 'Security',
+      label: isClient ? 'My Security & Sessions' : 'Vault Security Policy',
       icon: <Lock size={15} />,
       allowedRoles: ['super_admin', 'staff', 'client']
     },
     {
       id: 'settings',
-      label: 'Settings',
+      label: 'System Settings',
       icon: <Settings size={15} />,
       allowedRoles: ['super_admin']
     }
@@ -388,8 +381,12 @@ export const ClientVaultContainer: React.FC = () => {
           {/* Sign Out Button */}
           <button
             type="button"
-            onClick={() => setIsSignOutModalOpen(true)}
-            className="px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 active:bg-rose-200 text-rose-700 border border-rose-200 text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+            onClick={async () => {
+              if (window.confirm('Are you sure you want to end your secure Client Vault session?')) {
+                await logout();
+              }
+            }}
+            className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs"
             title="Sign out of Client Vault"
           >
             <LogOut size={13} />
@@ -459,21 +456,6 @@ export const ClientVaultContainer: React.FC = () => {
                 </button>
               );
             })}
-
-            {/* Direct Sign Out button inside Sidebar */}
-            <div className="pt-3 mt-3 border-t border-slate-100">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsMobileSidebarOpen(false);
-                  setIsSignOutModalOpen(true);
-                }}
-                className="w-full p-2.5 rounded-xl text-left flex items-center gap-2.5 text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-              >
-                <LogOut size={15} />
-                <span>Sign Out of Vault</span>
-              </button>
-            </div>
           </nav>
         </aside>
 
@@ -484,17 +466,6 @@ export const ClientVaultContainer: React.FC = () => {
             <ClientVaultDashboard
               onNavigateSubTab={(tab) => setActiveSubTab(tab as VaultSubTab)}
               onOpenCreate={handleOpenCreateModal}
-            />
-          )}
-
-          {/* SubTab: Users (All accounts - Super Admin Only) */}
-          {activeSubTab === 'users' && isSuperAdmin && (
-            <VaultUsersList
-              filterMode="all"
-              onOpenCreate={handleOpenCreateModal}
-              onSelectUser={(u) => setSelectedUserForDrawer(u)}
-              onOpenPermissions={(u) => setSelectedUserForPermissions(u)}
-              onSuccessToast={showToast}
             />
           )}
 
@@ -563,24 +534,14 @@ export const ClientVaultContainer: React.FC = () => {
           )}
 
           {/* SubTab 6 & 7: Files & Documents (Private Vault Explorer with isolated storage) */}
-          {(activeSubTab === 'files' || activeSubTab === 'documents' || activeSubTab === 'reports' || activeSubTab === 'invoices') && (
-            <PrivateVaultViewer
-              onSuccessToast={showToast}
-              defaultFolderSlug={
-                activeSubTab === 'documents' ? 'documents' :
-                activeSubTab === 'reports' ? 'reports' :
-                activeSubTab === 'invoices' ? 'invoices' : undefined
-              }
-            />
+          {(activeSubTab === 'files' || activeSubTab === 'documents') && (
+            <PrivateVaultViewer onSuccessToast={showToast} />
           )}
 
           {/* SubTab 8: Gallery (Photos & Videos) */}
-          {(activeSubTab === 'gallery' || activeSubTab === 'photos' || activeSubTab === 'videos') && (
+          {activeSubTab === 'gallery' && (
             <div className="space-y-6">
-              <PrivateVaultViewer
-                onSuccessToast={showToast}
-                defaultFolderSlug={activeSubTab === 'videos' ? 'videos' : 'photos'}
-              />
+              <PrivateVaultViewer onSuccessToast={showToast} />
             </div>
           )}
 
@@ -911,67 +872,6 @@ export const ClientVaultContainer: React.FC = () => {
                 className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
               >
                 Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL 6: Sign Out Confirmation Modal */}
-      {isSignOutModalOpen && (
-        <div
-          onClick={() => setIsSignOutModalOpen(false)}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-sm w-full p-6 text-left relative animate-in zoom-in-95"
-          >
-            <button
-              onClick={() => setIsSignOutModalOpen(false)}
-              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl"
-            >
-              <X size={18} />
-            </button>
-
-            <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center mb-3">
-              <LogOut size={22} />
-            </div>
-
-            <h3 className="font-manrope font-bold text-lg text-[#062A5A]">
-              End Vault Session?
-            </h3>
-            
-            <p className="text-xs text-slate-500 mt-1 mb-5 leading-relaxed">
-              Are you sure you want to sign out of the Client Vault? Your active session token will be invalidated and you will be returned to the secure sign-in page.
-            </p>
-
-            <div className="flex items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setIsSignOutModalOpen(false)}
-                className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-colors"
-              >
-                Stay Signed In
-              </button>
-              
-              <button
-                type="button"
-                onClick={handleConfirmSignOut}
-                disabled={isSigningOut}
-                className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
-              >
-                {isSigningOut ? (
-                  <>
-                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>Signing Out...</span>
-                  </>
-                ) : (
-                  <>
-                    <LogOut size={13} />
-                    <span>Sign Out</span>
-                  </>
-                )}
               </button>
             </div>
           </div>

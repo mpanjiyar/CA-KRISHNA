@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   VaultUser,
   VaultProject,
-  VaultFolder,
   VaultFileItem,
   VaultInvitation,
   VaultAuditLogEntry,
@@ -15,7 +14,6 @@ import {
 import {
   INITIAL_USERS,
   INITIAL_PROJECTS,
-  INITIAL_FOLDERS,
   INITIAL_FILES,
   INITIAL_INVITATIONS,
   INITIAL_AUDIT_LOGS,
@@ -26,7 +24,6 @@ import {
 const VAULT_STORAGE_KEYS = {
   USERS: 'panjiyar_vault_users_v2',
   PROJECTS: 'panjiyar_vault_projects_v2',
-  FOLDERS: 'panjiyar_vault_folders_v2',
   FILES: 'panjiyar_vault_files_v2',
   INVITATIONS: 'panjiyar_vault_invitations_v2',
   AUDIT_LOGS: 'panjiyar_vault_audit_logs_v2',
@@ -37,7 +34,6 @@ const VAULT_STORAGE_KEYS = {
 interface VaultContextType {
   users: VaultUser[];
   projects: VaultProject[];
-  folders: VaultFolder[];
   files: VaultFileItem[];
   invitations: VaultInvitation[];
   auditLogs: VaultAuditLogEntry[];
@@ -63,19 +59,10 @@ interface VaultContextType {
   updateProject: (id: string, partial: Partial<VaultProject>) => void;
   deleteProject: (id: string) => void;
 
-  // Folder Actions
-  createFolder: (folder: Omit<VaultFolder, 'id' | 'createdAt' | 'createdBy'>) => VaultFolder;
-  updateFolder: (id: string, partial: Partial<VaultFolder>) => void;
-  deleteFolder: (id: string) => void;
-  renameFolder: (id: string, newName: string) => void;
-
   // File Actions
   addFile: (file: Omit<VaultFileItem, 'id' | 'uploadDate' | 'sha256Hash'>) => VaultFileItem;
   deleteFile: (id: string) => void;
-  updateFile: (id: string, partial: Partial<VaultFileItem>) => void;
   updateFilePermissions: (id: string, permissions: VaultFileItem['permissions']) => void;
-  renameFile: (id: string, newTitle: string, newFileName: string) => void;
-  moveFile: (fileId: string, targetFolderId: string, targetFolderName: string) => void;
 
   // Invitation Actions
   sendInvitation: (inv: Omit<VaultInvitation, 'id' | 'invitedAt' | 'expiresAt' | 'status' | 'setupLink'>) => VaultInvitation;
@@ -119,18 +106,7 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return INITIAL_PROJECTS;
   });
 
-  // 3. Folders
-  const [folders, setFolders] = useState<VaultFolder[]>(() => {
-    try {
-      const saved = localStorage.getItem(VAULT_STORAGE_KEYS.FOLDERS);
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.warn('Error reading vault folders', e);
-    }
-    return INITIAL_FOLDERS;
-  });
-
-  // 4. Files
+  // 3. Files
   const [files, setFiles] = useState<VaultFileItem[]>(() => {
     try {
       const saved = localStorage.getItem(VAULT_STORAGE_KEYS.FILES);
@@ -141,7 +117,7 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return INITIAL_FILES;
   });
 
-  // 5. Invitations
+  // 4. Invitations
   const [invitations, setInvitations] = useState<VaultInvitation[]>(() => {
     try {
       const saved = localStorage.getItem(VAULT_STORAGE_KEYS.INVITATIONS);
@@ -152,7 +128,7 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return INITIAL_INVITATIONS;
   });
 
-  // 6. Audit Logs
+  // 5. Audit Logs
   const [auditLogs, setAuditLogs] = useState<VaultAuditLogEntry[]>(() => {
     try {
       const saved = localStorage.getItem(VAULT_STORAGE_KEYS.AUDIT_LOGS);
@@ -163,7 +139,7 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return INITIAL_AUDIT_LOGS;
   });
 
-  // 7. Role Templates
+  // 6. Role Templates
   const [roleTemplates, setRoleTemplates] = useState<RoleTemplate[]>(() => {
     try {
       const saved = localStorage.getItem(VAULT_STORAGE_KEYS.TEMPLATES);
@@ -174,7 +150,7 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return INITIAL_ROLE_TEMPLATES;
   });
 
-  // 8. Security Config
+  // 7. Security Config
   const [securityConfig, setSecurityConfig] = useState<VaultSecurityConfig>(() => {
     try {
       const saved = localStorage.getItem(VAULT_STORAGE_KEYS.SECURITY);
@@ -184,16 +160,6 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
     return INITIAL_SECURITY_CONFIG;
   });
-
-  // Helper for authenticated API calls
-  const getAuthHeaders = (): Record<string, string> => {
-    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('panjiyar_vault_session_token_v3') : null;
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-    return headers;
-  };
 
   // Broadcast sync helper
   const broadcastVaultSync = (actionKey: string, payload?: unknown) => {
@@ -236,8 +202,6 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (u) setUsers(JSON.parse(u));
         const p = localStorage.getItem(VAULT_STORAGE_KEYS.PROJECTS);
         if (p) setProjects(JSON.parse(p));
-        const fld = localStorage.getItem(VAULT_STORAGE_KEYS.FOLDERS);
-        if (fld) setFolders(JSON.parse(fld));
         const f = localStorage.getItem(VAULT_STORAGE_KEYS.FILES);
         if (f) setFiles(JSON.parse(f));
         const i = localStorage.getItem(VAULT_STORAGE_KEYS.INVITATIONS);
@@ -274,8 +238,7 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (!token) return;
         const headers = { Authorization: `Bearer ${token}` };
 
-        const [foldersRes, filesRes, projRes, usersRes, logsRes, secRes] = await Promise.allSettled([
-          fetch('/api/vault/folders', { headers }),
+        const [filesRes, projRes, usersRes, logsRes, secRes] = await Promise.allSettled([
           fetch('/api/vault/files', { headers }),
           fetch('/api/vault/projects', { headers }),
           fetch('/api/vault/users', { headers }),
@@ -283,19 +246,9 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           fetch('/api/vault/security-config', { headers })
         ]);
 
-        if (foldersRes.status === 'fulfilled' && foldersRes.value.ok) {
-          const data = await foldersRes.value.json();
-          if (Array.isArray(data.folders) && data.folders.length > 0) {
-            setFolders(data.folders);
-            try { localStorage.setItem(VAULT_STORAGE_KEYS.FOLDERS, JSON.stringify(data.folders)); } catch {}
-          }
-        }
         if (filesRes.status === 'fulfilled' && filesRes.value.ok) {
           const data = await filesRes.value.json();
-          if (Array.isArray(data.files)) {
-            setFiles(data.files);
-            try { localStorage.setItem(VAULT_STORAGE_KEYS.FILES, JSON.stringify(data.files)); } catch {}
-          }
+          if (Array.isArray(data.files)) setFiles(data.files);
         }
         if (projRes.status === 'fulfilled' && projRes.value.ok) {
           const data = await projRes.value.json();
@@ -546,183 +499,15 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     addAuditLog(`Project Deleted (${id})`, 'Project', `Removed project ${id} from registry.`, 'Warning');
   };
 
-  // 3. Folder Actions
-  const createFolder = (folderData: Omit<VaultFolder, 'id' | 'createdAt' | 'createdBy'>): VaultFolder => {
-    const newId = `FLD-${Date.now().toString(36).toUpperCase()}`;
-    const slug = folderData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    const newFolder: VaultFolder = {
-      ...folderData,
-      id: newId,
-      slug: slug || 'folder',
-      createdAt: new Date().toISOString().split('T')[0],
-      createdBy: 'CA Krishna Panjiyar (Admin)',
-      isSystem: false,
-      permissions: folderData.permissions || {
-        canView: true,
-        canUpload: true,
-        canDownload: true,
-        canEdit: true,
-        canDelete: true
-      }
-    };
-
-    setFolders((prev) => {
-      const next = [...prev, newFolder];
-      try {
-        localStorage.setItem(VAULT_STORAGE_KEYS.FOLDERS, JSON.stringify(next));
-      } catch (e) {
-        console.error('Failed writing folders', e);
-      }
-      broadcastVaultSync('CREATE_FOLDER', newFolder);
-      return next;
-    });
-
-    // Background server sync
-    fetch('/api/vault/folders', {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(newFolder)
-    }).catch((e) => console.warn('Server sync error for createFolder:', e));
-
-    addAuditLog(`Vault Folder Created: ${newFolder.name}`, 'File', `New repository section initialized for scope ${newFolder.clientId}.`);
-    return newFolder;
-  };
-
-  const updateFolder = (id: string, partial: Partial<VaultFolder>) => {
-    const targetFolder = folders.find((f) => f.id === id);
-    const oldName = targetFolder?.name || '';
-    const newName = partial.name;
-
-    setFolders((prev) => {
-      const next = prev.map((f) => {
-        if (f.id === id) {
-          const updated = { ...f, ...partial };
-          if (partial.name) {
-            updated.slug = partial.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-          }
-          return updated;
-        }
-        return f;
-      });
-      try {
-        localStorage.setItem(VAULT_STORAGE_KEYS.FOLDERS, JSON.stringify(next));
-      } catch (e) {
-        console.error('Failed writing folders', e);
-      }
-      broadcastVaultSync('UPDATE_FOLDER', { id, partial });
-      return next;
-    });
-
-    // If folder name was changed, sync files that belong to this folder
-    if (newName && oldName && newName !== oldName) {
-      setFiles((prev) => {
-        const next = prev.map((file) => {
-          if (file.folderId === id || file.folder === oldName) {
-            return {
-              ...file,
-              folderId: id,
-              folder: newName
-            };
-          }
-          return file;
-        });
-        try {
-          localStorage.setItem(VAULT_STORAGE_KEYS.FILES, JSON.stringify(next));
-        } catch (e) {
-          console.error('Failed writing files on folder rename', e);
-        }
-        return next;
-      });
-    }
-
-    // Background server sync
-    fetch(`/api/vault/folders/${id}`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(partial)
-    }).catch((e) => console.warn('Server sync error for updateFolder:', e));
-
-    addAuditLog(`Vault Folder Modified (${id})`, 'File', `Updated properties on folder "${newName || oldName}".`);
-  };
-
-  const renameFolder = (id: string, newName: string) => {
-    updateFolder(id, { name: newName });
-  };
-
-  const deleteFolder = (id: string) => {
-    const target = folders.find((f) => f.id === id);
-    if (!target) return;
-    if (target.isSystem) {
-      console.warn('Cannot delete system standard folder');
-      return;
-    }
-
-    const fallbackFolder = folders.find((f) => f.id === 'FLD-DOCS') || folders[0];
-    const fallbackId = fallbackFolder ? fallbackFolder.id : 'FLD-DOCS';
-    const fallbackName = fallbackFolder ? fallbackFolder.name : 'Documents & Certificates';
-
-    // Move any files in this folder to Documents so they are never lost
-    setFiles((prev) => {
-      const next = prev.map((f) => {
-        if (f.folderId === id || f.folder === target.name) {
-          return {
-            ...f,
-            folderId: fallbackId,
-            folder: fallbackName
-          };
-        }
-        return f;
-      });
-      try {
-        localStorage.setItem(VAULT_STORAGE_KEYS.FILES, JSON.stringify(next));
-      } catch (e) {
-        console.error('Failed updating files after folder delete', e);
-      }
-      return next;
-    });
-
-    setFolders((prev) => {
-      const next = prev.filter((f) => f.id !== id);
-      try {
-        localStorage.setItem(VAULT_STORAGE_KEYS.FOLDERS, JSON.stringify(next));
-      } catch (e) {
-        console.error('Failed writing folders', e);
-      }
-      broadcastVaultSync('DELETE_FOLDER', id);
-      return next;
-    });
-
-    // Background server sync
-    fetch(`/api/vault/folders/${id}`, {
-      method: 'DELETE',
-      headers: getAuthHeaders()
-    }).catch((e) => console.warn('Server sync error for deleteFolder:', e));
-
-    addAuditLog(`Vault Folder Deleted: ${target.name}`, 'File', `Folder purged. Existing files moved safely to ${fallbackName}.`, 'Warning');
-  };
-
-  // 4. File Actions
+  // 3. File Actions
   const addFile = (fileData: Omit<VaultFileItem, 'id' | 'uploadDate' | 'sha256Hash'>): VaultFileItem => {
     const newId = `FIL-${Math.floor(1000 + Math.random() * 9000)}`;
     const sha = Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
-    
-    // Resolve folderId
-    let folderId = fileData.folderId;
-    let folderName = fileData.folder || 'Documents & Certificates';
-    if (!folderId) {
-      const match = folders.find((f) => f.name.toLowerCase() === folderName.toLowerCase() || f.slug.toLowerCase() === folderName.toLowerCase());
-      folderId = match ? match.id : 'FLD-DOCS';
-      folderName = match ? match.name : folderName;
-    }
-
     const newFile: VaultFileItem = {
       ...fileData,
       id: newId,
-      folderId,
-      folder: folderName,
       uploadDate: new Date().toISOString().split('T')[0],
-      sha256Hash: sha,
-      previewContent: fileData.previewContent || `PANJIYAR KRISHNA & CO. - CLIENT VAULT REPOSITORY\nFile Name: ${fileData.fileName}\nClient: ${fileData.clientName}\nFolder: ${folderName}\nSHA-256: ${sha}\nVerified compliance record.`
+      sha256Hash: sha
     };
 
     setFiles((prev) => {
@@ -735,13 +520,6 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       broadcastVaultSync('ADD_FILE', newFile);
       return next;
     });
-
-    // Background server sync
-    fetch('/api/vault/files', {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(newFile)
-    }).catch((e) => console.warn('Server sync error for addFile:', e));
 
     addAuditLog(`Document Stored: ${newFile.fileName}`, 'File', `Uploaded to client vault of ${newFile.clientName} under folder ${newFile.folder}.`);
     return newFile;
@@ -759,60 +537,21 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       broadcastVaultSync('DELETE_FILE', id);
       return next;
     });
-
-    // Background server sync
-    fetch(`/api/vault/files/${id}`, {
-      method: 'DELETE',
-      headers: getAuthHeaders()
-    }).catch((e) => console.warn('Server sync error for deleteFile:', e));
-
     addAuditLog(`File Deleted: ${target?.fileName || id}`, 'File', `File ${id} purged from vault storage.`, 'Warning');
   };
 
-  const updateFile = (id: string, partial: Partial<VaultFileItem>) => {
+  const updateFilePermissions = (id: string, permissions: VaultFileItem['permissions']) => {
     setFiles((prev) => {
-      const next = prev.map((f) => (f.id === id ? { ...f, ...partial } : f));
+      const next = prev.map((f) => (f.id === id ? { ...f, permissions } : f));
       try {
         localStorage.setItem(VAULT_STORAGE_KEYS.FILES, JSON.stringify(next));
       } catch (e) {
-        console.error('Failed updating file', e);
+        console.error('Failed updating file permissions', e);
       }
-      broadcastVaultSync('UPDATE_FILE', { id, partial });
+      broadcastVaultSync('UPDATE_FILE_PERMS', { id, permissions });
       return next;
     });
-
-    // Background server sync
-    fetch(`/api/vault/files/${id}`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(partial)
-    }).catch((e) => console.warn('Server sync error for updateFile:', e));
-  };
-
-  const updateFilePermissions = (id: string, permissions: VaultFileItem['permissions']) => {
-    updateFile(id, { permissions });
     addAuditLog(`Granular File Permissions Changed (${id})`, 'Permission', `Updated file access flags on file ${id}.`);
-  };
-
-  const renameFile = (id: string, newTitle: string, newFileName: string) => {
-    const target = files.find((f) => f.id === id);
-    updateFile(id, { title: newTitle, fileName: newFileName });
-    addAuditLog(`File Renamed (${id})`, 'File', `Renamed '${target?.fileName}' to '${newFileName}' (${newTitle}).`);
-  };
-
-  const moveFile = (fileId: string, targetFolderId: string, targetFolderName: string) => {
-    const target = files.find((f) => f.id === fileId);
-    const oldFolder = target?.folder || 'Unknown';
-    updateFile(fileId, { folderId: targetFolderId, folder: targetFolderName });
-
-    // Background server sync
-    fetch(`/api/vault/files/${fileId}/move`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ targetFolderId, targetFolderName })
-    }).catch((e) => console.warn('Server sync error for moveFile:', e));
-
-    addAuditLog(`File Organized (${fileId})`, 'File', `Moved '${target?.fileName}' from '${oldFolder}' to folder '${targetFolderName}'.`);
   };
 
   // 4. Invitation Actions
@@ -941,7 +680,6 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       value={{
         users,
         projects,
-        folders,
         files,
         invitations,
         auditLogs,
@@ -962,16 +700,9 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         createProject,
         updateProject,
         deleteProject,
-        createFolder,
-        updateFolder,
-        deleteFolder,
-        renameFolder,
         addFile,
         deleteFile,
-        updateFile,
         updateFilePermissions,
-        renameFile,
-        moveFile,
         sendInvitation,
         resendInvitation,
         cancelInvitation,
