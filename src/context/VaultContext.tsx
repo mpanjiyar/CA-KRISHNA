@@ -231,48 +231,6 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const interval = setInterval(syncAllVaultState, 3500);
 
-    // Sync with Server API on boot/token change
-    const syncWithServerApi = async () => {
-      try {
-        const token = localStorage.getItem('panjiyar_vault_session_token_v3');
-        if (!token) return;
-        const headers = { Authorization: `Bearer ${token}` };
-
-        const [filesRes, projRes, usersRes, logsRes, secRes] = await Promise.allSettled([
-          fetch('/api/vault/files', { headers }),
-          fetch('/api/vault/projects', { headers }),
-          fetch('/api/vault/users', { headers }),
-          fetch('/api/vault/audit-logs', { headers }),
-          fetch('/api/vault/security-config', { headers })
-        ]);
-
-        if (filesRes.status === 'fulfilled' && filesRes.value.ok) {
-          const data = await filesRes.value.json();
-          if (Array.isArray(data.files)) setFiles(data.files);
-        }
-        if (projRes.status === 'fulfilled' && projRes.value.ok) {
-          const data = await projRes.value.json();
-          if (Array.isArray(data.projects)) setProjects(data.projects);
-        }
-        if (usersRes.status === 'fulfilled' && usersRes.value.ok) {
-          const data = await usersRes.value.json();
-          if (Array.isArray(data.users)) setUsers(data.users);
-        }
-        if (logsRes.status === 'fulfilled' && logsRes.value.ok) {
-          const data = await logsRes.value.json();
-          if (Array.isArray(data.logs)) setAuditLogs(data.logs);
-        }
-        if (secRes.status === 'fulfilled' && secRes.value.ok) {
-          const data = await secRes.value.json();
-          if (data.config) setSecurityConfig(data.config);
-        }
-      } catch (e) {
-        // Fallback to local cache
-      }
-    };
-
-    syncWithServerApi();
-
     return () => {
       bc?.close();
       window.removeEventListener('storage', handleStorageChange);

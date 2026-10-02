@@ -40,8 +40,6 @@ export interface VaultUser {
   email: string;
   phone: string;
   username: string;
-  passwordHash?: string; // Cryptographic salt+SHA-256 digest (never stored in plain text)
-  passwordSalt?: string; // Secure random cryptographic salt
   passwordMasked?: string;
   accountType: VaultAccountType;
   role: string;
@@ -55,28 +53,9 @@ export interface VaultUser {
   forcePasswordChange: boolean;
   loginDisabled: boolean;
   twoFactorEnabled: boolean;
-  twoFactorSecret?: string;
-  failedLoginAttempts?: number;
-  lockedUntil?: string | null;
   permissions: UserPermissions;
   sectionAccess: VaultSectionName[];
   activeSessionsCount: number;
-}
-
-export interface VaultSession {
-  token: string;
-  userId: string;
-  username: string;
-  accountType: VaultAccountType;
-  role: string;
-  fullName: string;
-  company: string;
-  email: string;
-  device: string;
-  loginTime: string;
-  lastActivityTime: number; // timestamp in ms
-  expiresAt: number; // timestamp in ms
-  twoFactorVerified: boolean;
 }
 
 export interface VaultProject {

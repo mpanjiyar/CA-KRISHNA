@@ -26,23 +26,21 @@ import {
 } from '../../types/vault';
 
 interface CreateAccountModalProps {
-  isOpen?: boolean;
+  isOpen: boolean;
   onClose: () => void;
-  accountType?: VaultAccountType;
   defaultAccountType?: VaultAccountType;
   onSuccessToast: (msg: string) => void;
 }
 
 export const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
-  isOpen = true,
+  isOpen,
   onClose,
-  accountType: initialType,
   defaultAccountType = 'client',
   onSuccessToast
 }) => {
   const { createUser, projects, roleTemplates, generateSecurePassword, sendInvitation } = useVault();
 
-  const [accountType, setAccountType] = useState<VaultAccountType>(initialType || defaultAccountType);
+  const [accountType, setAccountType] = useState<VaultAccountType>(defaultAccountType);
   const [fullName, setFullName] = useState('');
   const [company, setCompany] = useState('');
   const [email, setEmail] = useState('');

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Folder,
   FileText,
@@ -17,11 +17,9 @@ import {
   Building,
   Key,
   Save,
-  RotateCcw,
-  ShieldCheck
+  RotateCcw
 } from 'lucide-react';
 import { useVault } from '../../context/VaultContext';
-import { useVaultAuth } from '../../context/VaultAuthContext';
 import { VaultFileItem } from '../../types/vault';
 
 interface PrivateVaultViewerProps {
@@ -29,34 +27,11 @@ interface PrivateVaultViewerProps {
 }
 
 export const PrivateVaultViewer: React.FC<PrivateVaultViewerProps> = ({ onSuccessToast }) => {
-  const { user: authUser } = useVaultAuth();
   const { users, files, projects, addFile, deleteFile, updateFilePermissions } = useVault();
 
-  const isClient = authUser?.accountType === 'client';
-  const isStaff = authUser?.accountType === 'staff';
-
-  // Determine accessible clients
-  const accessibleClients = users.filter((u) => {
-    if (u.accountType !== 'client') return false;
-    if (isClient) return u.id === authUser?.id;
-    if (isStaff) return (authUser?.assignedClientIds || []).includes(u.id);
-    return true; // Super admin sees all
-  });
-
   // Selected client for vault isolation
-  const [selectedClientId, setSelectedClientId] = useState<string>(() => {
-    if (isClient && authUser) return authUser.id;
-    return accessibleClients[0]?.id || users.find(u => u.accountType === 'client')?.id || '';
-  });
-
-  useEffect(() => {
-    if (isClient && authUser) {
-      setSelectedClientId(authUser.id);
-    } else if (accessibleClients.length > 0 && !accessibleClients.some(c => c.id === selectedClientId)) {
-      setSelectedClientId(accessibleClients[0].id);
-    }
-  }, [authUser, isClient, accessibleClients, selectedClientId]);
-
+  const clients = users.filter((u) => u.accountType === 'client');
+  const [selectedClientId, setSelectedClientId] = useState<string>(clients[0]?.id || '');
   const [activeFolder, setActiveFolder] = useState<VaultFileItem['folder']>('Documents');
   const [searchQuery, setSearchQuery] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -69,7 +44,7 @@ export const PrivateVaultViewer: React.FC<PrivateVaultViewerProps> = ({ onSucces
   const [newFileType, setNewFileType] = useState<VaultFileItem['fileType']>('document');
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
 
-  const currentClient = users.find((u) => u.id === selectedClientId) || accessibleClients[0] || (authUser?.accountType === 'client' ? authUser : null);
+  const currentClient = users.find((u) => u.id === selectedClientId) || clients[0];
 
   // Strictly isolated client files
   const clientFiles = files.filter(
@@ -149,41 +124,29 @@ export const PrivateVaultViewer: React.FC<PrivateVaultViewerProps> = ({ onSucces
           </p>
         </div>
 
-        {/* Client Selector Dropdown / Verified Client Badge */}
+        {/* Client Selector Dropdown */}
         <div className="flex items-center gap-2.5 shrink-0">
-          {isClient ? (
-            <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-xs">
-              <ShieldCheck size={16} className="text-emerald-600" />
-              <div>
-                <span className="text-[10px] text-emerald-700 font-bold block uppercase tracking-wider">Your Confidential Vault</span>
-                <span className="font-extrabold text-[#062A5A]">{currentClient?.company || authUser?.company}</span>
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="text-right hidden sm:block">
-                <span className="text-[10px] text-slate-400 uppercase font-bold block">Active Vault</span>
-                <span className="text-xs font-bold text-[#062A5A] truncate max-w-[200px] block">
-                  {currentClient?.company}
-                </span>
-              </div>
+          <div className="text-right hidden sm:block">
+            <span className="text-[10px] text-slate-400 uppercase font-bold block">Active Vault</span>
+            <span className="text-xs font-bold text-[#062A5A] truncate max-w-[200px] block">
+              {currentClient?.company}
+            </span>
+          </div>
 
-              <div className="relative">
-                <Building size={14} className="absolute left-3 top-3 text-slate-400" />
-                <select
-                  value={selectedClientId}
-                  onChange={(e) => setSelectedClientId(e.target.value)}
-                  className="pl-9 pr-8 py-2.5 rounded-xl border border-slate-300 font-semibold text-xs text-[#062A5A] bg-white focus:outline-none focus:ring-1 focus:ring-[#0969C7] shadow-2xs"
-                >
-                  {accessibleClients.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.company} ({c.id})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </>
-          )}
+          <div className="relative">
+            <Building size={14} className="absolute left-3 top-3 text-slate-400" />
+            <select
+              value={selectedClientId}
+              onChange={(e) => setSelectedClientId(e.target.value)}
+              className="pl-9 pr-8 py-2.5 rounded-xl border border-slate-300 font-semibold text-xs text-[#062A5A] bg-white focus:outline-none focus:ring-1 focus:ring-[#0969C7] shadow-2xs"
+            >
+              {clients.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.company} ({c.id})
+                </option>
+              ))}
+            </select>
+          </div>
 
           <button
             onClick={() => setIsUploading(true)}

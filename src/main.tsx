@@ -4,22 +4,19 @@ import { MediaProvider } from './context/MediaContext.tsx';
 import { AdminAuthProvider } from './context/AdminAuthContext.tsx';
 import { FirmDataProvider } from './context/FirmDataContext.tsx';
 import { VaultProvider } from './context/VaultContext.tsx';
-import { VaultAuthProvider } from './context/VaultAuthContext.tsx';
 import { GlobalErrorBoundary } from './components/GlobalErrorBoundary.tsx';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
   <GlobalErrorBoundary>
-    <VaultAuthProvider>
-      <AdminAuthProvider>
-        <FirmDataProvider>
-          <MediaProvider>
-            <VaultProvider>
-              <App />
-            </VaultProvider>
-          </MediaProvider>
-        </FirmDataProvider>
-      </AdminAuthProvider>
-    </VaultAuthProvider>
+    <AdminAuthProvider>
+      <FirmDataProvider>
+        <MediaProvider>
+          <VaultProvider>
+            <App />
+          </VaultProvider>
+        </MediaProvider>
+      </FirmDataProvider>
+    </AdminAuthProvider>
   </GlobalErrorBoundary>
 );
