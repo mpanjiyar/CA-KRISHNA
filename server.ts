@@ -13,8 +13,9 @@ const isProduction = process.env.NODE_ENV === 'production';
 const PORT = process.env.PORT || 3000;
 
 // Path to persistent database file
-const DATA_DIR = path.resolve(__dirname, 'data');
-const DB_FILE = path.resolve(DATA_DIR, 'vault_server_db.json');
+const DATA_DIR = process.env.VERCEL ? path.resolve('/tmp', 'data') : path.resolve(__dirname, 'data');
+const SEED_DB_FILE = path.resolve(__dirname, 'data', 'vault_server_db.json');
+const DB_FILE = process.env.VERCEL ? path.resolve(DATA_DIR, 'vault_server_db.json') : path.resolve(__dirname, 'data', 'vault_server_db.json');
 
 // --- Cryptographic Password Utilities (PBKDF2) ---
 function hashPassword(password: string): string {
@@ -681,15 +682,24 @@ class VaultDatabaseManager {
   }
 
   private ensureDataDirectory() {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+    try {
+      if (!fs.existsSync(DATA_DIR)) {
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+      }
+    } catch (e) {
+      console.warn('Filesystem notice (ensuring data dir):', e);
     }
   }
 
   private loadDatabase(): VaultDatabase {
     try {
-      if (fs.existsSync(DB_FILE)) {
-        const raw = fs.readFileSync(DB_FILE, 'utf-8');
+      let fileToRead = DB_FILE;
+      if (!fs.existsSync(fileToRead) && fs.existsSync(SEED_DB_FILE)) {
+        fileToRead = SEED_DB_FILE;
+      }
+
+      if (fs.existsSync(fileToRead)) {
+        const raw = fs.readFileSync(fileToRead, 'utf-8');
         const parsed = JSON.parse(raw);
         let modified = false;
 
@@ -725,7 +735,7 @@ class VaultDatabaseManager {
         return parsed;
       }
     } catch (e) {
-      console.error('Failed to load database file, creating fresh:', e);
+      console.warn('Failed to load database file, falling back to initial database:', e);
     }
     const fresh = createInitialDatabase();
     this.saveDatabase(fresh);
@@ -735,9 +745,10 @@ class VaultDatabaseManager {
   public saveDatabase(data?: VaultDatabase) {
     if (data) this.db = data;
     try {
+      this.ensureDataDirectory();
       fs.writeFileSync(DB_FILE, JSON.stringify(this.db, null, 2), 'utf-8');
     } catch (e) {
-      console.error('Failed to write database file:', e);
+      console.warn('Filesystem notice (writing database file):', e);
     }
   }
 
@@ -858,11 +869,20 @@ function getClientMeta(req: Request) {
 // In-memory 2FA verification temp tokens
 const temp2FATokens = new Map<string, { userId: string; expiresAt: number; code: string }>();
 
-// --- Server Setup ---
-async function startServer() {
-  const app = express();
-  app.use(cors());
-  app.use(express.json({ limit: '30mb' }));
+// --- Server Application & Routes Initialization ---
+export const app = express();
+app.use(cors());
+app.use(express.json({ limit: '30mb' }));
+
+// Health Check Endpoint
+app.get('/api/health', (_req: Request, res: Response) => {
+  res.json({
+    status: 'ok',
+    service: 'Panjiyar CA Client Vault API',
+    timestamp: new Date().toISOString(),
+    environment: isProduction ? 'production' : 'development'
+  });
+});
 
   // ==========================================
   // API ROUTE 1: Login
@@ -2029,8 +2049,9 @@ async function startServer() {
   });
 
   // ==========================================
-  // Static Assets / Vite Integration
+  // Static Assets / Vite Integration & Server Startup
   // ==========================================
+async function startServer() {
   if (!isProduction) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -2044,12 +2065,19 @@ async function startServer() {
     });
   }
 
-  app.listen(Number(PORT), '0.0.0.0', () => {
-    console.log(`[Panjiyar CA Vault] Server running on http://0.0.0.0:${PORT}`);
+  // Only start listening when not running as Vercel serverless function
+  if (!process.env.VERCEL) {
+    app.listen(Number(PORT), '0.0.0.0', () => {
+      console.log(`[Panjiyar CA Vault] Server running on http://0.0.0.0:${PORT}`);
+    });
+  }
+}
+
+if (!process.env.VERCEL) {
+  startServer().catch((err) => {
+    console.error('Failed to start server:', err);
+    process.exit(1);
   });
 }
 
-startServer().catch((err) => {
-  console.error('Failed to start server:', err);
-  process.exit(1);
-});
+export default app;
