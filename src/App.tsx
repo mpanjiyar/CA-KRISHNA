@@ -158,6 +158,15 @@ export default function App() {
     );
   }
 
+  if (currentRoute === 'portal') {
+    return (
+      <div className="min-h-screen bg-[#F7F9FC] font-inter">
+        <ScrollProgressBar />
+        <ClientPortal onBackToWebsite={() => handleNavigate('home')} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#172033] font-inter pb-16 md:pb-0">
       {/* Scroll Progress Indicator Line (Every Page) */}
@@ -292,12 +301,7 @@ export default function App() {
           </div>
         )}
 
-        {/* VIEW 7: Client Document & Verification Vault Portal */}
-        {currentRoute === 'portal' && (
-          <ClientPortal />
-        )}
-
-        {/* VIEW 8: Contact Page */}
+        {/* VIEW 7: Contact Page */}
         {currentRoute === 'contact' && (
           <ContactSection />
         )}

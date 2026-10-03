@@ -38,7 +38,7 @@ export const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
   defaultAccountType = 'client',
   onSuccessToast
 }) => {
-  const { createUser, projects, roleTemplates, generateSecurePassword, sendInvitation } = useVault();
+  const { createUser, projects, roleTemplates, generateSecurePassword, sendInvitation, adminSetPassword } = useVault();
 
   const [accountType, setAccountType] = useState<VaultAccountType>(defaultAccountType);
   const [fullName, setFullName] = useState('');
@@ -115,8 +115,13 @@ export const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
       loginDisabled: status === 'Suspended' || status === 'Inactive',
       twoFactorEnabled: accountType === 'super_admin' || accountType === 'staff',
       permissions: finalPermissions,
-      sectionAccess: finalSections
+      sectionAccess: finalSections,
+      canSelfManageCredentials: false
     });
+
+    if (password.trim()) {
+      adminSetPassword(newUser.id, password.trim(), true);
+    }
 
     if (sendInviteChecked) {
       sendInvitation({

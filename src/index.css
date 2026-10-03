@@ -66,6 +66,11 @@
 }
 
 /* Subtle performance-optimized animations */
+.backdrop-blur-xs {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
 @keyframes fadeInSlideUp {
   from {
     opacity: 0;
@@ -80,6 +85,146 @@
 .animate-fade-slide-up {
   animation: fadeInSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   will-change: opacity, transform;
+}
+
+/* Tailwind-animate compatibility classes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoomIn95 {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInFromTop2 {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromBottom2 {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation-fill-mode: both;
+  will-change: opacity, transform;
+}
+
+.animate-in.fade-in {
+  animation-name: fadeIn;
+  animation-duration: 0.2s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-in.zoom-in-95 {
+  animation-name: zoomIn95;
+  animation-duration: 0.2s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-in.slide-in-from-top-2 {
+  animation-name: slideInFromTop2;
+  animation-duration: 0.2s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-in.slide-in-from-bottom-2 {
+  animation-name: slideInFromBottom2;
+  animation-duration: 0.2s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.duration-150 {
+  animation-duration: 150ms !important;
+  transition-duration: 150ms !important;
+}
+
+.duration-200 {
+  animation-duration: 200ms !important;
+  transition-duration: 200ms !important;
+}
+
+.duration-300 {
+  animation-duration: 300ms !important;
+  transition-duration: 300ms !important;
+}
+
+@keyframes vaultFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes vaultZoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes vaultSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-vault-fade {
+  animation: vaultFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+}
+
+.animate-vault-zoom {
+  animation: vaultZoomIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+}
+
+.animate-vault-slide {
+  animation: vaultSlideDown 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+}
+
+.folder-tab-hover {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.folder-tab-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px -4px rgba(9, 105, 199, 0.12), 0 4px 6px -2px rgba(6, 42, 90, 0.04);
 }
 
 .card-hover-lift {

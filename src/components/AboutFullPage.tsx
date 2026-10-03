@@ -67,31 +67,58 @@ export const AboutFullPage: React.FC<AboutFullPageProps> = ({
         {/* Section: CA Krishna Panjiyar */}
         <section className="mb-10 sm:mb-14 p-6 sm:p-8 rounded-2xl bg-[#F7F9FC] border border-[#D9E2EC]">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 items-center">
-            <div className="md:col-span-4 flex flex-col items-center text-center">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white border border-[#D9E2EC] shadow-sm mb-3 flex items-center justify-center overflow-hidden p-1">
-                {settings.founderPhoto && !imageError ? (
-                  <img
-                    key={settings.founderPhoto}
-                    src={settings.founderPhoto}
-                    alt={firmDetails.founder}
-                    className="w-full h-full object-cover rounded-full"
-                    onError={() => setImageError(true)}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                ) : (
-                  <CaEmblem sizePx={72} />
-                )}
+            <div className="md:col-span-5 flex flex-col items-center text-center">
+              <div className="relative mb-4">
+                <div className="w-48 h-48 xs:w-56 xs:h-56 sm:w-64 sm:h-64 lg:w-72 lg:h-72 rounded-full bg-white border-3 border-[#0969C7]/30 shadow-lg flex items-center justify-center overflow-hidden p-1.5 sm:p-2 transition-all ring-4 ring-[#EEF5FC]">
+                  {settings.founderPhoto && !imageError ? (
+                    <img
+                      key={settings.founderPhoto}
+                      src={settings.founderPhoto}
+                      alt={firmDetails.founder}
+                      className="w-full h-full object-cover object-center rounded-full"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+                      onError={() => setImageError(true)}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <CaEmblem sizePx={128} />
+                  )}
+                </div>
+
+                {/* Verified Badge Icon */}
+                <div 
+                  className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 flex items-center justify-center filter drop-shadow-md transition-transform hover:scale-110" 
+                  title="Verified Chartered Accountant (ICAI Member)"
+                  aria-label="Verified Badge"
+                >
+                  <svg className="w-7 h-7 sm:w-8 sm:h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path 
+                      d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" 
+                      fill="#0969C7" 
+                      stroke="#FFFFFF" 
+                      strokeWidth="1.2" 
+                    />
+                    <path 
+                      d="m9 12 2 2 4-4" 
+                      fill="none"
+                      stroke="#FFFFFF" 
+                      strokeWidth="2.4" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                    />
+                  </svg>
+                </div>
               </div>
-              <h3 className="font-brand font-bold text-base sm:text-lg text-[#062A5A]">
+              <h3 className="font-brand font-bold text-base sm:text-xl text-[#062A5A]">
                 {firmDetails.founder}
               </h3>
-              <p className="text-xs uppercase tracking-wider font-semibold text-[#0969C7]">
+              <p className="text-xs uppercase tracking-wider font-semibold text-[#0969C7] mt-1">
                 {firmDetails.founderTitle}
               </p>
             </div>
 
-            <div className="md:col-span-8">
+            <div className="md:col-span-7">
               <h2 className="font-manrope text-xl sm:text-2xl font-bold text-[#062A5A] mb-1.5 tracking-tight">
                 {firmDetails.founder}
               </h2>

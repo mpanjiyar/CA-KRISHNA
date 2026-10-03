@@ -56,6 +56,7 @@ export const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
   const [editEmail, setEditEmail] = useState('');
   const [editPhone, setEditPhone] = useState('');
   const [editRole, setEditRole] = useState('');
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
 
   if (!user) return null;
 
@@ -469,20 +470,38 @@ export const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
                 {user.status === 'Suspended' ? 'Re-activate Account' : 'Suspend Access'}
               </button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  if (window.confirm(`Permanently remove ${user.fullName} (${user.id}) from Client Vault?`)) {
-                    deleteUser(user.id);
-                    onSuccessToast(`User ${user.fullName} removed.`);
-                    onClose();
-                  }
-                }}
-                className="px-3 py-1.5 rounded-lg text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors flex items-center gap-1"
-              >
-                <Trash2 size={13} />
-                <span>Delete Account</span>
-              </button>
+              {isConfirmingDelete ? (
+                <div className="flex items-center gap-1.5 bg-rose-50 p-1 rounded-lg border border-rose-200">
+                  <span className="text-[11px] font-bold text-rose-700 px-1">Confirm delete?</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      deleteUser(user.id);
+                      onSuccessToast(`User ${user.fullName} removed.`);
+                      onClose();
+                    }}
+                    className="px-2 py-1 rounded bg-rose-600 hover:bg-rose-700 text-white text-[10.5px] font-bold cursor-pointer"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsConfirmingDelete(false)}
+                    className="px-2 py-1 rounded bg-white hover:bg-slate-100 text-slate-700 text-[10.5px] font-semibold border border-slate-200 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIsConfirmingDelete(true)}
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors flex items-center gap-1 cursor-pointer"
+                >
+                  <Trash2 size={13} />
+                  <span>Delete Account</span>
+                </button>
+              )}
             </div>
           </div>
         </div>

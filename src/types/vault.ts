@@ -53,6 +53,10 @@ export interface VaultUser {
   forcePasswordChange: boolean;
   loginDisabled: boolean;
   twoFactorEnabled: boolean;
+  canSelfManageCredentials?: boolean; // When false, only Admin can manage credentials
+  passwordHash?: string; // PBKDF2 WebCrypto hash
+  passwordSalt?: string; // Salt for PBKDF2
+  lastPasswordChange?: string;
   permissions: UserPermissions;
   sectionAccess: VaultSectionName[];
   activeSessionsCount: number;
@@ -86,6 +90,10 @@ export interface VaultFileItem {
   uploadedBy: string;
   sha256Hash: string;
   encryptionStandard: string;
+  verificationStatus?: 'Verified' | 'Under Review' | 'Action Required';
+  reviewedBy?: string;
+  previewContent?: string;
+  tags?: string[];
   permissions: {
     canView: boolean;
     canUpload: boolean;
@@ -97,6 +105,27 @@ export interface VaultFileItem {
     canMove: boolean;
   };
   fileUrl?: string;
+}
+
+export interface VaultFolder {
+  id: string;
+  name: VaultFileItem['folder'];
+  displayName: string;
+  description: string;
+  color: string;
+  iconName: string;
+  itemCount?: number;
+  totalSize?: string;
+}
+
+export interface VaultSession {
+  user: VaultUser;
+  token: string;
+  loginTime: string;
+  expiresAt: string;
+  ipAddress: string;
+  deviceInfo: string;
+  twoFactorVerified: boolean;
 }
 
 export interface VaultInvitation {

@@ -1,6 +1,7 @@
 import {
   VaultUser,
   VaultProject,
+  VaultFolder,
   VaultFileItem,
   VaultInvitation,
   VaultAuditLogEntry,
@@ -419,6 +420,113 @@ export const INITIAL_USERS: VaultUser[] = [
   }
 ];
 
+export const INITIAL_FOLDERS: VaultFolder[] = [
+  {
+    id: 'FLD-DOCS',
+    name: 'Documents & Certificates',
+    slug: 'documents',
+    clientId: 'all',
+    description: 'Statutory audit reports, CA certified balance sheets, and formal tax declarations.',
+    color: 'blue',
+    icon: 'FileText',
+    createdAt: '2026-01-01',
+    createdBy: 'CA Krishna Panjiyar',
+    isSystem: true,
+    permissions: { canView: true, canUpload: true, canDownload: true, canEdit: true, canDelete: false }
+  },
+  {
+    id: 'FLD-REPORTS',
+    name: 'Audit & Tax Reports',
+    slug: 'reports',
+    clientId: 'all',
+    description: 'Detailed Form 3CD schedules, transfer pricing dossiers, and GSTR-9C certifications.',
+    color: 'emerald',
+    icon: 'FileSpreadsheet',
+    createdAt: '2026-01-01',
+    createdBy: 'CA Krishna Panjiyar',
+    isSystem: true,
+    permissions: { canView: true, canUpload: true, canDownload: true, canEdit: true, canDelete: false }
+  },
+  {
+    id: 'FLD-INVOICES',
+    name: 'Invoices & Financing',
+    slug: 'invoices',
+    clientId: 'all',
+    description: 'Bank CMA working capital dossiers, term loan appraisals, and commercial invoices.',
+    color: 'amber',
+    icon: 'FileSpreadsheet',
+    createdAt: '2026-01-01',
+    createdBy: 'CA Krishna Panjiyar',
+    isSystem: true,
+    permissions: { canView: true, canUpload: true, canDownload: true, canEdit: true, canDelete: false }
+  },
+  {
+    id: 'FLD-PHOTOS',
+    name: 'Inspection & Site Photos',
+    slug: 'photos',
+    clientId: 'all',
+    description: 'Physical inventory verification, plant inspection visuals, and registered office geotagged photos.',
+    color: 'purple',
+    icon: 'Image',
+    createdAt: '2026-01-01',
+    createdBy: 'CA Krishna Panjiyar',
+    isSystem: true,
+    permissions: { canView: true, canUpload: true, canDownload: true, canEdit: true, canDelete: false }
+  },
+  {
+    id: 'FLD-VIDEOS',
+    name: 'Meeting & Audit Recordings',
+    slug: 'videos',
+    clientId: 'all',
+    description: 'Board audit committee briefings, ROC compliance discussions, and video depositions.',
+    color: 'indigo',
+    icon: 'Video',
+    createdAt: '2026-01-01',
+    createdBy: 'CA Krishna Panjiyar',
+    isSystem: true,
+    permissions: { canView: true, canUpload: true, canDownload: true, canEdit: true, canDelete: false }
+  },
+  {
+    id: 'FLD-CONTRACTS',
+    name: 'Agreements & NDAs',
+    slug: 'contracts',
+    clientId: 'all',
+    description: 'Confidential corporate agreements, partner NDAs, and engagement engagement letters.',
+    color: 'cyan',
+    icon: 'Folder',
+    createdAt: '2026-01-01',
+    createdBy: 'CA Krishna Panjiyar',
+    isSystem: true,
+    permissions: { canView: true, canUpload: true, canDownload: true, canEdit: true, canDelete: false }
+  },
+  {
+    id: 'FLD-APX-TAX',
+    name: 'FY 2025-26 Tax Workpapers',
+    slug: 'apex-tax-workpapers',
+    clientId: 'USR-CL-101',
+    description: 'Exclusive working files for Apex Precision Engineering Ltd tax audit engagement.',
+    color: 'blue',
+    icon: 'Shield',
+    createdAt: '2026-04-10',
+    createdBy: 'CA Krishna Panjiyar',
+    isSystem: false,
+    permissions: { canView: true, canUpload: true, canDownload: true, canEdit: true, canDelete: true }
+  },
+  {
+    id: 'FLD-NEX-GST',
+    name: 'GST Reconciliation Archive',
+    slug: 'nexus-gst-archive',
+    clientId: 'USR-CL-102',
+    description: 'Exclusive monthly GSTR-2B vs ERP reconciliation worksheets for Nexus BioPharma.',
+    color: 'emerald',
+    icon: 'Briefcase',
+    createdAt: '2026-05-20',
+    createdBy: 'CA Sneha Mehta',
+    isSystem: false,
+    permissions: { canView: true, canUpload: true, canDownload: true, canEdit: true, canDelete: true }
+  }
+];
+
 export const INITIAL_FILES: VaultFileItem[] = [
   {
     id: 'FIL-1001',
@@ -430,7 +538,8 @@ export const INITIAL_FILES: VaultFileItem[] = [
     clientName: 'Apex Precision Engineering Ltd',
     projectId: 'PRJ-MUM-01',
     projectName: 'Statutory & Tax Audit FY 2025-26',
-    folder: 'Documents',
+    folderId: 'FLD-DOCS',
+    folder: 'Documents & Certificates',
     uploadDate: '2026-08-15',
     uploadedBy: 'CA Krishna Panjiyar',
     sha256Hash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
@@ -442,21 +551,33 @@ export const INITIAL_FILES: VaultFileItem[] = [
       canEdit: false,
       canDelete: false,
       canShare: true,
-      canRename: false,
-      canMove: false
-    }
+      canRename: true,
+      canMove: true
+    },
+    previewContent: `PANJIYAR KRISHNA & CO.
+CHARTERED ACCOUNTANTS
+Firm Regn No: 035129N | Peer Reviewed Unit
+
+INDEPENDENT AUDITOR'S REPORT
+To the Members of Apex Precision Engineering Ltd
+
+1. Opinion
+We have audited the accompanying standalone financial statements of Apex Precision Engineering Ltd, which comprise the Balance Sheet as at March 31, 2025, and the Statement of Profit and Loss and Statement of Cash Flows for the year then ended.
+
+In our opinion and to the best of our information and according to the explanations given to us, the aforesaid financial statements give the information required by the Companies Act, 2013 in the manner so required and give a true and fair view in conformity with the accounting principles generally accepted in India.`
   },
   {
     id: 'FIL-1002',
     title: 'Form 3CD Tax Audit Statement',
     fileName: 'Form_3CD_Tax_Audit_Statement_FY25.pdf',
-    fileType: 'document',
+    fileType: 'report',
     fileSize: '2.1 MB',
     clientId: 'USR-CL-101',
     clientName: 'Apex Precision Engineering Ltd',
     projectId: 'PRJ-MUM-01',
     projectName: 'Statutory & Tax Audit FY 2025-26',
-    folder: 'Reports',
+    folderId: 'FLD-REPORTS',
+    folder: 'Audit & Tax Reports',
     uploadDate: '2026-08-18',
     uploadedBy: 'CA Sneha Mehta',
     sha256Hash: 'a7c93e4b11f32890cdfa457788102aef649bc33198de7422bcde1029471abef1',
@@ -468,9 +589,21 @@ export const INITIAL_FILES: VaultFileItem[] = [
       canEdit: false,
       canDelete: false,
       canShare: false,
-      canRename: false,
-      canMove: false
-    }
+      canRename: true,
+      canMove: true
+    },
+    previewContent: `FORM NO. 3CD
+[See rule 6G(2)]
+Statement of particulars required to be furnished under section 44AB of the Income-tax Act, 1961
+
+1. Name of the assessee: Apex Precision Engineering Ltd
+2. Address: Plot 44-A, MIDC Industrial Area, Andheri (East), Mumbai 400093
+3. Permanent Account Number (PAN): AAACA1234F
+4. Status: Domestic Company
+5. Previous year ended: 31st March, 2025
+6. Assessment year: 2025-26
+
+Clauses 13 to 44: Audited without qualification. Depreciation schedule conforms with Appendix I.`
   },
   {
     id: 'FIL-1003',
@@ -482,7 +615,8 @@ export const INITIAL_FILES: VaultFileItem[] = [
     clientName: 'Nexus BioPharma Solutions',
     projectId: 'PRJ-MUM-02',
     projectName: 'GSTR-9 & 9C Annual Reconciliation',
-    folder: 'Reports',
+    folderId: 'FLD-REPORTS',
+    folder: 'Audit & Tax Reports',
     uploadDate: '2026-09-02',
     uploadedBy: 'Rohan Verma',
     sha256Hash: '98d5a1e2f8c7b3990412e8bcde219a55743b1239cdfe80447192aabbccddeeff',
@@ -494,21 +628,34 @@ export const INITIAL_FILES: VaultFileItem[] = [
       canEdit: false,
       canDelete: false,
       canShare: true,
-      canRename: false,
-      canMove: false
-    }
+      canRename: true,
+      canMove: true
+    },
+    previewContent: `FORM GSTR-9C
+[See rule 80(3)]
+PART A - RECONCILIATION STATEMENT
+
+GSTIN: 27AABCN8890K1ZP
+Legal Name: Nexus BioPharma Solutions Pvt Ltd
+Financial Year: 2024-25
+
+Gross Turnover as per audited financial statements: ₹48,22,50,000/-
+Taxable Turnover: ₹46,80,00,000/-
+Eligible Input Tax Credit reconciled with GSTR-2B: ₹5,41,20,000/-
+No adverse tax leakage or reverse charge discrepancy identified.`
   },
   {
     id: 'FIL-1004',
     title: 'Bank CMA Model & 7-Year Cash Flows',
     fileName: 'Bluecrest_CMA_WorkingCapital_14Cr.xlsx',
-    fileType: 'contract',
+    fileType: 'spreadsheet',
     fileSize: '8.4 MB',
     clientId: 'USR-CL-103',
     clientName: 'Bluecrest Logistics & Cold Storage',
     projectId: 'PRJ-MUM-03',
     projectName: 'Bank Loan CMA Project Financing',
-    folder: 'Invoices',
+    folderId: 'FLD-INVOICES',
+    folder: 'Invoices & Financing',
     uploadDate: '2026-06-25',
     uploadedBy: 'CA Krishna Panjiyar',
     sha256Hash: '1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b',
@@ -520,9 +667,18 @@ export const INITIAL_FILES: VaultFileItem[] = [
       canEdit: false,
       canDelete: false,
       canShare: false,
-      canRename: false,
-      canMove: false
-    }
+      canRename: true,
+      canMove: true
+    },
+    previewContent: `BANK CONSORTIUM CREDIT APPRAISAL DOSSIER
+Borrower: Bluecrest Logistics & Cold Storage Ltd
+Facility: ₹14.50 Crore Working Capital & Cold Chain Expansion
+
+Summary of Financial Ratios:
+- Current Ratio: 1.48 (Norm: > 1.33)
+- Debt Service Coverage Ratio (DSCR): 2.14x (Average over 7 years)
+- Fixed Asset Coverage Ratio: 1.85x
+- Break-Even Capacity Utilization: 42.8%`
   },
   {
     id: 'FIL-1005',
@@ -534,7 +690,8 @@ export const INITIAL_FILES: VaultFileItem[] = [
     clientName: 'Vertex FinTech Pvt Ltd',
     projectId: 'PRJ-MUM-04',
     projectName: 'Cross-Border SaaS Export 15CA/15CB Compliance',
-    folder: 'Documents',
+    folderId: 'FLD-DOCS',
+    folder: 'Documents & Certificates',
     uploadDate: '2026-09-10',
     uploadedBy: 'CA Sneha Mehta',
     sha256Hash: '4f5e6d7c8b9a0123456789abcdef0123456789abcdef0123456789abcdef0123',
@@ -546,9 +703,18 @@ export const INITIAL_FILES: VaultFileItem[] = [
       canEdit: false,
       canDelete: false,
       canShare: true,
-      canRename: false,
-      canMove: false
-    }
+      canRename: true,
+      canMove: true
+    },
+    previewContent: `CERTIFICATE UNDER SECTION 195(6) OF THE INCOME-TAX ACT, 1961
+FORM NO. 15CB
+
+Name of Remitter: Vertex FinTech Pvt Ltd
+Name of Beneficiary: Cloud Infrastructure Inc, Delaware, USA
+Amount: USD 450,000 (INR Equivalent ₹3,78,00,000)
+Purpose: SaaS Cloud Hosting and API Gateway Services
+Applicable DTAA: India-USA DTAA Article 12 (Royalties & FTS)
+TDS Withholding Rate: 0% under Business Profits Article 7.`
   },
   {
     id: 'FIL-1006',
@@ -560,7 +726,8 @@ export const INITIAL_FILES: VaultFileItem[] = [
     clientName: 'Apex Precision Engineering Ltd',
     projectId: 'PRJ-MUM-01',
     projectName: 'Statutory & Tax Audit FY 2025-26',
-    folder: 'Photos',
+    folderId: 'FLD-PHOTOS',
+    folder: 'Inspection & Site Photos',
     uploadDate: '2026-07-20',
     uploadedBy: 'Rajesh Singhal',
     sha256Hash: '89abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567',
@@ -572,9 +739,14 @@ export const INITIAL_FILES: VaultFileItem[] = [
       canEdit: false,
       canDelete: false,
       canShare: false,
-      canRename: false,
-      canMove: false
-    }
+      canRename: true,
+      canMove: true
+    },
+    previewContent: `[GEOTAGGED INSPECTION IMAGE]
+Timestamp: 2026-07-20T14:32:10 IST
+Coordinates: 19.1136° N, 72.8697° E (MIDC Industrial Area, Andheri West, Mumbai)
+Verification Item: CNC Multi-Axis Milling Unit (Asset ID: CNC-MUM-09)
+Auditor Verification: CA Sneha Mehta (Physical asset tagged and matched with Block 3 Fixed Asset Register).`
   }
 ];
 

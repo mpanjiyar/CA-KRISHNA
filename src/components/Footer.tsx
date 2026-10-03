@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import { BrandHeaderLockup } from './CaLogo';
 import { PageRoute } from '../types';
 import { useFirmData } from '../context/FirmDataContext';
+import { ComplianceModal, ComplianceModalTab } from './ComplianceModal';
 
 interface FooterProps {
   onNavigate: (route: PageRoute, serviceId?: string) => void;
@@ -11,6 +12,13 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenConsultation }) => {
   const { firmDetails, services } = useFirmData();
+  const [complianceOpen, setComplianceOpen] = useState(false);
+  const [complianceTab, setComplianceTab] = useState<ComplianceModalTab>('privacy');
+
+  const handleOpenCompliance = (tab: ComplianceModalTab) => {
+    setComplianceTab(tab);
+    setComplianceOpen(true);
+  };
   return (
     <footer className="w-full bg-[#031C3D] text-white border-t border-[#062A5A] pb-16 md:pb-0">
       <div className="max-w-7xl mx-auto px-3.5 xs:px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 lg:pt-16 pb-10">
@@ -159,15 +167,34 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenConsultation }
           </p>
 
           <div className="flex items-center gap-3 sm:gap-4 text-slate-400 flex-wrap justify-center text-[11px] xs:text-xs">
-            <span className="hover:text-white cursor-pointer py-1">Privacy Policy</span>
-            <span>&middot;</span>
-            <span className="hover:text-white cursor-pointer py-1">Terms of Engagement</span>
-            <span>&middot;</span>
-            <span className="hover:text-white cursor-pointer py-1">Statutory Disclaimer</span>
+            <button 
+              type="button"
+              onClick={() => handleOpenCompliance('privacy')} 
+              className="hover:text-white cursor-pointer py-1 transition-colors"
+            >
+              Privacy Policy
+            </button>
             <span>&middot;</span>
             <button 
+              type="button"
+              onClick={() => handleOpenCompliance('terms')} 
+              className="hover:text-white cursor-pointer py-1 transition-colors"
+            >
+              Terms of Engagement
+            </button>
+            <span>&middot;</span>
+            <button 
+              type="button"
+              onClick={() => handleOpenCompliance('disclaimer')} 
+              className="hover:text-white cursor-pointer py-1 transition-colors"
+            >
+              Statutory Disclaimer
+            </button>
+            <span>&middot;</span>
+            <button 
+              type="button"
               onClick={() => onNavigate('admin')} 
-              className="hover:text-[#F28C18] text-slate-400 transition-colors py-1 flex items-center gap-1 font-medium"
+              className="hover:text-[#F28C18] text-slate-400 transition-colors py-1 flex items-center gap-1 font-medium cursor-pointer"
             >
               <span>Admin Portal</span>
             </button>
@@ -180,6 +207,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenConsultation }
         </p>
 
       </div>
+
+      {/* Compliance Information Modal */}
+      <ComplianceModal
+        isOpen={complianceOpen}
+        initialTab={complianceTab}
+        onClose={() => setComplianceOpen(false)}
+      />
     </footer>
   );
 };

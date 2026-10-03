@@ -35,6 +35,7 @@ export const PrivateVaultViewer: React.FC<PrivateVaultViewerProps> = ({ onSucces
   const [activeFolder, setActiveFolder] = useState<VaultFileItem['folder']>('Documents');
   const [searchQuery, setSearchQuery] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [confirmDeleteFileId, setConfirmDeleteFileId] = useState<string | null>(null);
 
   // New file form
   const [newTitle, setNewTitle] = useState('');
@@ -299,19 +300,37 @@ export const PrivateVaultViewer: React.FC<PrivateVaultViewerProps> = ({ onSucces
                         <Share2 size={15} />
                       </button>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (window.confirm(`Delete ${file.fileName} from client vault?`)) {
-                            deleteFile(file.id);
-                            onSuccessToast(`Removed ${file.fileName}`);
-                          }
-                        }}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50"
-                        title="Purge File"
-                      >
-                        <Trash2 size={15} />
-                      </button>
+                      {confirmDeleteFileId === file.id ? (
+                        <div className="flex items-center gap-1 bg-rose-50 px-1 py-0.5 rounded border border-rose-200">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              deleteFile(file.id);
+                              onSuccessToast(`Removed ${file.fileName}`);
+                              setConfirmDeleteFileId(null);
+                            }}
+                            className="text-[10px] text-white font-bold bg-rose-600 hover:bg-rose-700 px-1.5 py-0.5 rounded cursor-pointer"
+                          >
+                            Delete
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setConfirmDeleteFileId(null)}
+                            className="text-[10px] text-slate-600 bg-white hover:bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setConfirmDeleteFileId(file.id)}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 cursor-pointer"
+                          title="Purge File"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}

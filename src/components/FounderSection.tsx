@@ -29,7 +29,7 @@ export const FounderSection: React.FC = () => {
             <div className="md:col-span-4 flex flex-col items-center text-center">
               <div className="relative mb-3 sm:mb-4">
                 {/* Circular Profile Frame with ICAI Colors or Uploaded Photo - Enlarged for prestige */}
-                <div className="w-32 h-32 xs:w-36 xs:h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 rounded-full bg-gradient-to-br from-[#062A5A] via-[#0969C7] to-[#F28C18]/60 p-1 sm:p-1.5 shadow-md flex items-center justify-center overflow-hidden">
+                <div className="w-44 h-44 xs:w-52 xs:h-52 sm:w-60 sm:h-60 md:w-64 md:h-64 rounded-full bg-gradient-to-br from-[#062A5A] via-[#0969C7] to-[#F28C18]/60 p-1.5 sm:p-2 shadow-lg flex items-center justify-center overflow-hidden ring-4 ring-[#EEF5FC]">
                   <div className={`w-full h-full rounded-full bg-white flex flex-col items-center justify-center overflow-hidden ${settings.founderPhoto && !imageError ? 'p-0' : 'p-3'}`}>
                     {settings.founderPhoto && !imageError ? (
                       <img
@@ -53,9 +53,28 @@ export const FounderSection: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Verified Green Dot */}
-                <div className="absolute bottom-1.5 right-1.5 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#159447] text-white flex items-center justify-center border-2 border-white shadow-xs">
-                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                {/* Verified Badge Icon */}
+                <div 
+                  className="absolute bottom-1.5 right-1.5 sm:bottom-2 sm:right-2 flex items-center justify-center filter drop-shadow-md transition-transform hover:scale-110" 
+                  title="Verified Chartered Accountant (ICAI Member)"
+                  aria-label="Verified Badge"
+                >
+                  <svg className="w-7 h-7 sm:w-8 sm:h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path 
+                      d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" 
+                      fill="#0969C7" 
+                      stroke="#FFFFFF" 
+                      strokeWidth="1.2" 
+                    />
+                    <path 
+                      d="m9 12 2 2 4-4" 
+                      fill="none"
+                      stroke="#FFFFFF" 
+                      strokeWidth="2.4" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                    />
+                  </svg>
                 </div>
               </div>
 

@@ -117,6 +117,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
   const [editingReview, setEditingReview] = useState<ReviewItem | null>(null);
   const [isCreatingReview, setIsCreatingReview] = useState(false);
   const [reviewToDelete, setReviewToDelete] = useState<ReviewItem | null>(null);
+  const [genericConfirm, setGenericConfirm] = useState<{
+    title: string;
+    message: string;
+    confirmLabel?: string;
+    isDestructive?: boolean;
+    onConfirm: () => void | Promise<void>;
+  } | null>(null);
   const [reviewSearchQuery, setReviewSearchQuery] = useState('');
   const [reviewRatingFilter, setReviewRatingFilter] = useState<number | 'all'>('all');
 
@@ -785,13 +792,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={async () => {
-                    if (window.confirm('Reset all client reviews back to official firm default testimonials?')) {
-                      await resetReviewsToDefault();
-                      showToast('✓ Restored official firm reviews to default.');
-                    }
+                  onClick={() => {
+                    setGenericConfirm({
+                      title: 'Restore Default Testimonials',
+                      message: 'Are you sure you want to reset all client reviews back to official firm default testimonials?',
+                      confirmLabel: 'Restore Defaults',
+                      onConfirm: async () => {
+                        await resetReviewsToDefault();
+                        showToast('✓ Restored official firm reviews to default.');
+                      }
+                    });
                   }}
-                  className="px-3.5 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-600 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                  className="px-3.5 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-600 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <RotateCcw size={13} />
                   <span>Restore Defaults</span>
@@ -1195,12 +1207,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
 
                     <button
                       onClick={() => {
-                        if (window.confirm(`Are you sure you want to remove "${srv.name}"?`)) {
-                          deleteService(srv.id);
-                          showToast(`Service "${srv.name}" removed.`);
-                        }
+                        setGenericConfirm({
+                          title: 'Remove Service',
+                          message: `Are you sure you want to remove "${srv.name}" from published practice areas?`,
+                          confirmLabel: 'Delete Service',
+                          isDestructive: true,
+                          onConfirm: () => {
+                            deleteService(srv.id);
+                            showToast(`Service "${srv.name}" removed.`);
+                          }
+                        });
                       }}
-                      className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                       title="Delete service"
                     >
                       <Trash2 size={14} />
@@ -1290,12 +1308,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
 
                     <button
                       onClick={() => {
-                        if (window.confirm(`Are you sure you want to remove "${proj.title}"?`)) {
-                          deleteProject(proj.id);
-                          showToast(`Project removed.`);
-                        }
+                        setGenericConfirm({
+                          title: 'Remove Project',
+                          message: `Are you sure you want to remove "${proj.title}" from published mandates?`,
+                          confirmLabel: 'Delete Project',
+                          isDestructive: true,
+                          onConfirm: () => {
+                            deleteProject(proj.id);
+                            showToast(`Project removed.`);
+                          }
+                        });
                       }}
-                      className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                       title="Delete project"
                     >
                       <Trash2 size={14} />
@@ -1394,12 +1418,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
                     {!off.isHeadquarter && (
                       <button
                         onClick={() => {
-                          if (window.confirm(`Are you sure you want to remove ${off.city} office?`)) {
-                            deleteOffice(off.id);
-                            showToast(`Office removed.`);
-                          }
+                          setGenericConfirm({
+                            title: 'Remove Office',
+                            message: `Are you sure you want to remove ${off.city} office?`,
+                            confirmLabel: 'Delete Office',
+                            isDestructive: true,
+                            onConfirm: () => {
+                              deleteOffice(off.id);
+                              showToast(`Office removed.`);
+                            }
+                          });
                         }}
-                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                         title="Delete office"
                       >
                         <Trash2 size={14} />
@@ -1728,13 +1758,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
 
               <button
                 onClick={() => {
-                  if (window.confirm('Are you sure you want to reset all media, services, and content to initial verified defaults?')) {
-                    resetMediaDefaults();
-                    resetAllFirmData();
-                    showToast('All settings restored to factory defaults.');
-                  }
+                  setGenericConfirm({
+                    title: 'Reset Everything to Defaults',
+                    message: 'Are you sure you want to reset all media, services, and content to initial verified defaults? This action will overwrite local changes.',
+                    confirmLabel: 'Reset to Defaults',
+                    isDestructive: true,
+                    onConfirm: () => {
+                      resetMediaDefaults();
+                      resetAllFirmData();
+                      showToast('All settings restored to factory defaults.');
+                    }
+                  });
                 }}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold text-xs shadow-2xs transition-colors shrink-0"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold text-xs shadow-2xs transition-colors shrink-0 cursor-pointer"
               >
                 <RotateCcw size={14} />
                 <span>Reset to Factory Defaults</span>
@@ -2434,6 +2470,58 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToWebsite 
               >
                 <Save size={14} className="text-[#F28C18]" />
                 <span>Save Review</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Generic Confirmation Modal */}
+      {genericConfirm && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full border border-slate-200 shadow-2xl p-6 text-left my-auto space-y-4 animate-in zoom-in-95">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
+                genericConfirm.isDestructive ? 'bg-rose-50 border border-rose-200 text-rose-600' : 'bg-blue-50 border border-blue-200 text-[#0969C7]'
+              }`}>
+                <AlertCircle size={20} />
+              </div>
+              <div>
+                <h4 className="font-manrope font-bold text-base text-[#062A5A]">
+                  {genericConfirm.title}
+                </h4>
+                <p className="text-xs text-slate-500">
+                  Please confirm to proceed
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed">
+              {genericConfirm.message}
+            </p>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setGenericConfirm(null)}
+                className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 font-semibold text-xs hover:bg-slate-200 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  const action = genericConfirm.onConfirm;
+                  setGenericConfirm(null);
+                  await action();
+                }}
+                className={`px-5 py-2 rounded-xl font-bold text-xs text-white transition-colors shadow-2xs cursor-pointer ${
+                  genericConfirm.isDestructive
+                    ? 'bg-rose-600 hover:bg-rose-700'
+                    : 'bg-[#062A5A] hover:bg-[#031C3D]'
+                }`}
+              >
+                {genericConfirm.confirmLabel || 'Confirm'}
               </button>
             </div>
           </div>

@@ -54,23 +54,24 @@ export const VaultSecuritySettings: React.FC<VaultSecuritySettingsProps> = ({ on
     onSuccessToast('Reset security configuration to saved values.');
   };
 
+  const [confirmLogoutAllOpen, setConfirmLogoutAllOpen] = useState(false);
+
   const handleLogoutAllFirmSessions = () => {
-    if (
-      window.confirm(
-        'Are you sure you want to terminate all active sessions across all client and staff accounts? All users will need to re-authenticate.'
-      )
-    ) {
-      users.forEach((u) => {
-        updateUser(u.id, { activeSessionsCount: 0 });
-      });
-      addAuditLog(
-        'Firm-Wide Device Session Purge',
-        'Security',
-        'All active portal device tokens invalidated by Super Admin.',
-        'Warning'
-      );
-      onSuccessToast('All client and staff devices have been signed out.');
-    }
+    setConfirmLogoutAllOpen(true);
+  };
+
+  const handleExecuteLogoutAll = () => {
+    users.forEach((u) => {
+      updateUser(u.id, { activeSessionsCount: 0 });
+    });
+    addAuditLog(
+      'Firm-Wide Device Session Purge',
+      'Security',
+      'All active portal device tokens invalidated by Super Admin.',
+      'Warning'
+    );
+    setConfirmLogoutAllOpen(false);
+    onSuccessToast('All client and staff devices have been signed out.');
   };
 
   return (
@@ -278,6 +279,48 @@ export const VaultSecuritySettings: React.FC<VaultSecuritySettingsProps> = ({ on
           </button>
         </div>
       </div>
+
+      {/* Terminate All Sessions Confirmation Modal */}
+      {confirmLogoutAllOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full border border-slate-200 shadow-2xl p-6 text-left my-auto space-y-4 animate-in zoom-in-95">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shrink-0">
+                <AlertTriangle size={20} />
+              </div>
+              <div>
+                <h4 className="font-manrope font-bold text-base text-[#062A5A]">
+                  Terminate All Device Sessions?
+                </h4>
+                <p className="text-xs text-slate-500">
+                  Firm-Wide Security Invalidation
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed">
+              This action will immediately terminate all active browser and device sessions across all client and staff accounts. All portal users will be required to re-authenticate with their credentials.
+            </p>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setConfirmLogoutAllOpen(false)}
+                className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 font-semibold text-xs hover:bg-slate-200 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleExecuteLogoutAll}
+                className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-colors shadow-2xs cursor-pointer"
+              >
+                Confirm Terminate All
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 };
